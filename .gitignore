@@ -1,0 +1,6 @@
+*.bat
+*.tmp
+*.map
+*.obj
+*.exe
+*.hex

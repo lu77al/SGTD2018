@@ -1,0 +1,107 @@
+SEGMENTBASE $00
+$00	r0
+$01	r1
+$02	r2
+$03	r3
+$04	r4
+$05	r5
+$06	r6
+$07	r7
+$08	r8
+$09	r9
+$0A	r10
+$0B	r11
+$0C	r12
+$0D	r13
+$0E	r14
+$0F	r15
+$10	r16
+$11	r17
+$12	r18
+$13	r19
+$14	r20
+$15	r21
+$16	r22
+$17	r23
+$18	r24
+$19	r25
+$1A	r26(XL)
+$1B	r27(XH)
+$1C	r28(YL)
+$1D	r29(YH)
+$1E	r30(ZL)
+$1F	r31(ZH)
+SEGMENTBASE $20
+.equ	SREG	=$3f
+.equ	SPH	=$3e
+.equ	SPL	=$3d
+.equ	GIMSK	=$3b
+.equ	GICR	=$3b
+.equ	GIFR	=$3a
+.equ	TIMSK	=$39
+.equ	TIFR	=$38
+.equ	SPMCR	=$37
+.equ    I2CR    =$36
+.equ    TWCR    =$36
+.equ    MCUCR   =$35
+.equ    MCUSR   =$34
+.equ    MCUCSR  =$34
+.equ	TCCR0	=$33
+.equ	TCNT0	=$32
+.equ    OSCCAL  =$31
+.equ    SFIOR   =$30
+.equ	TCCR1A	=$2f
+.equ	TCCR1B	=$2e
+.equ	TCNT1H	=$2d
+.equ	TCNT1L	=$2c
+.equ	OCR1AH	=$2b
+.equ	OCR1AL	=$2a
+.equ	OCR1BH	=$29
+.equ	OCR1BL	=$28
+.equ	ICR1H	=$27
+.equ	ICR1L	=$26
+.equ	TCCR2	=$25
+.equ	TCNT2	=$24
+.equ	OCR2	=$23
+.equ	ASSR	=$22
+.equ	WDTCR	=$21
+.equ    UBRRH   =$20
+.equ	EEARH	=$1f
+.equ	EEARL	=$1e
+.equ	EEDR	=$1d
+.equ	EECR	=$1c
+.equ	PORTB	=$18
+.equ	DDRB	=$17
+.equ	PINB	=$16
+.equ	PORTC	=$15
+.equ	DDRC	=$14
+.equ	PINC	=$13
+.equ	PORTD	=$12
+.equ	DDRD	=$11
+.equ	PIND	=$10
+.equ	SPDR	=$0f
+.equ	SPSR	=$0e
+.equ	SPCR	=$0d
+.equ	UDR	=$0c
+.equ	UCSRA	=$0b
+.equ	UCSRB	=$0a
+.equ	UCSRC	=$20
+.equ	UBRRL	=$09
+.equ	ACSR	=$08
+.equ    ADMUX   =$07
+.equ    ADCSR   =$06
+.equ	ADCSRA	=$06
+.equ    ADCH    =$05
+.equ    ADCL    =$04
+.equ    I2DR    =$03
+.equ    I2AR    =$02
+.equ    I2SR    =$01
+.equ    I2BR    =$00
+.equ    TWDR    =$03
+.equ    TWAR    =$02
+.equ    TWSR    =$01
+.equ    TWBR    =$00
+
+
+
+

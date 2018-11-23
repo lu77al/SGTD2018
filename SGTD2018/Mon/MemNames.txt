@@ -1,0 +1,31 @@
+Registers
+SEGMENTBASE $00
+$02	r2(SSREG)
+$03	r3(AFlags)
+$04	r4(BFlags)
+$05	r5(KS_Dead)
+$06	r6(KS_High)
+
+Yindexed VARS
+SEGMENTBASE $60
+
+.equ	YBUF = $60
+; --- Переменные ($60..$9F)
+.equ	Read_swtch	= $20
+.equ	Write_swtch	= $30
+
+SEGMENTBASE $170
+.equ	Second		= $00
+.equ	Minute		= $01
+.equ	Hour		= $02
+.equ	DayOfWeek	= $03
+.equ	Date		= $04
+.equ	Month		= $05
+.equ	Year		= $06
+.equ	CONTROL		= $07
+.equ	user00		= $08
+.equ	user01		= $09
+.equ	user02		= $0A
+.equ	user03		= $0B
+.equ	user04		= $0C
+.equ	user05		= $0D
