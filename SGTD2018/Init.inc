@@ -13,7 +13,7 @@ ini_1:	st	Z+,YH
 	cpi	ZH,2
 	brlo	ini_1
 
-	ldi_w	YH,YL,YBUF
+	ldi_w	YH,YL,YSEG
 	ldi_w	XH,XL,XSEG
 
 	clr	AFlags
@@ -22,6 +22,8 @@ ini_1:	st	Z+,YH
 	rcall	InitTact
 
 	rcall	InitUart
+
+	rcall	InitPWM
 
 
 	sei

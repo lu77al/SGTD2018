@@ -197,11 +197,11 @@ div_2:	sec
 
 ;***** Subroutine Register Variables
 
-.def	drem8u	=r15		;remainder
-.def	dres8u	=r16		;result
-.def	dd8u	=r16		;dividend
-.def	dv8u	=r17		;divisor
-.def	dcnt8u	=r18		;loop counter
+#define	drem8u	r15		;remainder
+#define	dres8u	r16		;result
+#define	dd8u	r16		;dividend
+#define	dv8u	r17		;divisor
+#define	dcnt8u	r18		;loop counter
 
 ;***** Code
 

@@ -7,19 +7,25 @@
 	.equ	bfRTCRead    = 0
 	.equ	bfRTCWrite   = 1
 
+.def	KS_Dead    = r5
+.def	KS_High    = r6
+
 
 #define	ZeroReg	YH
 
 .equ	XSEG = $100
-; --- Массивы ($100..$1FF)
-.equ	RTCBuf	  = $70
-.equ	RXBuf     = $80
-.equ	TXBuf     = $A0
+; --- Arrays ($100..$1FF)
+.equ	KS_Buf  = $00
+;.equ	TimeBuf = $03
+;.equ	ADCBuf	= $20
+;.equ	InputBuf= $30
+.equ	RXBuf   = $50
+.equ	TXBuf   = $70
 
  ; EditVal, Val
 
-.equ	YBUF = $60
-; --- Переменные ($60..$9F)
+.equ	YSEG = $60
+; --- Fast vars ($60..$9F)
 .equ	yMainCntL	= $00
 .equ	yMainCntM	= $01
 .equ	yMainCntH	= $02

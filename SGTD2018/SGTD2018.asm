@@ -9,8 +9,8 @@ reti			; INT1
 reti			; TIMER2 COMP
 reti			; TIMER2 OVF
 reti			; TIMER1 CAPT
-reti			; TIMER1 COMPA
-reti			; TIMER1 COMPB
+rjmp	SetKeysHigh	; TIMER1 COMPA
+rjmp	SetKeysLow	; TIMER1 COMPB
 reti			; TIMER1 OVF
 reti			; TIMER0 OVF
 reti			; SPI,STC
@@ -23,12 +23,13 @@ reti			; EE_RDY
 .include "UART.inc"
 .include "Tact.inc"
 .include "Subs.inc"
+.include "DriverLowLayer.inc"
 
 RESET:
 
 .include "Init.inc"
 
-
+	rcall	StartKeysTest
 Main:
 	tskTact
 RetTact:
