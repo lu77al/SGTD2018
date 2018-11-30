@@ -77,3 +77,49 @@ StartKeysTest:
 	st	X+,r17		; Low
 	sei
 	ret
+
+/*** Track rotor position and speed ***/
+TrackRotor:
+	in	r16,PORTC
+	lsr	r16
+	andi	r16,0b111	; Actual state of rotor sensors
+	ldd	ZL,Y+yRotorState ; Recorded state
+	cp	r16,ZL
+	brne	tr_1
+	ret		; Nothing changed !!! add logic
+tr_4:			; Incorrect step !!!  add logic
+	ret
+
+tr_1:	std	Y+yRotorState,r16
+	lsl	ZL
+	ldi	ZH,0
+	subi_w	ZH,ZL,-2*RotorMovement	; Pointer to raw
+	ldd	r18,Y+yPanPosL	; load current panel position
+	ldd	r19,Y+yPanPosM
+	ldd	r20,Y+yPanPosH
+	lpm	r17,Z+
+	cp	r16,r17	; is it step to west?
+	brne	tr_2
+	subi_w	r19,r18,-1 ; increase position
+	sbci	r20,$FF
+	rjmp	tr_3
+tr_2:	lpm	r17,Z+
+	cp	r16,r17	; is it step to east?
+	brne	tr_4
+	subi_w	r19,r18,1  ; decrease position
+	sbci	r20,0
+tr_3:	std	Y+yPanPosL,r18	; save current panel position
+	std	Y+yPanPosM,r19
+	std	Y+yPanPosH,r20
+	ret
+
+RotorMovement:	; Expected next states of rotor sensors ("+" - to west, "-" - to east)
+		;  +    -	current
+	.db	0b111,0b111	; 000 - ubnormal
+	.db	0b011,0b101	; 001
+	.db	0b110,0b011	; 010
+	.db	0b010,0b001	; 011
+	.db	0b101,0b110	; 100
+	.db	0b001,0b100	; 101
+	.db	0b100,0b010	; 110
+	.db	0b000,0b000	; 111 - ubnormal

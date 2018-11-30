@@ -39,7 +39,11 @@
 .equ	yADCSaveAddr	= $0A
 .equ	yADCChCnt	= $0B
 
-.equ	ySecond		= $10
+.equ	yRotorState	= $10
+.equ	yPanPosL	= $11
+.equ	yPanPosM	= $12
+.equ	yPanPosH	= $13
+
 .equ	yMinute		= $11
 .equ	yHour		= $12
 .equ	yRTCstage	= $13

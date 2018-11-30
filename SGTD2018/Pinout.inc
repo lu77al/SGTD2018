@@ -30,7 +30,17 @@
 11 AIN1		PORTD,7	- WEST_BUT^
 */
 
-#define	LED	PORTD,6
+#define	LED		PORTD,6
+
+#define	ROTOR_HS_POWER  PORTC,0
+#define	ROTOR_HS_POWER_ON  cbi ROTOR_HS_POWER
+#define	ROTOR_HS_POWER_OFF sbi ROTOR_HS_POWER
+
+#define	LIMIT_HS_POWER  PORTD,2
+#define	LIMIT_HS_POWER_ON  cbi LIMIT_HS_POWER
+#define	LIMIT_HS_POWER_OFF sbi LIMIT_HS_POWER
+
+
 
 ; --- Initial port state ---
 .macro	InitPorts
