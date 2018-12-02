@@ -1,7 +1,7 @@
 .def	SSREG	= r2
 
 .def	AFlags	= r3
-	.equ	afWait	= 0
+	.equ	afWestDir	= 0
 
 .def	BFlags	= r4
 	.equ	bfRTCRead    = 0
@@ -43,6 +43,11 @@
 .equ	yPanPosL	= $11
 .equ	yPanPosM	= $12
 .equ	yPanPosH	= $13
+.equ	yRotorHallsPort	= $14
+.equ	yJamPath	= $15
+.equ	yCurPeriod	= $16
+.equ	yLastPeriod	= $17
+
 
 .equ	yMinute		= $11
 .equ	yHour		= $12

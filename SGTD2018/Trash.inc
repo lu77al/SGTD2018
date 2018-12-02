@@ -1,3 +1,22 @@
+/*** Interrupt timer1 compare A (PWM -> high) ***/
+SetKeysHigh: 
+	out	PORTB,KS_Dead
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	out	PORTB,KS_High
+	reti	
+
+/*** Interrupt timer1 compare B (PWM -> low) ***/
+SetKeysLow:
+	out	PORTB,KS_Dead
+	lds	KS_Dead,XSEG+KS_Buf+0
+	lds	KS_High,XSEG+KS_Buf+1
+	lds	SSReg, XSEG+KS_Buf+2
+	out	PORTB,SSREG
+	reti
+
+
 	sbrs	BFlags,bfNoGrid
 	rjmp	a1_2
 	set

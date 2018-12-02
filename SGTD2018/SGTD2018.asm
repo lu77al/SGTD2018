@@ -20,6 +20,26 @@ reti			; UART, TX
 reti			; ADC
 reti			; EE_RDY
 
+DriveKeyTable:	; !!! Must be within first 256 bytes of PROM
+;HS	  High	   Dead		Halls
+.db	0b101010,0b000000 ; Not normal state (is used for key tests)
+;000	  + + +    0 0 0
+.db	0b010010,0b010000
+;001	  - 0 +    - 0 0   Ok
+.db	0b001001,0b000001
+;010	  0 + -    0 0 -   Ok
+.db	0b011000,0b010000
+;011	  - + 0    - 0 0   Ok
+.db	0b100100,0b000100
+;100	  + - 0    0 - 0   Ok
+.db	0b000110,0b000100
+;101	  0 - +	   0 - 0   Ok
+.db	0b100001,0b000001
+;110	  + 0 -    0 0 -   Ok
+.db	0b101010,0b000000 ; Not normal state (is used for key tests) 
+;111	  + + +    0 0 0 
+
+
 .include "UART.inc"
 .include "Tact.inc"
 .include "Subs.inc"
@@ -29,7 +49,6 @@ RESET:
 
 .include "Init.inc"
 
-	rcall	StartKeysTest
 Main:
 	tskTact
 RetTact:

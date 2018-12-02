@@ -1,6 +1,6 @@
 InitTact:
 	outi	TCCR2,0b010	; CK/8
-	outi	OCR2,$40
+;	outi	OCR2,$40
 	ret
 
 .macro	tskTact		;----- Такт 3906.25 Hz -----
@@ -10,7 +10,6 @@ InitTact:
 .endm
 
 Tact:	outi	TIFR,1<<TOV2
-
 
 ;**** RXTimer ****
 	ldd	r16,Y+yRXTimer
@@ -32,6 +31,14 @@ rxtm_1:
 	std	Y+yMainCntL,r23
 	std	Y+yMainCntM,r24
 	std	Y+yMainCntH,r25
+
+	rjmp	PC+1	; Delay for Rotor HS stabilize 
+	rjmp	PC+1	; to stabilize power of rot
+	rjmp	PC+1
+	rjmp	PC+1
+
+
+
 
 
 	ROTOR_HS_POWER_ON
