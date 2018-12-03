@@ -1,3 +1,18 @@
+	ldi	XL,Y+yTimePointer
+	subi	XL,2
+	brcc	tr_5
+	ldi	XL,10
+tr_5:	std	Y+yTimePointer,XL
+	ld	r16,X+
+	ld	r17,X
+	st	X,r24
+	st	-X,r23
+	sub	r16,r23
+	sbc	r17,r24
+	std	Y+yPeriodL,r16
+	std	Y+yPeriodH,r17
+
+
 /*** Start sinchronous meandr on all channels ***/
 /*
 StartKeysTest:

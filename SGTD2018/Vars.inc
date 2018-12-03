@@ -1,11 +1,11 @@
 .def	SSREG	= r2
 
 .def	AFlags	= r3
-	.equ	afWestDir	= 0
+	.equ	afReverse  = 0
 
 .def	BFlags	= r4
-	.equ	bfRTCRead    = 0
-	.equ	bfRTCWrite   = 1
+	.equ	bfRTCRead  = 0
+	.equ	bfRTCWrite = 1
 
 .def	KS_Dead    = r5
 .def	KS_High    = r6
@@ -15,7 +15,8 @@
 
 .equ	XSEG = $100
 ; --- Arrays ($100..$1FF)
-.equ	KS_Buf  = $00
+;.equ	PeriodBuf = $00
+;.equ	KS_Buf  = $00
 ;.equ	TimeBuf = $03
 ;.equ	ADCBuf	= $20
 ;.equ	InputBuf= $30
@@ -47,6 +48,10 @@
 .equ	yJamPath	= $15
 .equ	yCurPeriod	= $16
 .equ	yLastPeriod	= $17
+.equ	yDummyPeriod	= $18
+.equ	yPWML		= $19
+.equ	yPWMH		= $1A
+.equ	yTargetPeriod	= $1B
 
 
 .equ	yMinute		= $11

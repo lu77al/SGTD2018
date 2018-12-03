@@ -22,6 +22,8 @@ Tact:	outi	TIFR,1<<TOV2
 rxtm_1:
 ;**** RXTimer ****
 
+	rcall	TrackRotor
+
 ;-- MainCnt 24bit
 	ldd	r23,Y+yMainCntL
 	ldd	r24,Y+yMainCntM
@@ -31,9 +33,6 @@ rxtm_1:
 	std	Y+yMainCntL,r23
 	std	Y+yMainCntM,r24
 	std	Y+yMainCntH,r25
-
-	rcall	TrackRotor
-
 
 ;--- Br0 ---
 	cpi	r23,0b01100111

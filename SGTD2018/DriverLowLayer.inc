@@ -28,7 +28,7 @@ SetKeysLow:
 	in	ZL,PINC		; Hall sensors state
 	ROTOR_HS_POWER_OFF	; Power off hall sensors
 	std	Y+yRotorHallsPort,ZL
-	sbrs	AFlags,afWestDir
+	sbrc	AFlags,afReverse
 	com	ZL		; Apply direction
 	andi	ZL,0b1110
 	subi	ZL,-DriveKeyTable*2 ; Pointer to table of Keys' states
@@ -85,7 +85,11 @@ DisablePWM:
 
 /*** Track rotor position and speed (step period) ***/
 TrackRotor:
-	ldd	r16,Y+yRotorHallsPort
+	ldd	r16,Y+yCurPeriod
+	inc	r16
+	breq	tr_4
+	std	Y+yCurPeriod,r16
+tr_4:	ldd	r16,Y+yRotorHallsPort
 	andi	r16,0b1110	; Actual state of rotor sensors
 	ldd	ZL,Y+yRotorState ; Recorded state
 	cp	r16,ZL
@@ -101,7 +105,7 @@ TrackRotor:
 	lpm	r17,Z+
 	cp	r16,r17	; is it step to west?
 	brne	tr_2
-	sbrc	AFlags,afWestDir
+	sbrs	AFlags,afReverse
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,-1 ; increase position
 	sbci	r20,$FF
@@ -112,7 +116,7 @@ TrackRotor:
 tr_2:	lpm	r17,Z+
 	cp	r16,r17	; is it step to east?
 	brne	tr_1
-	sbrs	AFlags,afWestDir
+	sbrc	AFlags,afReverse
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,1  ; decrease position
 	sbci	r20,0
@@ -124,16 +128,60 @@ tr_3:	std	Y+yPanPosL,r18	; save current panel position
 	std	Y+yPanPosH,r20
 	std	Y+yJamPath,r21
 	cpi	r25,0
-	breq	tr_1
-	std	Y+yLastPeriod,r25
-	std	Y+yCurPeriod,ZeroReg
-tr_1:
-	ldd	r16,Y+yCurPeriod
+	brne	tr_5
+tr_1:	ldd	r16,Y+yDummyPeriod
 	inc	r16
-	breq	tr_4			; Max period = 255 -> 3906.25 / 255 / 36 = 0.426 Hz (2.35s/r)
-	std	Y+yCurPeriod,r16
-tr_4:
+	std	Y+yDummyPeriod,r16
+	breq	tr_6
 	ret
+tr_6:	ldi	r25,$FF
+	rjmp	tr_7
+tr_5:	std	Y+yCurPeriod,ZeroReg
+	std	Y+yDummyPeriod,ZeroReg
+tr_7:	std	Y+yLastPeriod,r25
+
+; *** Stabilize ***
+
+	ldd	r16,Y+yTargetPeriod
+	sub	r25,r16
+	brcs	st_1
+; Add power
+	cpi	r25,100
+	brlo	st_2
+	ldi	r25,100
+	rjmp	st_2
+st_1:	cpi	r25,-100
+	brsh	st_2
+	ldi	r25,-100
+st_2:
+	ldd	r16,Y+yPWML
+	ldd	r17,Y+yPWMH
+	sbrc	r25,7
+	rjmp	st_3
+	add	r16,r25
+	adc	r17,ZeroReg
+	ldi_w	r19,r18,9600
+	cp	r18,r16
+	cpc	r19,r17
+	brsh	st_4
+	movw	r17:r16,r19:r18
+	rjmp	st_4
+st_3:	neg	r25
+	sub	r16,r25
+	sbc	r17,ZeroReg
+	brcc	st_4
+	ldi_w	r17,r16,0
+st_4:	std	Y+yPWML,r16
+	std	Y+yPWMH,r17
+	lsr16	r17,r16
+	lsr16	r17,r16
+	lsr16	r17,r16
+	subi_w	r17,r16,-24
+	out	OCR1BH,r17
+	out	OCR1BL,r16
+	ret
+
+
 
 RotorMovement:	; Expected next states of rotor sensors ("+" - to west, "-" - to east)
 		;  +    -	current

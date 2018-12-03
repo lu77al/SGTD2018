@@ -32,6 +32,11 @@ SEGMENTBASE $60
 .equ	yJamPath	= $15
 .equ	yCurPeriod	= $16
 .equ	yLastPeriod	= $17
+.equ	yDummyPeriod	= $18
+.equ	yPWML		= $19
+.equ	yPWMH		= $1A
+.equ	yTargetPeriod	= $1B
+
 
 SEGMENTBASE $170
 .equ	Second		= $00
