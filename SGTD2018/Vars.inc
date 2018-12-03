@@ -39,11 +39,11 @@
 .equ	yADCSaveAddr	= $0A
 .equ	yADCChCnt	= $0B
 
-.equ	yRotorState	= $10
-.equ	yPanPosL	= $11
-.equ	yPanPosM	= $12
-.equ	yPanPosH	= $13
-.equ	yRotorHallsPort	= $14
+.equ	yPanPosL	= $10
+.equ	yPanPosM	= $11
+.equ	yPanPosH	= $12
+.equ	yRotorHallsPort	= $13
+.equ	yRotorState	= $14
 .equ	yJamPath	= $15
 .equ	yCurPeriod	= $16
 .equ	yLastPeriod	= $17

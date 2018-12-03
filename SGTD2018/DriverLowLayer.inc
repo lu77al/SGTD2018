@@ -80,23 +80,6 @@ DisablePWM:
 	outi	PORTB,0b010101	; Short drive
 	ret
 
-/*** Start sinchronous meandr on all channels ***/
-/*
-StartKeysTest:
-	rcall	EnablePWM
-	ldi_w	r17,r16,PWMPeriod/2
-	out	OCR1BH,r17
-	out	OCR1BL,r16
-	ldi	r16,0b101010	; High
-	ldi	r17,0b010101	; Low
-	ldi	XL,KS_Buf
-	cli
-	st	X+,ZeroReg	; Dead state
-	st	X+,r16		; High
-	st	X+,r17		; Low
-	sei
-	ret
-*/
 
 .equ	JAM_SMALL_PATH = 10
 
@@ -147,18 +130,40 @@ tr_3:	std	Y+yPanPosL,r18	; save current panel position
 tr_1:
 	ldd	r16,Y+yCurPeriod
 	inc	r16
-	breq	tr_4
+	breq	tr_4			; Max period = 255 -> 3906.25 / 255 / 36 = 0.426 Hz (2.35s/r)
 	std	Y+yCurPeriod,r16
 tr_4:
 	ret
 
 RotorMovement:	; Expected next states of rotor sensors ("+" - to west, "-" - to east)
 		;  +    -	current
-	.db	0b111,0b111	; 000 - ubnormal
-	.db	0b011,0b101	; 001
-	.db	0b110,0b011	; 010
-	.db	0b010,0b001	; 011
-	.db	0b101,0b110	; 100
-	.db	0b001,0b100	; 101
-	.db	0b100,0b010	; 110
-	.db	0b000,0b000	; 111 - ubnormal
+	.db	0b1110,0b1110	; 000 - ubnormal
+	.db	0b0110,0b1010	; 001
+	.db	0b1100,0b0110	; 010
+	.db	0b0100,0b0010	; 011
+	.db	0b1010,0b1100	; 100
+	.db	0b0010,0b1000	; 101
+	.db	0b1000,0b0100	; 110
+	.db	0b0000,0b0000	; 111 - ubnormal
+
+/*
+; 120rpm speed in old driver
+StabSpeed: 
+	ldd	r16,Y+yCurPeriod
+	ldd	r17,Y+yLastPeriod
+	cpi	r16,r17
+	brsh	ss_1
+	mov	r16,r17
+ss_1:	ldd	r17,Y+yTargetPeriod
+	sub	r16,r17
+	brcs	ss_2
+	cpi	r16,20
+	brlo	ss_
+
+	add	r18,
+	
+
+	
+
+	ret
+*/

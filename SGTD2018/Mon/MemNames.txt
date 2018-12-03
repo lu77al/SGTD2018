@@ -11,8 +11,27 @@ SEGMENTBASE $60
 
 .equ	YBUF = $60
 ; --- Переменные ($60..$9F)
-.equ	Read_swtch	= $20
-.equ	Write_swtch	= $30
+.equ	yMainCntL	= $00
+.equ	yMainCntM	= $01
+.equ	yMainCntH	= $02
+.equ	yRXPointer	= $03
+.equ	yTXPointer	= $04
+.equ	yTXEnd		= $05
+.equ	yRXTimer	= $06
+.equ	yRXTXCHS	= $07
+.equ	yMyAddr		= $08
+.equ	yNextADC	= $09
+.equ	yADCSaveAddr	= $0A
+.equ	yADCChCnt	= $0B
+
+.equ	yPanPosL	= $10
+.equ	yPanPosM	= $11
+.equ	yPanPosH	= $12
+.equ	yRotorHallsPort	= $13
+.equ	yRotorState	= $14
+.equ	yJamPath	= $15
+.equ	yCurPeriod	= $16
+.equ	yLastPeriod	= $17
 
 SEGMENTBASE $170
 .equ	Second		= $00

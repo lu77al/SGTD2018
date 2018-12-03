@@ -44,10 +44,13 @@ DriveKeyTable:	; !!! Must be within first 256 bytes of PROM
 .include "Tact.inc"
 .include "Subs.inc"
 .include "DriverLowLayer.inc"
+.include "Tests.inc"
 
 RESET:
 
 .include "Init.inc"
+
+	rcall	StartSimplePWM
 
 Main:
 	tskTact

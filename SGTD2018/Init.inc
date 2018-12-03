@@ -25,7 +25,6 @@ ini_1:	st	Z+,YH
 
 	rcall	InitPWM
 
-
 	sei
 
 

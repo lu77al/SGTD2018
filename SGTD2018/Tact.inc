@@ -32,39 +32,8 @@ rxtm_1:
 	std	Y+yMainCntM,r24
 	std	Y+yMainCntH,r25
 
-	rjmp	PC+1	; Delay for Rotor HS stabilize 
-	rjmp	PC+1	; to stabilize power of rot
-	rjmp	PC+1
-	rjmp	PC+1
+	rcall	TrackRotor
 
-
-
-
-
-	ROTOR_HS_POWER_ON
-	LIMIT_HS_POWER_ON
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	ROTOR_HS_POWER_OFF
-	LIMIT_HS_POWER_OFF
-
-
-/*	ldi	r16,0b111
-	and	r16,r23
-	cpi	r16,1
-	brlo	tt_1
-	ROTOR_HS_POWER_OFF
-	rjmp	tt_2
-tt_1:	ROTOR_HS_POWER_ON
-tt_2:*/
 
 ;--- Br0 ---
 	cpi	r23,0b01100111

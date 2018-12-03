@@ -1,3 +1,37 @@
+/*** Start sinchronous meandr on all channels ***/
+/*
+StartKeysTest:
+	rcall	EnablePWM
+	ldi_w	r17,r16,PWMPeriod/2
+	out	OCR1BH,r17
+	out	OCR1BL,r16
+	ldi	r16,0b101010	; High
+	ldi	r17,0b010101	; Low
+	ldi	XL,KS_Buf
+	cli
+	st	X+,ZeroReg	; Dead state
+	st	X+,r16		; High
+	st	X+,r17		; Low
+	sei
+	ret
+*/
+
+	ROTOR_HS_POWER_ON
+	LIMIT_HS_POWER_ON
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	ROTOR_HS_POWER_OFF
+	LIMIT_HS_POWER_OFF
+
+
 /*** Interrupt timer1 compare A (PWM -> high) ***/
 SetKeysHigh: 
 	out	PORTB,KS_Dead
