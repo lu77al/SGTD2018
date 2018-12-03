@@ -140,7 +140,28 @@ tr_5:	std	Y+yCurPeriod,ZeroReg
 	std	Y+yDummyPeriod,ZeroReg
 tr_7:	std	Y+yLastPeriod,r25
 
+
 ; *** Stabilize ***
+
+	ldd	r16,Y+yPanPosL
+	ldd	r17,Y+yPanPosM
+	ldi_w	ZH,ZL,20*36
+	sub	ZL,r16
+	sbc	ZH,r17
+	brcc	tb_1
+	rjmp	DisablePWM
+tb_1:	lsr16	ZH,ZL
+	cpi	ZL,85
+	cpc	ZH,ZeroReg
+	brlo	tb_2
+	ldi_w	ZH,ZL,85
+tb_2:	subi_w	ZH,ZL,-2*BreakTable
+	lpm	r16,Z
+	std	Y+yTargetPeriod,r16
+
+
+
+	ldd	r25,Y+yLastPeriod
 
 	ldd	r16,Y+yTargetPeriod
 	sub	r25,r16
@@ -167,8 +188,11 @@ st_2:
 	movw	r17:r16,r19:r18
 	rjmp	st_4
 st_3:	neg	r25
+	lsl	r25
+	ldi	r18,0
+	lsl16	r18,r25
 	sub	r16,r25
-	sbc	r17,ZeroReg
+	sbc	r17,r18
 	brcc	st_4
 	ldi_w	r17,r16,0
 st_4:	std	Y+yPWML,r16
@@ -182,7 +206,6 @@ st_4:	std	Y+yPWML,r16
 	ret
 
 
-
 RotorMovement:	; Expected next states of rotor sensors ("+" - to west, "-" - to east)
 		;  +    -	current
 	.db	0b1110,0b1110	; 000 - ubnormal
@@ -194,24 +217,14 @@ RotorMovement:	; Expected next states of rotor sensors ("+" - to west, "-" - to 
 	.db	0b1000,0b0100	; 110
 	.db	0b0000,0b0000	; 111 - ubnormal
 
-/*
-; 120rpm speed in old driver
-StabSpeed: 
-	ldd	r16,Y+yCurPeriod
-	ldd	r17,Y+yLastPeriod
-	cpi	r16,r17
-	brsh	ss_1
-	mov	r16,r17
-ss_1:	ldd	r17,Y+yTargetPeriod
-	sub	r16,r17
-	brcs	ss_2
-	cpi	r16,20
-	brlo	ss_
 
-	add	r18,
-	
-
-	
-
-	ret
-*/
+BreakTable:
+	.db	200,189,179,171,164,157,151,146,141,136	; 0
+	.db	132,128,124,121,118,115,112,110,107,105	; 10
+	.db	103,101, 99, 97, 95, 93, 92, 90, 89, 88	; 20
+	.db	 86, 85, 84, 83, 82, 80, 79, 78, 78, 77	; 30
+	.db	 76, 75, 74, 73, 73, 72, 71, 70, 70, 69	; 40
+	.db	 68, 68, 67, 67, 66, 66, 65, 65, 64, 64	; 50
+	.db	 63, 63, 62, 62, 61, 61, 61, 60, 60, 59	; 60
+	.db	 59, 59, 58, 58, 58, 57, 57, 57, 56, 56	; 70
+	.db	 56, 55, 55, 55, 55, 54			; 80..85

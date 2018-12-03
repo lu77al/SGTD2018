@@ -52,6 +52,9 @@
 .equ	yPWML		= $19
 .equ	yPWMH		= $1A
 .equ	yTargetPeriod	= $1B
+.equ	yTargetPosL	= $1C
+.equ	yTargetPosM	= $1D
+.equ	yTargetPosH	= $1E
 
 
 .equ	yMinute		= $11
