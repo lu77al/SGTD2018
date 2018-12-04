@@ -1,8 +1,3 @@
-.equ	PWMPeriod = 1600	; f = 8e6 / 1600 = 5000Hz
-.equ	MaxPWM = PWMPeriod/8*6
-.equ	MinPWM = 24
-.equ	PWMInitState = MinPWM
-
 /*** Interrupt timer1 compare A (PWM -> high) ***/
 SetKeysHigh: 
 	out	PORTB,KS_Dead
@@ -58,8 +53,14 @@ InitPWM:
 	ret
 
 /*** Activate timer1 setup PWM start values ***/
-EnablePWM:
-	ldi_w	r17,r16,PWMInitState ; Minimum phase
+DriveOn:
+	set
+	bld	AFlags,afActive
+	std	Y+yPWML,ZeroReg
+	std	Y+yPWMH,ZeroReg
+	std	Y+yAccelCnt,ZeroReg
+
+	ldi_w	r17,r16,PWMMinPulse ; Minimum pulse
 	out	OCR1BH,r17
 	out	OCR1BL,r16
 	clr	KS_High		; Zero state registers
@@ -70,18 +71,34 @@ EnablePWM:
 	ret
 
 /*** Disactivate timer1 release port ***/
-DisablePWM:
+DriveOff:
 	outi	TCCR1B,0b00001000 ; Stop timer
 	outi	TIFR,(1<<OCF1B) + (1<<OCF1A) ; Clear interrupt flags
 	out	PORTB,ZeroReg
 	rjmp	PC+1
 	rjmp	PC+1
 	rjmp	PC+1
+	clt
+	bld	AFlags,afActive
 	outi	PORTB,0b010101	; Short drive
 	ret
 
 
-.equ	JAM_SMALL_PATH = 10
+GetHallState:
+	ROTOR_HS_POWER_ON
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	in	r16,PINC
+	ROTOR_HS_POWER_OFF	; Power off hall sensors
+	std	Y+yRotorHallsPort,r16
+	ret
 
 /*** Track rotor position and speed (step period) ***/
 TrackRotor:
@@ -89,7 +106,9 @@ TrackRotor:
 	inc	r16
 	breq	tr_4
 	std	Y+yCurPeriod,r16
-tr_4:	ldd	r16,Y+yRotorHallsPort
+tr_4:	sbrs	AFlags,afActive	; If PWM isn't active -> get halls port state
+	rcall	GetHallState
+	ldd	r16,Y+yRotorHallsPort
 	andi	r16,0b1110	; Actual state of rotor sensors
 	ldd	ZL,Y+yRotorState ; Recorded state
 	cp	r16,ZL
@@ -109,7 +128,7 @@ tr_4:	ldd	r16,Y+yRotorHallsPort
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,-1 ; increase position
 	sbci	r20,$FF
-	cpi	r21,128+JAM_SMALL_PATH
+	cpi	r21,128+JAM_PATH
 	brsh	tr_3
 	inc	r21
 	rjmp	tr_3
@@ -120,7 +139,7 @@ tr_2:	lpm	r17,Z+
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,1  ; decrease position
 	sbci	r20,0
-	cpi	r21,128-JAM_SMALL_PATH
+	cpi	r21,128-JAM_PATH
 	brlo	tr_3
 	dec	r21
 tr_3:	std	Y+yPanPosL,r18	; save current panel position
@@ -140,91 +159,154 @@ tr_5:	std	Y+yCurPeriod,ZeroReg
 	std	Y+yDummyPeriod,ZeroReg
 tr_7:	std	Y+yLastPeriod,r25
 
+	sbrs	AFlags,afActive
+	ret
+
+; *** Set speed ***
+	sbrs	AFlags,afReverse	; Calculate rest of target path
+	rjmp	ss_1
+	ldd	r16,Y+yPanPosL		;  - reverse (to East): Real-Target
+	ldd	r17,Y+yPanPosM
+	ldd	r18,Y+yPanPosH
+	ldd	r19,Y+yStopPosL
+	ldd	r20,Y+yStopPosM
+	ldd	r21,Y+yStopPosH
+	rjmp	ss_2
+ss_1:	ldd	r19,Y+yPanPosL		; - direct (to West): Target-Real
+	ldd	r20,Y+yPanPosM
+	ldd	r21,Y+yPanPosH
+	ldd	r16,Y+yStopPosL
+	ldd	r17,Y+yStopPosM
+	ldd	r18,Y+yStopPosH
+ss_2:
+	sub	r16,r19
+	sbc	r17,r20
+	sbc	r18,r21
+	brcc	ss_3		; if RestPath<0
+	rcall	DriveOff	;    -> Stop drive
+	ret
+ss_3:
+	or	r17,r18	; Too far from target position -> cruising speed
+	brne	ss_4
+	sbrs	AFlags,afFastStop
+	rjmp	ss_5
+	lsl	r16	; Double deacceleration
+	brcs	ss_4
+ss_5:	cpi	r16,120	; Too far from target position
+	brlo	ss_6
+ss_4:	ldi	r16,120		; -> cruising speed 
+ss_6:	ldd	r17,Y+yAccelCnt
+	inc	r17	; Increase start path counter
+	cpi	r17,120
+	brlo	ss_7
+	ldi	r17,119	; limit start path
+ss_7:	std	Y+yAccelCnt,r17
+	cp	r16,r17	; Select lower value (start path, break path)
+	brlo	ss_8
+	mov	r16,r17
+ss_8:	ldi_w	ZH,ZL,2*BreakTable ; Get value from the table
+	add	ZL,r16
+	adc	ZH,ZeroReg
+	lpm	r16,Z
+	std	Y+yNeedPeriod,r16
+
 
 ; *** Stabilize ***
+	ldd	r20,Y+yLastPeriod
 
-	ldd	r16,Y+yPanPosL
-	ldd	r17,Y+yPanPosM
-	ldi_w	ZH,ZL,20*36
-	sub	ZL,r16
-	sbc	ZH,r17
-	brcc	tb_1
-	rjmp	DisablePWM
-tb_1:	lsr16	ZH,ZL
-	cpi	ZL,85
-	cpc	ZH,ZeroReg
-	brlo	tb_2
-	ldi_w	ZH,ZL,85
-tb_2:	subi_w	ZH,ZL,-2*BreakTable
-	lpm	r16,Z
-	std	Y+yTargetPeriod,r16
-
-
-
-	ldd	r25,Y+yLastPeriod
-
-	ldd	r16,Y+yTargetPeriod
-	sub	r25,r16
+	ldd	r16,Y+yNeedPeriod
+	sub	r20,r16
 	brcs	st_1
 ; Add power
-	cpi	r25,100
+	cpi	r20,60
 	brlo	st_2
-	ldi	r25,100
+	ldi	r20,60
 	rjmp	st_2
-st_1:	cpi	r25,-100
+st_1:	cpi	r20,-60
 	brsh	st_2
-	ldi	r25,-100
+	ldi	r20,-60
 st_2:
 	ldd	r16,Y+yPWML
 	ldd	r17,Y+yPWMH
-	sbrc	r25,7
+	sbrc	r20,7
 	rjmp	st_3
-	add	r16,r25
+	add	r16,r20
 	adc	r17,ZeroReg
-	ldi_w	r19,r18,9600
+	ldi_w	r19,r18,2400
 	cp	r18,r16
 	cpc	r19,r17
 	brsh	st_4
 	movw	r17:r16,r19:r18
 	rjmp	st_4
-st_3:	neg	r25
-	lsl	r25
-	ldi	r18,0
-	lsl16	r18,r25
-	sub	r16,r25
-	sbc	r17,r18
+st_3:	neg	r20
+	sub	r16,r20
+	sbc	r17,ZeroReg
 	brcc	st_4
 	ldi_w	r17,r16,0
 st_4:	std	Y+yPWML,r16
 	std	Y+yPWMH,r17
 	lsr16	r17,r16
-	lsr16	r17,r16
-	lsr16	r17,r16
-	subi_w	r17,r16,-24
+	subi_w	r17,r16,-PWMMinPulse
 	out	OCR1BH,r17
 	out	OCR1BL,r16
 	ret
 
+CheckTargetPos:
+	set
+	ldd	r19,Y+yTargetPosL
+	ldd	r20,Y+yTargetPosM
+	ldd	r21,Y+yTargetPosH
+	ldd	r16,Y+yPanPosL
+	ldd	r17,Y+yPanPosM
+	ldd	r18,Y+yPanPosH
+	sub	r16,r19
+	sbc	r17,r20
+	sbc	r18,r21
+	brcc	ctp_1
+	clt
+	com	r16
+	com	r17
+	com	r18
+	subi_w	r17,r16,-1
+	sbci	r18,-1
+ctp_1:	
+	cpi_w	r17,r16,MAX_POS_DIFF,r25
+	cpc	r18,ZeroReg
+	brsh	ctp_2
+	ret
+ctp_2:
+	bld	AFlags,afReverse
+	std	Y+yStopPosL,r19
+	std	Y+yStopPosM,r20
+	std	Y+yStopPosH,r21
+	rcall	DriveOn
+	ret
+
+
 
 RotorMovement:	; Expected next states of rotor sensors ("+" - to west, "-" - to east)
 		;  +    -	current
-	.db	0b1110,0b1110	; 000 - ubnormal
+	.db	0b0001,0b0001	; 000 - ubnormal
 	.db	0b0110,0b1010	; 001
 	.db	0b1100,0b0110	; 010
 	.db	0b0100,0b0010	; 011
 	.db	0b1010,0b1100	; 100
 	.db	0b0010,0b1000	; 101
 	.db	0b1000,0b0100	; 110
-	.db	0b0000,0b0000	; 111 - ubnormal
+	.db	0b0001,0b0001	; 111 - ubnormal
 
 
-BreakTable:
-	.db	200,189,179,171,164,157,151,146,141,136	; 0
-	.db	132,128,124,121,118,115,112,110,107,105	; 10
-	.db	103,101, 99, 97, 95, 93, 92, 90, 89, 88	; 20
-	.db	 86, 85, 84, 83, 82, 80, 79, 78, 78, 77	; 30
-	.db	 76, 75, 74, 73, 73, 72, 71, 70, 70, 69	; 40
-	.db	 68, 68, 67, 67, 66, 66, 65, 65, 64, 64	; 50
-	.db	 63, 63, 62, 62, 61, 61, 61, 60, 60, 59	; 60
-	.db	 59, 59, 58, 58, 58, 57, 57, 57, 56, 56	; 70
-	.db	 56, 55, 55, 55, 55, 54			; 80..85
+BreakTable: ; Periods for each step (from TargetPos to free move)
+	.db	200,192,185,179,173,168,163,159,155,151 ; 0
+	.db	147,143,140,137,134,131,128,126,124,121	; 10
+	.db	119,117,115,113,111,110,108,106,105,103	; 20
+	.db	102,100, 99, 98, 97, 95, 94, 93, 92, 91	; 30
+	.db	 90, 89, 88, 87, 86, 85, 85, 84, 83, 82	; 40
+	.db	 82, 81, 80, 79, 79, 78, 77, 77, 76, 76	; 50
+	.db	 75, 75, 74, 73, 73, 72, 72, 71, 71, 70	; 60
+	.db	 70, 70, 69, 69, 68, 68, 67, 67, 67, 66	; 70
+	.db	 66, 66, 65, 65, 64, 64, 64, 63, 63, 63	; 80
+	.db	 63, 62, 62, 62, 61, 61, 61, 61, 60, 60	; 90
+	.db	 60, 59, 59, 59, 59, 58, 58, 58, 58, 58	; 100
+	.db	 57, 57, 57, 57, 56, 56, 56, 56, 56, 54	; 110..119
+ 

@@ -1,4 +1,5 @@
 .include "m8def.inc"
+.include "Constants.inc"
 .include "Macro.inc"
 .include "Pinout.inc"
 .include "Vars.inc"
@@ -49,7 +50,7 @@ RESET:
 
 .include "Init.inc"
 
-	rcall	StartSimplePWM
+	rcall	StartTest
 
 Main:
 	tskTact

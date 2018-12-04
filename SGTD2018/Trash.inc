@@ -1,3 +1,23 @@
+
+/*
+	ldd	r16,Y+yPanPosL
+	ldd	r17,Y+yPanPosM
+	ldi_w	ZH,ZL,20*36
+	sub	ZL,r16
+	sbc	ZH,r17
+	brcc	tb_1
+	rjmp	DisablePWM
+tb_1:	lsr16	ZH,ZL
+	cpi	ZL,85
+	cpc	ZH,ZeroReg
+	brlo	tb_2
+	ldi_w	ZH,ZL,85
+tb_2:	subi_w	ZH,ZL,-2*BreakTable
+	lpm	r16,Z
+	std	Y+yTargetPeriod,r16
+
+*/
+
 	ldi	XL,Y+yTimePointer
 	subi	XL,2
 	brcc	tr_5

@@ -38,6 +38,9 @@ rxtm_1:
 	cpi	r23,0b01100111
 	brne	skBr0
 
+	sbrs	AFlags,afActive
+	rcall	CheckTargetPos
+
 	rjmp	RetTact
 skBr0:
 
@@ -45,6 +48,7 @@ skBr0:
 ;--- Br ---
 	cpi	r23,0b10100111; 15 Ãö
 	brne	sk_BR6
+
 
 
 	rjmp	RetTact

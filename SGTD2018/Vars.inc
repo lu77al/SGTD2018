@@ -1,7 +1,9 @@
 .def	SSREG	= r2
 
 .def	AFlags	= r3
-	.equ	afReverse  = 0
+	.equ	afActive   = 0
+	.equ	afReverse  = 1
+	.equ	afFastStop = 2
 
 .def	BFlags	= r4
 	.equ	bfRTCRead  = 0
@@ -51,10 +53,14 @@
 .equ	yDummyPeriod	= $18
 .equ	yPWML		= $19
 .equ	yPWMH		= $1A
-.equ	yTargetPeriod	= $1B
-.equ	yTargetPosL	= $1C
-.equ	yTargetPosM	= $1D
-.equ	yTargetPosH	= $1E
+.equ	yNeedPeriod	= $1B
+.equ	yStopPosL	= $1C
+.equ	yStopPosM	= $1D
+.equ	yStopPosH	= $1E
+.equ	yAccelCnt	= $1F
+.equ	yTargetPosL	= $20
+.equ	yTargetPosM	= $21
+.equ	yTargetPosH	= $22
 
 
 .equ	yMinute		= $11
