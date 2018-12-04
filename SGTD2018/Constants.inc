@@ -3,7 +3,8 @@
 .equ	MAX_POS_DIFF_MIN = 4	; Maximum panel position offset from target (minutes)
 .equ	MAX_POS_DIFF = MAX_POS_DIFF_MIN * FULL_CIRCLE / (24 * 60) ; ... drive tics
 
-.equ	JAM_PATH = 10	; Tics for jam detection
+.equ	JAM_PATH = 7		; Tics for jam detection
+.equ	JAM_INIT_PATH = 18	; Tics for jam detection (from start)
 
 .equ	PWMPeriod = 1600	; f = 8e6 / 1600 = 5000Hz
 .equ	PWMMinPulse = 24

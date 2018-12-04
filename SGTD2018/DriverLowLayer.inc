@@ -59,6 +59,10 @@ DriveOn:
 	std	Y+yPWML,ZeroReg
 	std	Y+yPWMH,ZeroReg
 	std	Y+yAccelCnt,ZeroReg
+	ldi	r16,$80+JAM_INIT_PATH
+	sbrc	AFlags,afReverse
+	ldi	r16,$80-JAM_INIT_PATH
+	std	Y+yJamPath,r16
 
 	ldi_w	r17,r16,PWMMinPulse ; Minimum pulse
 	out	OCR1BH,r17
@@ -128,7 +132,7 @@ tr_4:	sbrs	AFlags,afActive	; If PWM isn't active -> get halls port state
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,-1 ; increase position
 	sbci	r20,$FF
-	cpi	r21,128+JAM_PATH
+	cpi	r21,$80+JAM_PATH
 	brsh	tr_3
 	inc	r21
 	rjmp	tr_3
@@ -139,7 +143,7 @@ tr_2:	lpm	r17,Z+
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,1  ; decrease position
 	sbci	r20,0
-	cpi	r21,128-JAM_PATH
+	cpi	r21,$80-JAM_PATH
 	brlo	tr_3
 	dec	r21
 tr_3:	std	Y+yPanPosL,r18	; save current panel position
@@ -280,6 +284,22 @@ ctp_2:
 	std	Y+yStopPosM,r20
 	std	Y+yStopPosH,r21
 	rcall	DriveOn
+	ret
+
+CheckJam:
+	ldd	r16,Y+yJamPath
+	sbrc	AFlags,afReverse
+	rjmp	chj_1
+	dec	r16
+	cpi	r16,$81
+	brlo	chj_2
+chj_3:	std	Y+yJamPath,r16
+	ret
+chj_1:	inc	r16
+	cpi	r16,$80
+	brlo	chj_3
+chj_2:	rcall	DriveOff
+	stdi	yAfterFailCnt,255
 	ret
 
 

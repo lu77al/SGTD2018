@@ -43,7 +43,7 @@ SEGMENTBASE $60
 .equ	yTargetPosL	= $20
 .equ	yTargetPosM	= $21
 .equ	yTargetPosH	= $22
-
+.equ	yAfterFailCnt	= $23
 
 SEGMENTBASE $170
 .equ	Second		= $00

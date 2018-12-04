@@ -61,6 +61,7 @@
 .equ	yTargetPosL	= $20
 .equ	yTargetPosM	= $21
 .equ	yTargetPosH	= $22
+.equ	yAfterFailCnt	= $23
 
 
 .equ	yMinute		= $11

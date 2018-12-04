@@ -38,6 +38,13 @@ rxtm_1:
 	cpi	r23,0b01100111
 	brne	skBr0
 
+	ldd	r16,Y+yAfterFailCnt
+	subi	r16,1
+	brcs	a_1
+	std	Y+yAfterFailCnt,r16
+	rjmp	RetTact
+a_1:
+
 	sbrs	AFlags,afActive
 	rcall	CheckTargetPos
 
@@ -49,7 +56,8 @@ skBr0:
 	cpi	r23,0b10100111; 15 Ãö
 	brne	sk_BR6
 
-
+	sbrc	AFlags,afActive
+	rcall	CheckJam
 
 	rjmp	RetTact
 sk_BR6:
