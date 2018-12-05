@@ -1,5 +1,6 @@
 .equ	FULL_CIRCLE = 70693	; Drive tics per day
 .equ	HALF_CIRCLE = FULL_CIRCLE / 2
+.equ	HALL_OFFSET = FULL_CIRCLE / (24*60/1.5)
 
 .equ	MAX_POS_DIFF_MIN = 4	; Maximum panel position offset from target (minutes)
 .equ	MAX_POS_DIFF = MAX_POS_DIFF_MIN * FULL_CIRCLE / (24 * 60) ; ... drive tics

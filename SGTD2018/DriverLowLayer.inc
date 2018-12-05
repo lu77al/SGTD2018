@@ -262,13 +262,15 @@ CheckFixPanPos:
 	ldd	r16,Y+yPanPosL
 	ldd	r17,Y+yPanPosM
 	ldd	r18,Y+yPanPosH
-	sbrs	r18,7
-	rjmp	cfp_1
-	ldi_w	r17,r16,0
+	cpi	r16,20
+	cpc	r17,ZeroReg
+	cpc	r18,ZeroReg
+	brge	cfp_1
+	ldi_w	r17,r16,20
 	ldi	r18,0
 	rjmp	cfp_2
-cfp_1:	ldi_w	r21,r20,FULL_CIRCLE
-	ldi	r22,BYTE3(FULL_CIRCLE)
+cfp_1:	ldi_w	r21,r20,FULL_CIRCLE-20
+	ldi	r22,BYTE3(FULL_CIRCLE-20)
 	cp	r20,r16
 	cpc	r21,r17
 	cpc	r22,r18

@@ -73,3 +73,32 @@ ReadBLS: ; Read buttons and limit sensors
 	std	Y+yButPress,r19
 	std	Y+yButRelease,r20
 	ret
+
+ProcessLimits:
+	ldd	r25,Y+yButPress
+	mov	r16,r25
+	andi	r16,$FF - (1<<btEastLimit) - (1<<btWestLimit)
+	std	Y+yButPress,r16
+	sbrs	r25,btEastLimit	; East limit trigger
+	rjmp	ph_1
+	ldi_w	r17,r16,HALF_CIRCLE - HALL_OFFSET
+	ldi	r18,0
+	lds	r19,iHalfSpanL
+	lds	r20,iHalfSpanH
+	sub	r16,r19
+	sbc	r17,r20
+	rjmp	ph_2
+ph_1:	sbrs	r25,btWestLimit	; West limit trigger
+	rjmp	ph_3
+	ldi_w	r17,r16,HALF_CIRCLE + HALL_OFFSET
+	ldi	r18,0
+	lds	r19,iHalfSpanL
+	lds	r20,iHalfSpanH
+	add	r16,r19
+	adc	r17,r20
+	adc	r18,ZeroReg
+ph_2:	std	Y+yPanPosL,r16
+	std	Y+yPanPosM,r17
+	std	Y+yPanPosH,r18
+ph_3:
+	ret

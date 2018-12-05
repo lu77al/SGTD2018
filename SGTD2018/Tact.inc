@@ -38,15 +38,16 @@ rxtm_1:
 	cpi	r23,0b00001111	; 15.2587890625 Ãö
 	brne	skBr0
 
+	rcall	CheckFixPanPos
+
+	sbrs	AFlags,afSetup
+	sbrc	AFlags,afActive
+	rjmp	br0_1
 	ldd	r16,Y+yAfterFailCntL
 	ldd	r17,Y+yAfterFailCntH
 	or	r16,r17
 	brne	br0_1
-
-	rcall	CheckFixPanPos
-	sbrs	AFlags,afActive
 	rcall	CheckTargetPos
-
 br0_1:
 
 	rjmp	RetTact
@@ -103,9 +104,9 @@ sk_BR4:
 
 	rcall	ReadBLS
 
+	rcall	ProcessLimits
+
 	rjmp	RetTact
 sk_BR5:
-
-
 
 	rjmp	RetTact
