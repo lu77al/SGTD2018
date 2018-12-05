@@ -74,7 +74,7 @@ ReadBLS: ; Read buttons and limit sensors
 	std	Y+yButRelease,r20
 	ret
 
-ProcessLimits:
+UpdatePosOnLimits:
 	ldd	r25,Y+yButPress
 	mov	r16,r25
 	andi	r16,$FF - (1<<btEastLimit) - (1<<btWestLimit)
@@ -100,5 +100,18 @@ ph_1:	sbrs	r25,btWestLimit	; West limit trigger
 ph_2:	std	Y+yPanPosL,r16
 	std	Y+yPanPosM,r17
 	std	Y+yPanPosH,r18
-ph_3:
+ph_3:	ret
+
+/*
+StopOnLimits:
+	ldd	r16,Y+yButState
+	sbrc	AFlags,afReverse
+	rjmp	soh_1
+	sbrs	r16,btWestLimit
 	ret
+	
+
+soh_1:
+
+	ret
+*/

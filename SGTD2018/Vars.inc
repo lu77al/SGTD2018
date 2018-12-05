@@ -4,7 +4,8 @@
 	.equ	afActive   = 0
 	.equ	afReverse  = 1
 	.equ	afFastStop = 2
-	.equ	afSetup	   = 3
+	.equ	afFailStop = 3
+	.equ	afSetup	   = 4
 
 .def	BFlags	= r4
 	.equ	bfRTCRead  = 0

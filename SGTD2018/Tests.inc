@@ -34,6 +34,28 @@ StartTest:
 	ret
 
 
+TestStop:
+	ldd	r25,Y+yButPress
+	mov	r16,r25
+	andi	r16,$FF-(1<<btEastButton) - (1<<btWestButton)
+	std	Y+yButPress,r16
+	sbrc	r25,btEastButton
+	rjmp	tst_1
+	sbrs	r25,btWestButton
+	rjmp	tst_2
+	set
+	bld	AFlags,afFastStop
+tst_1:	rcall	StopDrive
+	ldd	r25,Y+yAfterFailPeriod
+	lsl	r25
+	inc	r25
+	std	Y+yAfterFailPeriod,r25
+	std	Y+yAfterFailCntH,r25
+	std	Y+yAfterFailCntL,ZeroReg
+	set
+	bld	AFlags,afFailStop
+tst_2:	ret
+
 
 /* Stop procedure variants
  - regular: (speed profile) + immediate stop

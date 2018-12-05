@@ -104,7 +104,9 @@ sk_BR4:
 
 	rcall	ReadBLS
 
-	rcall	ProcessLimits
+	rcall	UpdatePosOnLimits
+
+	rcall	TestStop
 
 	rjmp	RetTact
 sk_BR5:
