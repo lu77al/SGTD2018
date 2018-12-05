@@ -34,16 +34,18 @@ TimeToTargetPos:
 	movw	r17:r16,r1:r0
 	ldd	r18,Y+yMinute
 	add	r16,r18
-	adc	r17,ZeroReg
+	adc	r17,ZeroReg ; Minutes from 00:00
+	rcall	CheckForParking
+	brts	tt_1
 	ldi_w	r19,r18,2*MAX_POS_DIFF_MIN
 	movw	r25:r24,r17:r16
 	rcall	Div
 	sub	r24,r14
 	sbc	r25,r15
-	subi_w	r25,r24,-MAX_POS_DIFF_MIN ; Minutes form 00:00 with step DIFF*2
+	subi_w	r25,r24,-MAX_POS_DIFF_MIN ; Minutes from 00:00 with step DIFF*2
 	mov	r18,r25
 	mov	r17,r24
-	ldi	r16,0
+tt_1:	ldi	r16,0
 	ldi_w	r20,r19,12567
 	rcall	M24x16		; r25:r24:r23 Converted to tics
 	rcall	OffsetAndFitRange
@@ -52,7 +54,36 @@ TimeToTargetPos:
 	std	Y+yTargetPosH,r25
 	ret
 
-OffsetAndFitRange: ; r25:r24:r23 - input position
+CheckForParking: ; r17:r16 - input minutes from 00:00 / SREG.T and r18:r17 - output
+	clt
+	lds	r18,iMorningL
+	lds	r19,iMorningH
+	cp	r16,r18
+	cpc	r17,r19
+	brlo	cp_1
+	lds	r18,iEveningL
+	lds	r19,iEveningH
+	cp	r18,r16
+	cpc	r19,r17
+	brlo	cp_1
+	ret
+cp_1:	set
+	lds	r17,iParkingL
+	lds	r18,iParkingH
+	ret
+
+
+/*
+.equ	iMorningL	= $A4
+.equ	iMorningH	= $A5
+.equ	iEveningL	= $A6
+.equ	iEveningH	= $A7
+.equ	iParkingL	= $A8
+.equ	iParkingH	= $A9
+*/	
+	ret
+
+OffsetAndFitRange: ; r25:r24:r23 - input/output position
 	lds	r16,iTimeOffsetL
 	lds	r17,iTimeOffsetH
 	ldi	r18,0

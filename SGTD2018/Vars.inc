@@ -74,6 +74,13 @@
 .equ	iHalfSpanH	= $A1
 .equ	iTimeOffsetL	= $A2	; /2
 .equ	iTimeOffsetH	= $A3
+.equ	iMorningL	= $A4
+.equ	iMorningH	= $A5
+.equ	iEveningL	= $A6
+.equ	iEveningH	= $A7
+.equ	iParkingL	= $A8
+.equ	iParkingH	= $A9
+
 
 
 

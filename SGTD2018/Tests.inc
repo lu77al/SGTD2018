@@ -11,6 +11,15 @@ StartSimplePWM:
 */
 
 StartTest:
+	ldi_w	r17,r16,3*60
+	sts	iMorningL,r16
+	sts	iMorningH,r17
+	ldi_w	r17,r16,21*60
+	sts	iEveningL,r16
+	sts	iEveningH,r17
+	ldi_w	r17,r16,12*60
+	sts	iParkingL,r16
+	sts	iParkingH,r17
 	ldi_w	r17,r16,17673
 	sts	iHalfSpanL,r16
 	sts	iHalfSpanH,r17
