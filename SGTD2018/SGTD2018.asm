@@ -45,6 +45,7 @@ DriveKeyTable:	; !!! Must be within first 256 bytes of PROM
 .include "Subs.inc"
 .include "DriverLowLayer.inc"
 .include "Time.inc"
+.include "MainLogic.inc"
 
 
 .include "Tests.inc"

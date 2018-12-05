@@ -258,6 +258,29 @@ st_4:	std	Y+yPWML,r16
 	out	OCR1BL,r16
 	ret
 
+CheckFixPanPos:
+	ldd	r16,Y+yPanPosL
+	ldd	r17,Y+yPanPosM
+	ldd	r18,Y+yPanPosH
+	sbrs	r18,7
+	rjmp	cfp_1
+	ldi_w	r17,r16,0
+	ldi	r18,0
+	rjmp	cfp_2
+cfp_1:	ldi_w	r21,r20,FULL_CIRCLE
+	ldi	r22,BYTE3(FULL_CIRCLE)
+	cp	r20,r16
+	cpc	r21,r17
+	cpc	r22,r18
+	brlo	cfp_3
+	ret
+cfp_3:	movw	r17:r16,r21:r20
+	mov	r18,r22
+cfp_2:	std	Y+yPanPosL,r16
+	std	Y+yPanPosM,r17
+	std	Y+yPanPosH,r18
+	ret
+
 CheckTargetPos:
 	set
 	ldd	r19,Y+yTargetPosL

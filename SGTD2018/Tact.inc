@@ -43,6 +43,7 @@ rxtm_1:
 	or	r16,r17
 	brne	br0_1
 
+	rcall	CheckFixPanPos
 	sbrs	AFlags,afActive
 	rcall	CheckTargetPos
 
@@ -88,7 +89,7 @@ sk_BR3:
 	cpi	r23,0b01001111	; 15.2587890625 Ãö
 	brne	sk_BR4
 
-	rcall	SetTargetPos
+	rcall	TimeToTargetPos
 
 	rjmp	RetTact
 sk_BR4:

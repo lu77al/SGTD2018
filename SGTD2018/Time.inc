@@ -27,7 +27,7 @@ tg_1:	std	Y+ySecondCntH,r17
 	ret
 
 
-SetTargetPos:
+TimeToTargetPos:
 	ldd	r16,Y+yHour
 	ldi	r17,60
 	mul	r17,r16

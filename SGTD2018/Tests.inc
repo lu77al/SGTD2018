@@ -12,7 +12,7 @@ StartSimplePWM:
 
 StartTest:
 	stdi	yHour,12
-	rcall	SetTargetPos
+	rcall	TimeToTargetPos
 	ldd	r16,Y+yTargetPosL
 	ldd	r17,Y+yTargetPosM
 	ldd	r18,Y+yTargetPosH

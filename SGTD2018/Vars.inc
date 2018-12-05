@@ -70,25 +70,10 @@
 .equ	ySecondCntL	= $29
 .equ	ySecondCntH	= $2A
 
-
-
-.equ	yRTCstage	= $13
-.equ	yRTCWaitStatus	= $14
-
-.equ	yDB0		= $20
-.equ	yDB1		= $21
-.equ	yDB2		= $22
-.equ	yDB3		= $23
-.equ	yDB4		= $24
-.equ	yDB5		= $25
-.equ	yDB6		= $26
-.equ	yDB7		= $27
-
-.equ	yStatus0	= $28
-
-
-
-
+.equ	iHalfSpanL	= $A0
+.equ	iHalfSpanH	= $A1
+.equ	iTimeOffsetL	= $A2
+.equ	iTimeOffsetH	= $A3
 
 
 
