@@ -41,6 +41,11 @@
 #define	LIMIT_HS_POWER_OFF sbi LIMIT_HS_POWER
 
 
+.equ	btEastLimit  = 0
+.equ	btWestLimit  = 1
+.equ	btEastButton = 2
+.equ	btWestButton = 3
+
 
 ; --- Initial port state ---
 .macro	InitPorts

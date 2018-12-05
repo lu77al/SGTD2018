@@ -41,6 +41,9 @@
 .equ	yNextADC	= $09
 .equ	yADCSaveAddr	= $0A
 .equ	yADCChCnt	= $0B
+.equ	yButState	= $0C
+.equ	yButPress	= $0D
+.equ	yButRelease	= $0E
 
 .equ	yPanPosL	= $10
 .equ	yPanPosM	= $11
@@ -80,6 +83,12 @@
 .equ	iEveningH	= $A7
 .equ	iParkingL	= $A8
 .equ	iParkingH	= $A9
+
+.equ	iButtons_F	= $AB
+.equ	iEastLim_F	= $AC
+.equ	iWestLim_F	= $AD
+.equ	iEastBut_F	= $AE
+.equ	iWestBut_F	= $AF
 
 
 

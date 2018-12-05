@@ -82,6 +82,8 @@ sk_BR2:
 
 	rcall	TimeGo
 
+	rcall	PrepareButtonsF
+
 	rjmp	RetTact
 sk_BR3:
 
@@ -93,6 +95,16 @@ sk_BR3:
 
 	rjmp	RetTact
 sk_BR4:
+
+;--- Br ---
+	andi	r23,0b00011111	; 122.0703125 Ãö
+	cpi	r23,0b00000111
+	brne	sk_BR5
+
+	rcall	ReadBLS
+
+	rjmp	RetTact
+sk_BR5:
 
 
 
