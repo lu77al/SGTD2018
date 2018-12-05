@@ -102,16 +102,25 @@ ph_2:	std	Y+yPanPosL,r16
 	std	Y+yPanPosH,r18
 ph_3:	ret
 
-/*
 StopOnLimits:
+	sbrc	AFlags,afStopping
+	ret
 	ldd	r16,Y+yButState
+	ldi	r17,(1<<btWestLimit)
 	sbrc	AFlags,afReverse
-	rjmp	soh_1
-	sbrs	r16,btWestLimit
-	ret
-	
+	ldi	r17,(1<<btEastLimit)
+	and	r17,r16
+	breq	soh_1
+	set
+	bld	AFlags,afFastStop
+	rcall	StopDrive
+	ldd	r25,Y+yAfterFailPeriod
+	lsl	r25
+	inc	r25
+	std	Y+yAfterFailPeriod,r25
+	std	Y+yAfterFailCntH,r25
+	std	Y+yAfterFailCntL,ZeroReg
+	set
+	bld	AFlags,afFailStop
+soh_1:	ret
 
-soh_1:
-
-	ret
-*/

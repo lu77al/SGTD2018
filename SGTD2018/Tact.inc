@@ -106,7 +106,10 @@ sk_BR4:
 
 	rcall	UpdatePosOnLimits
 
-	rcall	TestStop
+	sbrc	AFlags,afActive
+	rcall	StopOnLimits	
+
+;	rcall	TestStop
 
 	rjmp	RetTact
 sk_BR5:

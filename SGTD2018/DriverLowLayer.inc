@@ -56,6 +56,7 @@ InitPWM:
 DriveOn:
 	clt
 	bld	AFlags,afFastStop
+	bld	AFlags,afStopping
 	set
 	bld	AFlags,afActive
 	std	Y+yPWML,ZeroReg
@@ -198,16 +199,17 @@ ss_2:
 	brcc	ss_3		; if RestPath<0
 	rcall	DriveOff	;    -> Stop drive
 	ret
-ss_3:
-	or	r17,r18	; Too far from target position -> cruising speed
-	brne	ss_4
-	sbrs	AFlags,afFastStop
-	rjmp	ss_5
+ss_3:	cpi	r16,120
+	cpc	r17,ZeroReg
+	cpc	r18,ZeroReg
+	brlo	ss_4
+	ldi	r16,120
+ss_4:	std	Y+yStopLength,r16
+	sbrc	AFlags,afFastStop
 	lsl	r16	; Double deacceleration
-	brcs	ss_4
 ss_5:	cpi	r16,120	; Too far from target position
 	brlo	ss_6
-ss_4:	ldi	r16,120		; -> cruising speed 
+	ldi	r16,120		; -> cruising speed 
 ss_6:	ldd	r17,Y+yAccelCnt
 	inc	r17	; Increase start path counter
 	cpi	r17,120
@@ -344,50 +346,39 @@ StopFail:
 	std	Y+yAfterFailCntL,ZeroReg
 	ret
 
+
 StopDrive:
-	sbrs	AFlags,afReverse	; Calculate rest of target path
-	rjmp	std_1
-	ldd	r16,Y+yPanPosL		;  - reverse (to East): Real-Target
-	ldd	r17,Y+yPanPosM
-	ldd	r18,Y+yPanPosH
-	ldd	r19,Y+yStopPosL
-	ldd	r20,Y+yStopPosM
-	ldd	r21,Y+yStopPosH
-	rjmp	std_2
-std_1:	ldd	r19,Y+yPanPosL		; - direct (to West): Target-Real
-	ldd	r20,Y+yPanPosM
-	ldd	r21,Y+yPanPosH
-	ldd	r16,Y+yStopPosL
-	ldd	r17,Y+yStopPosM
-	ldd	r18,Y+yStopPosH
-std_2:	sub	r16,r19
-	sbc	r17,r20
-	sbc	r18,r21
-	brcs	std_3
-	ldi	r19,120
+	sbrc	AFlags,afStopping
+	ret
+	set
+	bld	AFlags,afStopping
+	ldd	r16,Y+yStopLength
+	ldd	r17,Y+yAccelCnt
+	cp	r16,r17
+	brlo	std_4
+	mov	r16,r17
+std_4:	ldi	r19,120
 	sbrc	AFlags,afFastStop
 	ldi	r19,60
 	cp	r16,r19
-	cpc	r17,ZeroReg
-	cpc	r18,ZeroReg
-	brlo	std_3
-	ldd	r16,Y+yPanPosL
+	brsh	std_1
+	mov	r19,r16
+std_1:	ldd	r16,Y+yPanPosL
 	ldd	r17,Y+yPanPosM
 	ldd	r18,Y+yPanPosH
-	dec	r19
 	sbrc	AFlags,afReverse
-	rjmp	std_4
+	rjmp	std_2
 	add	r16,r19
 	adc	r17,ZeroReg
 	adc	r18,ZeroReg
-	rjmp	std_5
-std_4:	sub	r16,r19
+	rjmp	std_3
+std_2:	sub	r16,r19
 	sbc	r17,ZeroReg
 	sbc	r18,ZeroReg
-std_5:	std	Y+yStopPosL,r16
+std_3:	std	Y+yStopPosL,r16
 	std	Y+yStopPosM,r17
 	std	Y+yStopPosH,r18
-std_3:	ret
+	ret
 
 CountdownAfterFail:
 	ldd	r16,Y+yAfterFailCntL
