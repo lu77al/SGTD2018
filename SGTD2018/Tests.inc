@@ -11,6 +11,9 @@ StartSimplePWM:
 */
 
 StartTest:
+	ldi_w	r17,r16,17673
+	sts	iHalfSpanL,r16
+	sts	iHalfSpanH,r17
 	stdi	yHour,12
 	rcall	TimeToTargetPos
 	ldd	r16,Y+yTargetPosL

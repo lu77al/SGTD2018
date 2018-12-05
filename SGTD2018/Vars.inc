@@ -72,7 +72,7 @@
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1
-.equ	iTimeOffsetL	= $A2
+.equ	iTimeOffsetL	= $A2	; /2
 .equ	iTimeOffsetH	= $A3
 
 
