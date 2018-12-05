@@ -42,7 +42,7 @@ SetKeysLow:
 
 /*** Init timer1 based PWM frequency ***/
 InitPWM:
-	ldi_w	r17,r16,PWMPeriod
+	ldi_w	r17,r16,PWM_PERIOD
 	out	OCR1AH,r17
 	out	OCR1AL,r16	; PWM frequency
 	out	TCCR1A,ZeroReg
@@ -64,7 +64,7 @@ DriveOn:
 	ldi	r16,$80-JAM_INIT_PATH
 	std	Y+yJamPath,r16
 
-	ldi_w	r17,r16,PWMMinPulse ; Minimum pulse
+	ldi_w	r17,r16,PWM_MIN_PULSE ; Minimum pulse
 	out	OCR1BH,r17
 	out	OCR1BL,r16
 	clr	KS_High		; Zero state registers
@@ -85,6 +85,9 @@ DriveOff:
 	clt
 	bld	AFlags,afActive
 	outi	PORTB,0b010101	; Short drive
+	std	Y+yAfterFailCntL,ZeroReg
+	std	Y+yAfterFailCntH,ZeroReg
+	std	Y+yAfterFailPeriod,ZeroReg
 	ret
 
 
@@ -250,7 +253,7 @@ st_3:	neg	r20
 st_4:	std	Y+yPWML,r16
 	std	Y+yPWMH,r17
 	lsr16	r17,r16
-	subi_w	r17,r16,-PWMMinPulse
+	subi_w	r17,r16,-PWM_MIN_PULSE
 	out	OCR1BH,r17
 	out	OCR1BL,r16
 	ret
@@ -298,10 +301,26 @@ chj_3:	std	Y+yJamPath,r16
 chj_1:	inc	r16
 	cpi	r16,$80
 	brlo	chj_3
-chj_2:	rcall	DriveOff
-	stdi	yAfterFailCnt,255
+chj_2:	rjmp	StopFail
+
+StopFail:
+	ldd	r25,Y+yAfterFailPeriod
+	rcall	DriveOff
+	lsl	r25
+	inc	r25
+	std	Y+yAfterFailPeriod,r25
+	std	Y+yAfterFailCntH,r25
+	std	Y+yAfterFailCntL,ZeroReg
 	ret
 
+CountdownAfterFail:
+	ldd	r16,Y+yAfterFailCntL
+	ldd	r17,Y+yAfterFailCntH
+	subi_w	r17,r16,1
+	brcs	caf_1
+	std	Y+yAfterFailCntL,r16
+	std	Y+yAfterFailCntH,r17
+caf_1:	ret
 
 
 RotorMovement:	; Expected next states of rotor sensors ("+" - to west, "-" - to east)

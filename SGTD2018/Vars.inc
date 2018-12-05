@@ -61,11 +61,17 @@
 .equ	yTargetPosL	= $20
 .equ	yTargetPosM	= $21
 .equ	yTargetPosH	= $22
-.equ	yAfterFailCnt	= $23
+.equ	yAfterFailCntL	= $23
+.equ	yAfterFailCntH	= $24
+.equ	yAfterFailPeriod= $25
+.equ	yHour		= $26
+.equ	yMinute		= $27
+.equ	ySecond		= $28
+.equ	ySecondCntL	= $29
+.equ	ySecondCntH	= $2A
 
 
-.equ	yMinute		= $11
-.equ	yHour		= $12
+
 .equ	yRTCstage	= $13
 .equ	yRTCWaitStatus	= $14
 

@@ -35,56 +35,64 @@ rxtm_1:
 	std	Y+yMainCntH,r25
 
 ;--- Br0 ---
-	cpi	r23,0b01100111
+	cpi	r23,0b00001111	; 15.2587890625 關
 	brne	skBr0
 
-	ldd	r16,Y+yAfterFailCnt
-	subi	r16,1
-	brcs	a_1
-	std	Y+yAfterFailCnt,r16
-	rjmp	RetTact
-a_1:
+	ldd	r16,Y+yAfterFailCntL
+	ldd	r17,Y+yAfterFailCntH
+	or	r16,r17
+	brne	br0_1
 
 	sbrs	AFlags,afActive
 	rcall	CheckTargetPos
 
+br0_1:
+
 	rjmp	RetTact
 skBr0:
 
+;--- Br ---
+	cpi	r23,0b00011111	; 15.2587890625 關
+	brne	sk_BR1
+
+	andi	r24,0b11
+	brne	br1_1
+	rcall	CountdownAfterFail
+br1_1:
+
+	rjmp	RetTact
+sk_BR1:
+
 
 ;--- Br ---
-	cpi	r23,0b10100111; 15 關
-	brne	sk_BR6
+	cpi	r23,0b00101111	; 15.2587890625 關
+	brne	sk_BR2
 
 	sbrc	AFlags,afActive
 	rcall	CheckJam
 
 	rjmp	RetTact
-sk_BR6:
-
-
-;--- Br2 ---
-	andi	r23,0b01111111
-	cpi	r23,0b00010111	; 30 關
-	brne	sk_BR2
-
-	rjmp	RetTact
 sk_BR2:
 
 
-;--- Br3 ---
-	andi	r23,0b00111111	; 61 關
-	cpi	r23,0b00010011
+;--- Br ---
+	cpi	r23,0b00111111	; 15.2587890625 關
 	brne	sk_BR3
+
+	rcall	TimeGo
 
 	rjmp	RetTact
 sk_BR3:
 
-;--------- 扱闀膱 ------- 122 關
-	andi	r23,0b00011111 
-	cpi	r23,0b00000001
-	brne	skBut
+;--- Br ---
+	cpi	r23,0b01001111	; 15.2587890625 關
+	brne	sk_BR4
+
+	rcall	SetTargetPos
 
 	rjmp	RetTact
-skBut:
+sk_BR4:
+
+
+
 	rjmp	RetTact

@@ -125,7 +125,36 @@ K16x16:	push	r21
 	pop	r21
 	ret
 
-
+;--------------------------------------------
+; r18:r17:r16 * r20:r19 = r25:r24:r23:r22:r21
+;--------------------------------------------
+M24x16:	mul	r20,r18
+	movw	r25:r24,r1:r0
+	mul	r20,r17
+	mov	r23,r0
+	add	r24,r1
+	adc	r25,ZeroReg
+	mul	r20,r16
+	mov	r22,r0
+	add	r23,r1
+	adc	r24,ZeroReg
+	adc	r25,ZeroReg
+	mul	r19,r18
+	add	r23,r0
+	adc	r24,r1
+	adc	r25,ZeroReg
+	mul	r19,r17
+	add	r22,r0
+	adc	r23,r1
+	adc	r24,ZeroReg
+	adc	r25,ZeroReg
+	mul	r19,r16
+	mov	r21,r0
+	add	r22,r1
+	adc	r23,ZeroReg
+	adc	r24,ZeroReg
+	adc	r25,ZeroReg
+	ret
 
 ;***************************
 ; Divide Result = Val1/Val2

@@ -1,4 +1,5 @@
 .equ	FULL_CIRCLE = 70693	; Drive tics per day
+.equ	HALF_CIRCLE = FULL_CIRCLE / 2
 
 .equ	MAX_POS_DIFF_MIN = 4	; Maximum panel position offset from target (minutes)
 .equ	MAX_POS_DIFF = MAX_POS_DIFF_MIN * FULL_CIRCLE / (24 * 60) ; ... drive tics
@@ -6,9 +7,11 @@
 .equ	JAM_PATH = 7		; Tics for jam detection
 .equ	JAM_INIT_PATH = 18	; Tics for jam detection (from start)
 
-.equ	PWMPeriod = 1600	; f = 8e6 / 1600 = 5000Hz
-.equ	PWMMinPulse = 24
+.equ	PWM_PERIOD = 1600	; f = 8e6 / 1600 = 5000Hz
+.equ	PWM_MIN_PULSE = 24
 
+.equ	FULL_SECOND = 62500
+.equ	SECOND_FRACTION = 4096
 
 ; Передаточное отношение
 ; шестерни	(99/14)^2

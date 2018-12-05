@@ -11,14 +11,16 @@ StartSimplePWM:
 */
 
 StartTest:
-	ldi	r16,$80
-	std	Y+yPanPosH,r16
-	std	Y+yPanPosM,ZeroReg
-	std	Y+yPanPosL,ZeroReg
-	std	Y+yTargetPosH,r16
-	std	Y+yTargetPosM,ZeroReg
-	std	Y+yTargetPosL,ZeroReg
+	stdi	yHour,12
+	rcall	SetTargetPos
+	ldd	r16,Y+yTargetPosL
+	ldd	r17,Y+yTargetPosM
+	ldd	r18,Y+yTargetPosH
+	std	Y+yPanPosL,r16
+	std	Y+yPanPosM,r17
+	std	Y+yPanPosH,r18
 	ret
+
 
 
 /* Stop procedure variants
