@@ -55,6 +55,26 @@ InitPWM:
 /*** Activate timer1 setup PWM start values ***/
 DriveOn:
 	clt
+	ldd	r16,Y+yStopPosL
+	ldd	r17,Y+yStopPosM
+	ldd	r18,Y+yStopPosH
+	ldd	r19,Y+yPanPosL
+	ldd	r20,Y+yPanPosM
+	ldd	r21,Y+yPanPosH
+	cp	r16,r19
+	cpc	r17,r20
+	cpc	r18,r21
+	breq	don_1
+	brsh	don_2
+	set
+don_2:	bld	AFlags,afReverse
+	ldi	r16,1<<btWestLimit
+	sbrc	AFlags,afReverse
+	ldi	r16,1<<btEastLimit
+	ldd	r17,Y+yButState
+	and	r16,r17
+	brne	don_1
+	clt
 	bld	AFlags,afFastStop
 	bld	AFlags,afStopping
 	set
@@ -75,7 +95,7 @@ DriveOn:
 	out	PORTB,ZeroReg
 	outi	TIFR,(1<<OCF1B) + (1<<OCF1A) ; Clear interrupt flags
 	outi	TCCR1B,0b00001001 ; Start timer on CK frequency with CTC at OCR1A
-	ret
+don_1:	ret
 
 /*** Disactivate timer1 release port ***/
 DriveOff:
@@ -292,7 +312,6 @@ cfp_2:	std	Y+yPanPosL,r16
 	ret
 
 CheckTargetPos:
-	set
 	ldd	r19,Y+yTargetPosL
 	ldd	r20,Y+yTargetPosM
 	ldd	r21,Y+yTargetPosH
@@ -303,7 +322,6 @@ CheckTargetPos:
 	sbc	r17,r20
 	sbc	r18,r21
 	brcc	ctp_1
-	clt
 	com	r16
 	com	r17
 	com	r18
@@ -312,15 +330,12 @@ CheckTargetPos:
 ctp_1:	
 	cpi_w	r17,r16,MAX_POS_DIFF,r25
 	cpc	r18,ZeroReg
-	brsh	ctp_2
-	ret
-ctp_2:
-	bld	AFlags,afReverse
+	brlo	ctp_2
 	std	Y+yStopPosL,r19
 	std	Y+yStopPosM,r20
 	std	Y+yStopPosH,r21
 	rcall	DriveOn
-	ret
+ctp_2:	ret
 
 CheckJam:
 	ldd	r16,Y+yJamPath

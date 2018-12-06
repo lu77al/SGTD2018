@@ -109,7 +109,8 @@ sk_BR4:
 	sbrc	AFlags,afActive
 	rcall	StopOnLimits	
 
-;	rcall	TestStop
+	sbrs	AFlags,afActive
+	rcall	TestSimpleMove
 
 	rjmp	RetTact
 sk_BR5:

@@ -57,6 +57,37 @@ tst_1:	rcall	StopDrive
 tst_2:	ret
 
 
+TestSimpleMove:
+	ldi_w	r17,r16,HALF_CIRCLE
+	ldi	r18,0
+	lds	r19,iHalfSpanL
+	lds	r20,iHalfSpanH
+	ldd	r25,Y+yButPress
+	mov	r24,r25
+	andi	r24,$FF-(1<<btEastButton) - (1<<btWestButton)
+	std	Y+yButPress,r24
+	sbrs	r25,btWestButton
+	rjmp	tsm_1
+	add	r16,r19
+	adc	r17,r20
+	adc	r18,ZeroReg
+tsm_3:	std	Y+yStopPosL,r16
+	std	Y+yStopPosM,r17
+	std	Y+yStopPosH,r18
+	set
+	bld	AFlags,afSetup
+	rjmp	DriveOn
+tsm_1:
+	sbrs	r25,btEastButton
+	rjmp	tsm_2
+	sub	r16,r19
+	sbc	r17,r20
+	sbc	r18,ZeroReg
+	rjmp	tsm_3
+tsm_2:
+	ret	
+		
+
 /* Stop procedure variants
  - regular: (speed profile) + immediate stop
  - fast: set new target pos + double acceleration profile

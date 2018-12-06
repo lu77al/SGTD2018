@@ -5,8 +5,9 @@
 	.equ	afReverse  = 1
 	.equ	afFastStop = 2
 	.equ	afFailStop = 3
-	.equ	afSetup	   = 4
-	.equ	afStopping = 5
+	.equ	afStopping = 4
+	.equ	afSetup	   = 5
+
 
 .def	BFlags	= r4
 	.equ	bfRTCRead  = 0
@@ -76,6 +77,7 @@
 .equ	ySecondCntL	= $29
 .equ	ySecondCntH	= $2A
 .equ	yStopLength	= $2B
+.equ	yInitPhase	= $2C
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1

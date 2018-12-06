@@ -90,6 +90,7 @@ OffsetAndFitRange: ; r25:r24:r23 - input/output position
 	sbrc	r17,7
 	ldi	r18,$FF
 	lsl16	r17,r16		; Prepare offset (unpack 16bit)
+	lsl16	r17,r16
 	rol	r18
 	add	r23,r16		; Apply offset
 	adc	r24,r17
