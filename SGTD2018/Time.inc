@@ -127,15 +127,16 @@ fr_5:	mov	r23,r16
 	mov	r25,r18
 	ret
 
-
 UpdateOffset:
 	ldd	r16,Y+yHour
 	ldi	r17,60
 	mul	r17,r16
-	movw	r17:r16,r1:r0
-	ldd	r18,Y+yMinute
-	add	r16,r18
-	adc	r17,ZeroReg ; Minutes from 00:00
+	mov	r18,r1
+	mov	r17,r0
+	ldi	r16,0
+	ldd	r19,Y+yMinute
+	add	r17,r19
+	adc	r18,ZeroReg ; Minutes from 00:00
 	ldi_w	r20,r19,12567
 	rcall	M24x16	    ; r25:r24:r23 Converted to tics
 	ldd	r16,Y+yPanPosL

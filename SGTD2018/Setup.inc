@@ -25,6 +25,8 @@
 
 StopCMD:
 	rcall	StopDrive
+	set
+	bld	AFlags,afSetup
 	ret
 
 ExitSetupCMD:

@@ -366,6 +366,8 @@ StopFail:
 
 
 StopDrive:
+	sbrc	AFlags,afSetup
+	rcall	UpdateOffset
 	sbrc	AFlags,afActive
 	sbrc	AFlags,afStopping
 	ret
@@ -400,11 +402,16 @@ std_3:	std	Y+yStopPosL,r16
 	ret
 
 CountdownAfterFail:
-	ldd	r16,Y+yAfterFailCntL
+	sbrs	AFlags,afSetup
+	rjmp	caf_2
+	std	Y+yAfterFailPeriod,ZeroReg
+	ldi_w	r17,r16,115
+	rjmp	caf_3
+caf_2:	ldd	r16,Y+yAfterFailCntL
 	ldd	r17,Y+yAfterFailCntH
 	subi_w	r17,r16,1
 	brcs	caf_1
-	std	Y+yAfterFailCntL,r16
+caf_3:	std	Y+yAfterFailCntL,r16
 	std	Y+yAfterFailCntH,r17
 caf_1:	ret
 

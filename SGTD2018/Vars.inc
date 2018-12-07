@@ -9,14 +9,12 @@
 	.equ	afSetup	     = 5
 	.equ	afWaitButRel = 6
 
-
 .def	BFlags	= r4
 	.equ	bfRTCRead  = 0
 	.equ	bfRTCWrite = 1
 
 .def	KS_Dead    = r5
 .def	KS_High    = r6
-
 
 #define	ZeroReg	YH
 
