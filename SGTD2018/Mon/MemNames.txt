@@ -20,12 +20,13 @@ SEGMENTBASE $60
 .equ	yRXTimer	= $06
 .equ	yRXTXCHS	= $07
 .equ	yMyAddr		= $08
-.equ	yNextADC	= $09
+.equ	yAFlags		= $09
 .equ	yADCSaveAddr	= $0A
 .equ	yADCChCnt	= $0B
 .equ	yButState	= $0C
 .equ	yButPress	= $0D
 .equ	yButRelease	= $0E
+.equ	yButStateCnt	= $0F
 
 .equ	yPanPosL	= $10
 .equ	yPanPosM	= $11
@@ -54,7 +55,8 @@ SEGMENTBASE $60
 .equ	ySecond		= $28
 .equ	ySecondCntL	= $29
 .equ	ySecondCntH	= $2A
-
+.equ	yStopLength	= $2B
+.equ	yInitPhase	= $2C
 
 
 SEGMENTBASE $000

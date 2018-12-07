@@ -312,6 +312,9 @@ cfp_2:	std	Y+yPanPosL,r16
 	ret
 
 CheckTargetPos:
+	ldd	r16,Y+yButState	; Skip if any user button is pressed
+	andi	r16,(1<<btEastButton) + (1<<btWestButton)
+	brne	ctp_2
 	ldd	r19,Y+yTargetPosL
 	ldd	r20,Y+yTargetPosM
 	ldd	r21,Y+yTargetPosH
@@ -363,6 +366,7 @@ StopFail:
 
 
 StopDrive:
+	sbrc	AFlags,afActive
 	sbrc	AFlags,afStopping
 	ret
 	set

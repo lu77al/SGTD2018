@@ -73,16 +73,6 @@ cp_1:	set
 	ret
 
 
-/*
-.equ	iMorningL	= $A4
-.equ	iMorningH	= $A5
-.equ	iEveningL	= $A6
-.equ	iEveningH	= $A7
-.equ	iParkingL	= $A8
-.equ	iParkingH	= $A9
-*/	
-	ret
-
 OffsetAndFitRange: ; r25:r24:r23 - input/output position
 	lds	r16,iTimeOffsetL
 	lds	r17,iTimeOffsetH
@@ -138,20 +128,26 @@ fr_5:	mov	r23,r16
 	ret
 
 
-/*
-tg_5:	ldi	r16,60
-	mul	r16,r20
+UpdateOffset:
+	ldd	r16,Y+yHour
+	ldi	r17,60
+	mul	r17,r16
 	movw	r17:r16,r1:r0
-	add	r16,r19
-	adc	r17,ZeroReg
-	ldi_w	r19,r18,2*MAX_POS_DIFF_MIN
-	mov_w	r23:r22,r17:r16
-	rcall	Div
-	sub	r22,r14
-	sbc	r23,r15
-	subi_w	r23,r22,-MAX_POS_DIFF_MIN
-	
-
-	K16x16m	65536/(2*MAX_POS_DIFF_MIN)
-	
-*/
+	ldd	r18,Y+yMinute
+	add	r16,r18
+	adc	r17,ZeroReg ; Minutes from 00:00
+	ldi_w	r20,r19,12567
+	rcall	M24x16	    ; r25:r24:r23 Converted to tics
+	ldd	r16,Y+yPanPosL
+	ldd	r17,Y+yPanPosM
+	ldd	r18,Y+yPanPosH
+	sub	r16,r23
+	sbc	r17,r24
+	sbc	r18,r25
+	asr16	r18,r17
+	ror	r16
+	asr16	r18,r17
+	ror	r16
+	sts	iTimeOffsetL,r16
+	sts	iTimeOffsetH,r17
+	ret

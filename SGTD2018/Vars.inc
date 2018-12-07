@@ -1,12 +1,13 @@
 .def	SSREG	= r2
 
 .def	AFlags	= r3
-	.equ	afActive   = 0
-	.equ	afReverse  = 1
-	.equ	afFastStop = 2
-	.equ	afFailStop = 3
-	.equ	afStopping = 4
-	.equ	afSetup	   = 5
+	.equ	afActive     = 0
+	.equ	afReverse    = 1
+	.equ	afFastStop   = 2
+	.equ	afFailStop   = 3
+	.equ	afStopping   = 4
+	.equ	afSetup	     = 5
+	.equ	afWaitButRel = 6
 
 
 .def	BFlags	= r4
@@ -42,12 +43,13 @@
 .equ	yRXTimer	= $06
 .equ	yRXTXCHS	= $07
 .equ	yMyAddr		= $08
-.equ	yNextADC	= $09
+.equ	yAFlags		= $09
 .equ	yADCSaveAddr	= $0A
 .equ	yADCChCnt	= $0B
 .equ	yButState	= $0C
 .equ	yButPress	= $0D
 .equ	yButRelease	= $0E
+.equ	yButStateCnt	= $0F
 
 .equ	yPanPosL	= $10
 .equ	yPanPosM	= $11

@@ -94,6 +94,10 @@ sk_BR3:
 
 	rcall	TimeToTargetPos
 
+	rcall	ProcessButtons
+
+	std	Y+yAFlags,AFlags
+
 	rjmp	RetTact
 sk_BR4:
 
@@ -109,8 +113,8 @@ sk_BR4:
 	sbrc	AFlags,afActive
 	rcall	StopOnLimits	
 
-	sbrs	AFlags,afActive
-	rcall	TestSimpleMove
+;	sbrs	AFlags,afActive
+;	rcall	TestSimpleMove
 
 	rjmp	RetTact
 sk_BR5:

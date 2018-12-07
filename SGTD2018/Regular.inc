@@ -67,12 +67,18 @@ ReadBLS: ; Read buttons and limit sensors
 	and	r17,r16	; Released = Prev_State & State^
 	or	r20,r17
 	com	r16
-	and	r18,r16	; Pressed = PrevState^ & State
+	ldd	r17,Y+yButState ; Test for buttons change
+	eor	r17,r16
+	andi	r17,(1<<btEastButton) + (1<<btWestButton)
+	breq	rbls_1
+	std	Y+yButStateCnt,ZeroReg
+rbls_1:	and	r18,r16	; Pressed = PrevState^ & State
 	or	r19,r18
 	std	Y+yButState,r16
 	std	Y+yButPress,r19
 	std	Y+yButRelease,r20
 	ret
+
 
 UpdatePosOnLimits:
 	ldd	r25,Y+yButPress
@@ -127,36 +133,3 @@ StopOnLimits:
 	std	Y+yAfterFailCntL,ZeroReg
 soh_1:	ret
 
-WestLimitSetup:
-	sbrc	AFLags,afReverse
-	ret
-
-EastLimitSetup:
-	sbrs	AFLags,afReverse
-	ret
-
-	ret
-
-UpdateOffset:
-	ldd	r16,Y+yHour
-	ldi	r17,60
-	mul	r17,r16
-	movw	r17:r16,r1:r0
-	ldd	r18,Y+yMinute
-	add	r16,r18
-	adc	r17,ZeroReg ; Minutes from 00:00
-	ldi_w	r20,r19,12567
-	rcall	M24x16	    ; r25:r24:r23 Converted to tics
-	ldd	r16,Y+yPanPosL
-	ldd	r17,Y+yPanPosM
-	ldd	r18,Y+yPanPosH
-	sub	r16,r23
-	sbc	r17,r24
-	sbc	r18,r25
-	asr16	r18,r17
-	ror	r16
-	asr16	r18,r17
-	ror	r16
-	sts	iTimeOffsetL,r16
-	sts	iTimeOffsetH,r17
-	ret
