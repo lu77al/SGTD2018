@@ -15,6 +15,11 @@
  *     - automatic countdown for exit setup
  */
 
+/* Buttons interface V3
+ *   Long press - Start move
+ *   Press when moving - Stop + delay
+ */
+
 /* Setup Commands:
  *   - stop move / enter setup / update offset
  *   - start move
@@ -24,39 +29,29 @@
  */
 
 StopCMD:
+	sbrc	AFlags,afSetupMove
+	rcall	UpdateTimeOffset
 	rcall	StopDrive
-	set
-	bld	AFlags,afSetup
-	ret
-
-ExitSetupCMD:
-	clt
-	bld	AFlags,afSetup
+	std	Y+yAfterFailPeriod,ZeroReg
+	std	Y+yAfterFailCntH,ZeroReg
+	stdi	yAfterFailCntL,255
 	ret
 
 MoveEastCMD:
 	ldi_w	r17,r16,0
 	ldi	r18,0
 	rjmp	smv_1
-	ret
+
 
 MoveWestCMD:
 	ldi_w	r17,r16,FULL_CIRCLE
 	ldi	r18,BYTE2(FULL_CIRCLE)
 smv_1:	set
-	bld	AFlags,afSetup
+	bld	AFlags,afSetupMove
 	std	Y+yStopPosL,r16
 	std	Y+yStopPosM,r17
 	std	Y+yStopPosH,r18
 	rjmp	DriveOn
-	ret
-
-SearchEastCMD:
-	ret
-
-SearchWestCMD:
-	ret
-
 
 ProcessButtons:
 	ldd	r24,Y+yButState
@@ -75,46 +70,26 @@ pb_1:	std	Y+yButStateCnt,r25
 	clt
 	bld	AFlags,afWaitButRel
 pb_2:
-	ldd	r23,Y+yButPress
-	ldd	r22,Y+yButRelease
 	sbrs	AFLags,afActive	  ; If drive is active -> only process press for stop
 	rjmp	pb_4
-	; TODO add branch for search mode active
+	ldd	r23,Y+yButPress
 	andi	r23,(1<<btEastButton) + (1<<btWestButton)
 	breq	pb_3
 	rcall	StopCMD
 	rjmp	pb_6
 pb_4:
-	andi	r23,(1<<btEastButton) + (1<<btWestButton) ; Exit setup (both pressed)
-	breq	pb_5
-	cpi	r24,(1<<btEastButton) + (1<<btWestButton)
-	brne	pb_5
-	rcall	ExitSetupCMD
-	rjmp	pb_6
-pb_5:
-	sbrs	r22,btWestButton
+	cpi	r25,40		; Long ...
+	brlo	pb_5
+	sbrs	r24,btWestButton  ; Press west
 	rjmp	pb_7
-	rcall	MoveWestCMD
+	rcall	MoveWestCMD		; -> Move west
 	rjmp	pb_6
 pb_7:
-	sbrs	r22,btEastButton
-	rjmp	pb_8
-	rcall	MoveEastCMD
+	sbrs	r24,btEastButton  ; Press east
+	rjmp	pb_5
+	rcall	MoveEastCMD		; -> Move east
 	rjmp	pb_6
-pb_8:
-	cpi	r25,40
-	brlo	pb_3
-
-	sbrs	r24,btWestButton
-	rjmp	pb_9
-	rcall	SearchWestCMD
-	rjmp	pb_6
-pb_9:
-	sbrs	r24,btEastButton
-	rjmp	pb_10
-	rcall	SearchEastCMD
-	rjmp	pb_6
-pb_10:
+pb_5:
 	rjmp	pb_3
 pb_6:	set
 	bld	AFlags,afWaitButRel
@@ -125,16 +100,61 @@ pb_3:	ldd	r16,Y+yButPress		; Clear flags after processing
 	andi	r16,$ff - (1<<btEastButton) - (1<<btWestButton)
 	std	Y+yButRelease,r16
 	ret
-	
 
 
+; West limit sensor "pressed" during setup move
+;  - update halfspan (HS = PP - HC + HS) / 2 
+;  - limit ranges
+;  - update PP
+;  - update time offset
+;     HS - HalfSpan; PP - PanelPos; HC - HalfCircle   
 
 WestLimitSetup:
-	sbrc	AFLags,afReverse
+	sbrc	AFLags,afReverse ; Skip wrong direction
+	ret
+	ldd	r16,Y+yPanPosL	
+	ldd	r17,Y+yPanPosM
+	ldd	r18,Y+yPanPosH
+	subi	r16,LOW(HALF_CIRCLE)
+	sbci	r17,HIGH(HALF_CIRCLE)
+	sbci	r18,BYTE3(HALF_CIRCLE)
+ls_3:	lds	r19,iHalfSpanL
+	lds	r20,iHalfSpanH
+	add	r16,r19
+	adc	r17,r20
+	adc	r18,ZeroReg
+	ldi_w	r20,r19,MIN_SPAN
+	ldi	r21,BYTE3(MIN_SPAN)
+	cp	r16,r19
+	cpc	r17,r20
+	cpc	r18,r21
+	brlt	ls_1
+	ldi_w	r20,r19,MAX_SPAN
+	ldi	r21,BYTE3(MAX_SPAN)
+	cp	r16,r19
+	cpc	r17,r20
+	cpc	r18,r21
+	brlt	ls_2
+ls_1:	mov	r16,r19
+	mov	r17,r20
+	mov	r18,r21
+ls_2:	lsr16	r18,r17
+	ror	r16
+	sts	iHalfSpanL,r16
+	sts	iHalfSpanH,r17
 	ret
 
+; West limit sensor "pressed" during setup move
+;  (HS = HC - PP + HS) / 2 
+;  - limit ranges
 EastLimitSetup:
-	sbrs	AFLags,afReverse
-	ret
-
-	ret
+	sbrs	AFLags,afReverse ; Skip wrong direction
+	ldi_w	r17,r16,HALF_CIRCLE
+	ldi	r18,BYTE3(HALF_CIRCLE)
+	ldd	r19,Y+yPanPosL	
+	ldd	r20,Y+yPanPosM
+	ldd	r21,Y+yPanPosH
+	sub	r16,r19
+	sbc	r17,r20
+	sbc	r18,r21
+	rjmp	ls_3

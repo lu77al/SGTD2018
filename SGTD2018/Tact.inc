@@ -38,17 +38,9 @@ rxtm_1:
 	cpi	r23,0b00001111	; 15.2587890625 Ãö
 	brne	skBr0
 
-	rcall	CheckFixPanPos
+	rcall	CheckFixPanPos	; Don't allow reach 0 and FULL_CIRCLE
 
-	sbrs	AFlags,afSetup
-	sbrc	AFlags,afActive
-	rjmp	br0_1
-	ldd	r16,Y+yAfterFailCntL
-	ldd	r17,Y+yAfterFailCntH
-	or	r16,r17
-	brne	br0_1
 	rcall	CheckTargetPos
-br0_1:
 
 	rjmp	RetTact
 skBr0:
@@ -61,7 +53,6 @@ skBr0:
 	brne	br1_1
 	rcall	CountdownAfterFail
 br1_1:
-
 	rjmp	RetTact
 sk_BR1:
 
@@ -70,7 +61,6 @@ sk_BR1:
 	cpi	r23,0b00101111	; 15.2587890625 Ãö
 	brne	sk_BR2
 
-	sbrc	AFlags,afActive
 	rcall	CheckJam
 
 	rjmp	RetTact
@@ -108,13 +98,9 @@ sk_BR4:
 
 	rcall	ReadBLS
 
-	rcall	UpdatePosOnLimits
+	rcall	TestLimitPressed
 
-	sbrc	AFlags,afActive
 	rcall	StopOnLimits	
-
-;	sbrs	AFlags,afActive
-;	rcall	TestSimpleMove
 
 	rjmp	RetTact
 sk_BR5:

@@ -1,3 +1,255 @@
+/* Buttons interface V1
+ *   Enter setup - long press both
+ *   Exit setup  - press both
+ *   Start move (with offset correction) - release
+ *   Stop move  - press
+ *   Start limits search - long press
+ */
+
+/* Buttons interface V2
+ *   Release - Start move + enter setup
+ *   Long press - Start limit search + enter setup
+ *   Press when moving - Stop and enter setup
+ *   Press both - exit setup 
+ *     - wait for long release after each command 
+ *     - automatic countdown for exit setup
+ */
+
+/* Buttons interface V3
+ *   Long press - Start move
+ *   Press when moving - Stop + delay
+ */
+
+/* Setup Commands:
+ *   - stop move / enter setup / update offset
+ *   - start move
+ *   - start search
+ *   - exit setup
+ *   - set parameters (later)
+ */
+
+StopCMD:
+	sbrc	AFlags,afSetup
+	rcall	UpdateOffset
+	rcall	StopDrive
+	set
+	bld	AFlags,afSetup
+	ret
+
+ExitSetupCMD:
+	clt
+	bld	AFlags,afSetup
+	ret
+
+MoveEastCMD:
+	ldi_w	r17,r16,0
+	ldi	r18,0
+	rjmp	smv_1
+
+
+MoveWestCMD:
+	ldi_w	r17,r16,FULL_CIRCLE
+	ldi	r18,BYTE2(FULL_CIRCLE)
+smv_1:	set
+	bld	AFlags,afSetup
+	std	Y+yStopPosL,r16
+	std	Y+yStopPosM,r17
+	std	Y+yStopPosH,r18
+	rjmp	DriveOn
+
+
+SearchEastCMD:
+	ret
+
+SearchWestCMD:
+	ret
+
+
+FindLimits:	;1-0 - Exit; 2-1 - Move to midday; 3-2 - Move second side; 4-3 - Move first side
+	sbrc	AFlags,afActive
+fl_1:	ret
+	ldd	r16,Y+yInitPhase
+	subi	r16,1
+	brcs	fl_1
+	std	Y+yInitPhase,r16
+	cpi	r16,4
+	brsh	fl_1
+	cpi	r16,2
+	brlo	fl_2
+	ldi	r16,1<<afReverse
+	eor	AFlags,r16
+	sbrc	AFlags,afReverse
+	rjmp	fl_3
+	ldi_w	r17,r16,1000
+	ldi	r18,0
+	ldi_w	r20,r19,FULL_CIRCLE - 1000
+	ldi	r21,BYTE3(FULL_CIRCLE - 1000)
+	rjmp	fl_4
+fl_3:	ldi_w	r20,r19,1000
+	ldi	r21,0
+	ldi_w	r17,r16,FULL_CIRCLE - 1000
+	ldi	r18,BYTE3(FULL_CIRCLE - 1000)
+fl_4:	std	Y+yPanPosL,r16
+	std	Y+yPanPosM,r17
+	std	Y+yPanPosH,r18
+fl_6:	std	Y+yStopPosL,r19
+	std	Y+yStopPosM,r20
+	std	Y+yStopPosH,r21
+	rjmp	DriveOn
+fl_2:	cpi	r16,1
+	brne	fl_5
+	ldi_w	r20,r19,HALF_CIRCLE
+	ldi	r21,BYTE3(HALF_CIRCLE)
+	rjmp	fl_6
+fl_5:	
+	ret
+
+
+
+	
+
+
+ProcessButtons:
+	ldd	r24,Y+yButState
+	andi	r24,(1<<btEastButton) + (1<<btWestButton)
+	ldd	r25,Y+yButStateCnt ; Stable state counter
+	inc	r25
+	brne	pb_1
+	ldi	r25,0
+pb_1:	std	Y+yButStateCnt,r25
+	sbrs	AFlags,afWaitButRel ; Wait for buttons released
+	rjmp	pb_2
+	cpi	r24,0
+	brne	pb_3
+	cpi	r25,7
+	brlo	pb_3
+	clt
+	bld	AFlags,afWaitButRel
+pb_2:
+	ldd	r23,Y+yButPress
+	ldd	r22,Y+yButRelease
+	sbrs	AFLags,afActive	  ; If drive is active -> only process press for stop
+	rjmp	pb_4
+	; TODO add branch for search mode active
+	andi	r23,(1<<btEastButton) + (1<<btWestButton)
+	breq	pb_3
+	rcall	StopCMD
+	rjmp	pb_6
+pb_4:
+	andi	r23,(1<<btEastButton) + (1<<btWestButton) ; Exit setup (both pressed)
+	breq	pb_5
+	cpi	r24,(1<<btEastButton) + (1<<btWestButton)
+	brne	pb_5
+	rcall	ExitSetupCMD
+	rjmp	pb_6
+pb_5:
+	sbrs	r22,btWestButton
+	rjmp	pb_7
+	rcall	MoveWestCMD
+	rjmp	pb_6
+pb_7:
+	sbrs	r22,btEastButton
+	rjmp	pb_8
+	rcall	MoveEastCMD
+	rjmp	pb_6
+pb_8:
+	cpi	r25,40
+	brlo	pb_3
+
+	sbrs	r24,btWestButton
+	rjmp	pb_9
+	rcall	SearchWestCMD
+	rjmp	pb_6
+pb_9:
+	sbrs	r24,btEastButton
+	rjmp	pb_10
+	rcall	SearchEastCMD
+	rjmp	pb_6
+pb_10:
+	rjmp	pb_3
+pb_6:	set
+	bld	AFlags,afWaitButRel
+pb_3:	ldd	r16,Y+yButPress		; Clear flags after processing
+	andi	r16,$ff - (1<<btEastButton) - (1<<btWestButton)
+	std	Y+yButPress,r16
+	ldd	r16,Y+yButRelease
+	andi	r16,$ff - (1<<btEastButton) - (1<<btWestButton)
+	std	Y+yButRelease,r16
+	ret
+
+
+WestLimitSetup:
+	sbrc	AFLags,afReverse
+	ret
+	ldd	r16,Y+yInitPhase
+	cpi	r16,2
+	brne	ls_1
+	ldd	r16,Y+yPanPosL
+	ldd	r17,Y+yPanPosM
+	ldd	r18,Y+yPanPosH
+	ldi_w	r20,r19,1000
+	ldi	r21,0
+	rjmp	ls_3
+ls_1:	ret
+
+
+EastLimitSetup:
+	sbrs	AFLags,afReverse
+	ret
+ls_1:
+	ldd	r16,Y+yInitPhase
+	cpi	r16,2
+	brne	ls_2
+	ldi_w	r17,r16,FULL_CIRCLE - 1000
+	ldi	r18,BYTE3(FULL_CIRCLE - 1000)
+	ldd	r19,Y+yPanPosL
+	ldd	r20,Y+yPanPosM
+	ldd	r21,Y+yPanPosH
+ls_3:	sub	r16,r19
+	sbc	r17,r20
+	sbc	r18,r21
+	brcs	ls_4
+	ldi_w	r20,r19,MIN_SPAN
+	ldi	r21,BYTE3(MIN_SPAN)
+	cp	r16,r19
+	cpc	r17,r20
+	cpc	r18,r21
+	brsh	ls_5
+ls_4:	ldi_w	r17,r16,MIN_SPAN
+	ldi	r18,BYTE3(MIN_SPAN)
+	rjmp	ls_6
+ls_5:	ldi_w	r20,r19,MAX_SPAN
+	ldi	r21,BYTE3(MAX_SPAN)
+	cp	r16,r19
+	cpc	r17,r20
+	cpc	r18,r21
+	brlo	ls_6
+	ldi_w	r17,r16,MAX_SPAN
+	ldi	r18,BYTE3(MAX_SPAN)
+ls_6:	lsr16	r18,r17
+	ror	r16
+	sts	iHalfSpanL,r16
+	sts	iHalfSpanH,r17
+	ldi_w	r20,r19,HALF_CIRCLE
+	ldi	r21,BYTE3(HALF_CIRCLE)
+
+	
+	.equ	iHalfSpanH	= $A1
+	
+
+
+	.equ	MIN_SPAN = FULL_CIRCLE / 24 * 5
+.equ	MAX_SPAN = FULL_CIRCLE / 24 * 15
+
+
+
+	cp
+
+
+ls_2:
+	ret
+
+
 
 /*
 	ldd	r16,Y+yPanPosL

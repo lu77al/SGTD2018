@@ -80,41 +80,48 @@ rbls_1:	and	r18,r16	; Pressed = PrevState^ & State
 	ret
 
 
-UpdatePosOnLimits:
+TestLimitPressed:
 	ldd	r25,Y+yButPress
 	mov	r16,r25
 	andi	r16,$FF - (1<<btEastLimit) - (1<<btWestLimit)
 	std	Y+yButPress,r16
 	sbrs	r25,btEastLimit	; East limit trigger
 	rjmp	ph_1
-	sbrc	AFlags,afSetup
-	rjmp	EastLimitSetup
-	ldi_w	r17,r16,HALF_CIRCLE - HALL_OFFSET
-	ldi	r18,0
-	lds	r19,iHalfSpanL
-	lds	r20,iHalfSpanH
-	sub	r16,r19
-	sbc	r17,r20
+	sbrc	AFlags,afSetupMove
+	rcall	EastLimitSetup
+	set
 	rjmp	ph_2
 ph_1:	sbrs	r25,btWestLimit	; West limit trigger
-	rjmp	ph_3
-	sbrc	AFlags,afSetup
-	rjmp	WestLimitSetup
-	ldi_w	r17,r16,HALF_CIRCLE + HALL_OFFSET
+	ret
+	sbrc	AFlags,afSetupMove
+	rcall	WestLimitSetup
+	clt
+ph_2:	rcall	SetPosOnLimit
+	rjmp	UpdateTimeOffset
+
+
+SetPosOnLimit:
+	ldi_w	r17,r16,HALF_CIRCLE
 	ldi	r18,0
 	lds	r19,iHalfSpanL
 	lds	r20,iHalfSpanH
-	add	r16,r19
+	brcc	spl_1
+	sub	r16,r19
+	sbc	r17,r20
+	sbc	r18,ZeroReg
+	rjmp	spl_2
+spl_1:	add	r16,r19
 	adc	r17,r20
 	adc	r18,ZeroReg
-ph_2:	std	Y+yPanPosL,r16
+spl_2:	std	Y+yPanPosL,r16
 	std	Y+yPanPosM,r17
 	std	Y+yPanPosH,r18
-ph_3:	ret
+	ret
 
 StopOnLimits:
+	sbrc	AFlags,afActive	; Skip not active and already stopping
 	sbrc	AFlags,afStopping
-	ret
+soh_1:	ret
 	ldd	r16,Y+yButState
 	ldi	r17,(1<<btWestLimit)
 	sbrc	AFlags,afReverse
@@ -125,11 +132,16 @@ StopOnLimits:
 	bld	AFlags,afFastStop
 	bld	AFlags,afFailStop
 	rcall	StopDrive
-	ldd	r25,Y+yAfterFailPeriod
-	lsl	r25
-	inc	r25
-	std	Y+yAfterFailPeriod,r25
-	std	Y+yAfterFailCntH,r25
+	rjmp	CalculateNextDelay
+
+CalculateNextDelay:
+	ldd	r16,Y+yAfterFailPeriod
+	sbrc	AFlags,afSetupMove
+	ldi	r16,0
+	lsl	r16
+	inc	r16
+	std	Y+yAfterFailPeriod,r16
+	std	Y+yAfterFailCntH,r16
 	std	Y+yAfterFailCntL,ZeroReg
-soh_1:	ret
+	ret
 

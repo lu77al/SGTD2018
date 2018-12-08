@@ -56,7 +56,6 @@ SEGMENTBASE $60
 .equ	ySecondCntL	= $29
 .equ	ySecondCntH	= $2A
 .equ	yStopLength	= $2B
-.equ	yInitPhase	= $2C
 
 
 SEGMENTBASE $000

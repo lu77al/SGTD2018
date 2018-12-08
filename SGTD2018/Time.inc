@@ -100,7 +100,7 @@ fr_4:	cp	r16,r23
 	sbc	r24,r17
 	sbc	r25,r18
 	rjmp	fr_4
-fr_3:	ldi_w	r17,r16,HALF_CIRCLE ; Fit low limit
+fr_3:	ldi_w	r17,r16,HALF_CIRCLE + HALL_OFFSET ; Fit low limit
 	ldi	r18,0
 	lds	r19,iHalfSpanL
 	lds	r20,iHalfSpanH
@@ -110,7 +110,7 @@ fr_3:	ldi_w	r17,r16,HALF_CIRCLE ; Fit low limit
 	cpc	r24,r17
 	cpc	r25,r18
 	brlo	fr_5
-	ldi_w	r17,r16,HALF_CIRCLE ; Fit high limit
+	ldi_w	r17,r16,HALF_CIRCLE - HALL_OFFSET ; Fit high limit
 	ldi	r18,0
 	lds	r19,iHalfSpanL
 	lds	r20,iHalfSpanH
@@ -127,7 +127,7 @@ fr_5:	mov	r23,r16
 	mov	r25,r18
 	ret
 
-UpdateOffset:
+UpdateTimeOffset:
 	ldd	r16,Y+yHour
 	ldi	r17,60
 	mul	r17,r16

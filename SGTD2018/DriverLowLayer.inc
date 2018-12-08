@@ -108,13 +108,23 @@ DriveOff:
 	clt
 	bld	AFlags,afActive
 	outi	PORTB,0b010101	; Short drive
-	sbrc	AFlags,afFailStop
+	sbrs	AFlags,afSetupMove
+	rjmp	doff_2
+	std	Y+yAfterFailPeriod,ZeroReg
+	std	Y+yAfterFailCntH,ZeroReg
+	stdi	yAfterFailCntL,255
 	rjmp	doff_1
-	std	Y+yAfterFailCntL,ZeroReg
+doff_2:	sbrs	AFlags,afFailStop
+	rjmp	doff_3
+	rcall	CalculateNextDelay
+	rjmp	doff_1
+doff_3:	std	Y+yAfterFailCntL,ZeroReg
 	std	Y+yAfterFailCntH,ZeroReg
 	std	Y+yAfterFailPeriod,ZeroReg
 doff_1:	clt
 	bld	AFlags,afFailStop
+	bld	AFlags,afSetupMove
+	bld	AFlags,afStopping
 	ret
 
 
@@ -290,15 +300,15 @@ CheckFixPanPos:
 	ldd	r16,Y+yPanPosL
 	ldd	r17,Y+yPanPosM
 	ldd	r18,Y+yPanPosH
-	cpi	r16,20
+	cpi	r16,END_POS_GAP
 	cpc	r17,ZeroReg
 	cpc	r18,ZeroReg
 	brge	cfp_1
-	ldi_w	r17,r16,20
+	ldi_w	r17,r16,END_POS_GAP
 	ldi	r18,0
 	rjmp	cfp_2
-cfp_1:	ldi_w	r21,r20,FULL_CIRCLE-20
-	ldi	r22,BYTE3(FULL_CIRCLE-20)
+cfp_1:	ldi_w	r21,r20,FULL_CIRCLE - END_POS_GAP
+	ldi	r22,BYTE3(FULL_CIRCLE - END_POS_GAP)
 	cp	r20,r16
 	cpc	r21,r17
 	cpc	r22,r18
@@ -311,9 +321,16 @@ cfp_2:	std	Y+yPanPosL,r16
 	std	Y+yPanPosH,r18
 	ret
 
+
 CheckTargetPos:
+	sbrc	AFlags,afActive	; Skip if drive is active
+ctp_2:	ret
 	ldd	r16,Y+yButState	; Skip if any user button is pressed
 	andi	r16,(1<<btEastButton) + (1<<btWestButton)
+	brne	ctp_2
+	ldd	r16,Y+yAfterFailCntL ; Skip if dealy is active
+	ldd	r17,Y+yAfterFailCntH
+	or	r16,r17
 	brne	ctp_2
 	ldd	r19,Y+yTargetPosL
 	ldd	r20,Y+yTargetPosM
@@ -330,17 +347,17 @@ CheckTargetPos:
 	com	r18
 	subi_w	r17,r16,-1
 	sbci	r18,-1
-ctp_1:	
-	cpi_w	r17,r16,MAX_POS_DIFF,r25
+ctp_1:	cpi_w	r17,r16,MAX_POS_DIFF,r25
 	cpc	r18,ZeroReg
 	brlo	ctp_2
 	std	Y+yStopPosL,r19
 	std	Y+yStopPosM,r20
 	std	Y+yStopPosH,r21
-	rcall	DriveOn
-ctp_2:	ret
+	rjmp	DriveOn
 
 CheckJam:
+	sbrs	AFlags,afActive
+	ret
 	ldd	r16,Y+yJamPath
 	sbrc	AFlags,afReverse
 	rjmp	chj_1
@@ -355,19 +372,11 @@ chj_1:	inc	r16
 chj_2:	rjmp	StopFail
 
 StopFail:
-	ldd	r25,Y+yAfterFailPeriod
-	rcall	DriveOff
-	lsl	r25
-	inc	r25
-	std	Y+yAfterFailPeriod,r25
-	std	Y+yAfterFailCntH,r25
-	std	Y+yAfterFailCntL,ZeroReg
-	ret
-
+	set
+	bld	AFlags,afFailStop
+	rjmp	DriveOff
 
 StopDrive:
-	sbrc	AFlags,afSetup
-	rcall	UpdateOffset
 	sbrc	AFlags,afActive
 	sbrc	AFlags,afStopping
 	ret
@@ -402,16 +411,11 @@ std_3:	std	Y+yStopPosL,r16
 	ret
 
 CountdownAfterFail:
-	sbrs	AFlags,afSetup
-	rjmp	caf_2
-	std	Y+yAfterFailPeriod,ZeroReg
-	ldi_w	r17,r16,115
-	rjmp	caf_3
-caf_2:	ldd	r16,Y+yAfterFailCntL
+	ldd	r16,Y+yAfterFailCntL
 	ldd	r17,Y+yAfterFailCntH
 	subi_w	r17,r16,1
 	brcs	caf_1
-caf_3:	std	Y+yAfterFailCntL,r16
+	std	Y+yAfterFailCntL,r16
 	std	Y+yAfterFailCntH,r17
 caf_1:	ret
 

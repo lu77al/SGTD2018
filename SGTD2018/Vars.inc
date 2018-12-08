@@ -6,7 +6,7 @@
 	.equ	afFastStop   = 2
 	.equ	afFailStop   = 3
 	.equ	afStopping   = 4
-	.equ	afSetup	     = 5
+	.equ	afSetupMove  = 5
 	.equ	afWaitButRel = 6
 
 .def	BFlags	= r4
@@ -77,7 +77,7 @@
 .equ	ySecondCntL	= $29
 .equ	ySecondCntH	= $2A
 .equ	yStopLength	= $2B
-.equ	yInitPhase	= $2C
+
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1

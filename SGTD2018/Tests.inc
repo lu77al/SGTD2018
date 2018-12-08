@@ -33,7 +33,7 @@ StartTest:
 	std	Y+yPanPosH,r18
 	ret
 
-
+/*
 TestStop:
 	ldd	r25,Y+yButPress
 	mov	r16,r25
@@ -55,8 +55,9 @@ tst_1:	rcall	StopDrive
 	set
 	bld	AFlags,afFailStop
 tst_2:	ret
+*/
 
-
+/*
 TestSimpleMove:
 	ldi_w	r17,r16,HALF_CIRCLE
 	ldi	r18,0
@@ -86,7 +87,7 @@ tsm_1:
 	rjmp	tsm_3
 tsm_2:
 	ret	
-		
+*/		
 
 /* Stop procedure variants
  - regular: (speed profile) + immediate stop
