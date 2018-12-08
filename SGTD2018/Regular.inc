@@ -135,13 +135,115 @@ soh_1:	ret
 	rjmp	CalculateNextDelay
 
 CalculateNextDelay:
-	ldd	r16,Y+yAfterFailPeriod
+	ldd	r16,Y+yNextDelay
 	sbrc	AFlags,afSetupMove
 	ldi	r16,0
 	lsl	r16
 	inc	r16
-	std	Y+yAfterFailPeriod,r16
-	std	Y+yAfterFailCntH,r16
-	std	Y+yAfterFailCntL,ZeroReg
+	std	Y+yNextDelay,r16
+	std	Y+yDelayCntH,r16
+	std	Y+yDelayCntL,ZeroReg
+	ret
+
+
+InitADC:
+	outi	ADCSR,0b10000110	; Enable ADC, CK/64
+	outi	SFIOR,0
+	outi	ADMUX,0b11100110
+	sbi	ADCSR,ADSC
+	ret
+
+ReadADC:
+	sbic	ADCSR,ADSC
+	ret
+	in	r16,ADCL ; Result
+	in	r17,ADCH
+	in	r18,ADMUX
+	cpi	r18,0b11100110	; Current
+	brne	adc_1
+	lds	r18,iSleepCnt	; SleepCnt
+	sbrc	AFlags,afActive
+	ldi	r18,20
+	subi	r18,1
+	brcs	adc_2
+	sts	iSleepCnt,r18	; Work current
+	lds	r18,iIzeroL
+	lds	r19,iIzeroH
+	sub	r18,r16
+	sbc	r19,r17		; IadcZero - Iadc
+	brcc	adc_3
+	ldi_w	r19,r18,0
+adc_3:	sts	iIadcL,r18
+	sts	iIadcH,r19	
+	ldi_w	r17,r16,255	; Calculate I (0.1A)
+	rcall	K16x16
+	sts	iCurrent,r16
+	rjmp	adc_5
+adc_2:	sts	iIzeroL,r16	; Zero current
+	sts	iIzeroH,r17
+	sts	iIadcL,ZeroReg
+	sts	iIadcH,ZeroReg
+	sts	iCurrent,ZeroReg
+adc_5:	rcall	PrepareIreg
+	ldi	r18,0b11100111
+	rjmp	adc_4
+adc_1:				; Voltage
+	sts	iUadcL,r16
+	sts	iUadcH,r17
+	K16x16m	813
+	sts	iUL,r16
+	sts	iUH,r17
+	rcall	PrepareUreg
+	ldi	r18,0b11100110
+adc_4:	out	ADMUX,r18
+	sbi	ADCSR,ADSC
+	ret
+
+PrepareUreg:
+	lds	r16,iUadcL
+	lds	r17,iUadcH
+	lsr16	r17,r16
+	lsr16	r17,r16
+	lsr16	r17,r16
+	lsr16	r17,r16
+	lsr16	r17,r16	; / 32 (2048)
+	ldi_w	r19,r18,1612 ; 64 V
+	sub	r18,r16
+	sbc	r19,r17
+	ldi_w	r17,r16,-100
+	cp	r18,r16
+	cpc	r19,r17
+	brge	purg_1
+	ldi	r18,-100
+	rjmp	purg_2
+purg_1:	cpi	r18,100
+	cpc	r19,ZeroReg
+	brlt	purg_2
+	ldi	r18,100
+purg_2:	std	Y+yUreg,r18
+	ret
+
+PrepareIreg:
+	lds	r16,iIadcL
+	lds	r17,iIadcH
+	lsr16	r17,r16
+	lsr16	r17,r16
+	lsr16	r17,r16
+	lsr16	r17,r16
+	lsr16	r17,r16	; / 32 (2048)
+	ldi_w	r19,r18,640 ; 8 A
+	sub	r18,r16
+	sbc	r19,r17
+	ldi_w	r17,r16,-100
+	cp	r18,r16
+	cpc	r19,r17
+	brge	pirg_1
+	ldi	r18,-100
+	rjmp	pirg_2
+pirg_1:	cpi	r18,100
+	cpc	r19,ZeroReg
+	brlt	pirg_2
+	ldi	r18,100
+pirg_2:	std	Y+yIreg,r18
 	ret
 

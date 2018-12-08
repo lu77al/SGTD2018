@@ -10,6 +10,7 @@ StartSimplePWM:
 	ret
 */
 
+/*
 StartTest:
 	ldi_w	r17,r16,3*60
 	sts	iMorningL,r16
@@ -32,6 +33,7 @@ StartTest:
 	std	Y+yPanPosM,r17
 	std	Y+yPanPosH,r18
 	ret
+*/
 
 /*
 TestStop:

@@ -32,9 +32,9 @@ StopCMD:
 	sbrc	AFlags,afSetupMove
 	rcall	UpdateTimeOffset
 	rcall	StopDrive
-	std	Y+yAfterFailPeriod,ZeroReg
-	std	Y+yAfterFailCntH,ZeroReg
-	stdi	yAfterFailCntL,255
+	std	Y+yNextDelay,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	stdi	yDelayCntL,255
 	ret
 
 MoveEastCMD:

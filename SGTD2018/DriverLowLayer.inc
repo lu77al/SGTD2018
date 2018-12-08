@@ -52,7 +52,7 @@ InitPWM:
 	out	TIMSK,r16	  ; Enable interrupts
 	ret
 
-/*** Activate timer1 setup PWM start values ***/
+/*** Activate timer1, setup PWM, setup start values, ... ***/
 DriveOn:
 	clt
 	ldd	r16,Y+yStopPosL
@@ -110,24 +110,24 @@ DriveOff:
 	outi	PORTB,0b010101	; Short drive
 	sbrs	AFlags,afSetupMove
 	rjmp	doff_2
-	std	Y+yAfterFailPeriod,ZeroReg
-	std	Y+yAfterFailCntH,ZeroReg
-	stdi	yAfterFailCntL,255
+	std	Y+yNextDelay,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	stdi	yDelayCntL,255
 	rjmp	doff_1
 doff_2:	sbrs	AFlags,afFailStop
 	rjmp	doff_3
 	rcall	CalculateNextDelay
 	rjmp	doff_1
-doff_3:	std	Y+yAfterFailCntL,ZeroReg
-	std	Y+yAfterFailCntH,ZeroReg
-	std	Y+yAfterFailPeriod,ZeroReg
+doff_3:	std	Y+yDelayCntL,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	std	Y+yNextDelay,ZeroReg
 doff_1:	clt
 	bld	AFlags,afFailStop
 	bld	AFlags,afSetupMove
 	bld	AFlags,afStopping
 	ret
 
-
+; Read hall state when drive isn't active
 GetHallState:
 	ROTOR_HS_POWER_ON
 	rjmp	PC+1
@@ -262,7 +262,7 @@ ss_8:	ldi_w	ZH,ZL,2*BreakTable ; Get value from the table
 	ldd	r16,Y+yNeedPeriod
 	sub	r20,r16
 	brcs	st_1
-; Add power
+; --- Speed
 	cpi	r20,60
 	brlo	st_2
 	ldi	r20,60
@@ -271,6 +271,18 @@ st_1:	cpi	r20,-60
 	brsh	st_2
 	ldi	r20,-60
 st_2:
+; --- Voltage
+	ldd	r16,Y+yUreg
+	cp	r20,r16
+	brlt	st_5
+	mov	r20,r16
+st_5:
+; --- Current
+	ldd	r16,Y+yIreg
+	cp	r20,r16
+	brlt	st_6
+	mov	r20,r16
+st_6:
 	ldd	r16,Y+yPWML
 	ldd	r17,Y+yPWMH
 	sbrc	r20,7
@@ -296,6 +308,7 @@ st_4:	std	Y+yPWML,r16
 	out	OCR1BL,r16
 	ret
 
+; Don't allow coordinate to reach 0 or FULL_CIRCLE
 CheckFixPanPos:
 	ldd	r16,Y+yPanPosL
 	ldd	r17,Y+yPanPosM
@@ -321,15 +334,15 @@ cfp_2:	std	Y+yPanPosL,r16
 	std	Y+yPanPosH,r18
 	ret
 
-
+; Start (activate) drive if panel position differs target position
 CheckTargetPos:
 	sbrc	AFlags,afActive	; Skip if drive is active
 ctp_2:	ret
 	ldd	r16,Y+yButState	; Skip if any user button is pressed
 	andi	r16,(1<<btEastButton) + (1<<btWestButton)
 	brne	ctp_2
-	ldd	r16,Y+yAfterFailCntL ; Skip if dealy is active
-	ldd	r17,Y+yAfterFailCntH
+	ldd	r16,Y+yDelayCntL ; Skip if dealy is active
+	ldd	r17,Y+yDelayCntH
 	or	r16,r17
 	brne	ctp_2
 	ldd	r19,Y+yTargetPosL
@@ -355,10 +368,14 @@ ctp_1:	cpi_w	r17,r16,MAX_POS_DIFF,r25
 	std	Y+yStopPosH,r21
 	rjmp	DriveOn
 
+; Jam counter and stop drive when jam is detected
 CheckJam:
 	sbrs	AFlags,afActive
-	ret
+chj_4:	ret
 	ldd	r16,Y+yJamPath
+	ldd	r17,Y+yUreg
+	cpi	r17,10
+	brlo	chj_4
 	sbrc	AFlags,afReverse
 	rjmp	chj_1
 	dec	r16
@@ -371,11 +388,13 @@ chj_1:	inc	r16
 	brlo	chj_3
 chj_2:	rjmp	StopFail
 
+; Stop drive with delay before next activate
 StopFail:
 	set
 	bld	AFlags,afFailStop
 	rjmp	DriveOff
 
+; Start smooth drive stop
 StopDrive:
 	sbrc	AFlags,afActive
 	sbrc	AFlags,afStopping
@@ -410,13 +429,13 @@ std_3:	std	Y+yStopPosL,r16
 	std	Y+yStopPosH,r18
 	ret
 
-CountdownAfterFail:
-	ldd	r16,Y+yAfterFailCntL
-	ldd	r17,Y+yAfterFailCntH
+DelayCountdown:
+	ldd	r16,Y+yDelayCntL
+	ldd	r17,Y+yDelayCntH
 	subi_w	r17,r16,1
 	brcs	caf_1
-	std	Y+yAfterFailCntL,r16
-	std	Y+yAfterFailCntH,r17
+	std	Y+yDelayCntL,r16
+	std	Y+yDelayCntH,r17
 caf_1:	ret
 
 

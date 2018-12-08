@@ -55,8 +55,6 @@ RESET:
 
 .include "Init.inc"
 
-	rcall	StartTest
-
 Main:
 	tskTact
 RetTact:

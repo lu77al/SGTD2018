@@ -68,16 +68,17 @@
 .equ	yTargetPosL	= $20
 .equ	yTargetPosM	= $21
 .equ	yTargetPosH	= $22
-.equ	yAfterFailCntL	= $23
-.equ	yAfterFailCntH	= $24
-.equ	yAfterFailPeriod= $25
+.equ	yDelayCntL	= $23
+.equ	yDelayCntH	= $24
+.equ	yNextDelay	= $25
 .equ	yHour		= $26
 .equ	yMinute		= $27
 .equ	ySecond		= $28
 .equ	ySecondCntL	= $29
 .equ	ySecondCntH	= $2A
 .equ	yStopLength	= $2B
-
+.equ	yUreg		= $2C
+.equ	yIreg		= $2D
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1
@@ -95,15 +96,13 @@
 .equ	iWestLim_F	= $AD
 .equ	iEastBut_F	= $AE
 .equ	iWestBut_F	= $AF
-
-
-
-
-
-
-
-
-
-
-
-
+.equ	iIzeroL		= $B0
+.equ	iIzeroH		= $B1
+.equ	iIadcL		= $B2
+.equ	iIadcH		= $B3
+.equ	iCurrent	= $B4
+.equ	iUadcL		= $B5
+.equ	iUadcH		= $B6
+.equ	iUH		= $B7
+.equ	iUL		= $B8
+.equ	iSleepCnt	= $B9

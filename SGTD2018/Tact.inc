@@ -51,7 +51,7 @@ skBr0:
 
 	andi	r24,0b11
 	brne	br1_1
-	rcall	CountdownAfterFail
+	rcall	DelayCountdown
 br1_1:
 	rjmp	RetTact
 sk_BR1:
@@ -104,5 +104,15 @@ sk_BR4:
 
 	rjmp	RetTact
 sk_BR5:
+
+;--- Br ---
+	andi	r23,0b00011111	; 122.0703125 Ãö
+	cpi	r23,0b00001111
+	brne	sk_BR6
+
+	rcall	ReadADC
+
+	rjmp	RetTact
+sk_BR6:
 
 	rjmp	RetTact
