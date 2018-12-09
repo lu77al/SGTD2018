@@ -8,6 +8,7 @@
 	.equ	afStopping   = 4
 	.equ	afSetupMove  = 5
 	.equ	afWaitButRel = 6
+	.equ	afSaveParams = 7
 
 .def	BFlags	= r4
 	.equ	bfRTCRead  = 0
@@ -38,7 +39,7 @@
 .equ	yRXTXCHS	= $07
 .equ	yMyAddr		= $08
 .equ	yAFlags		= $09
-.equ	yADCSaveAddr	= $0A
+.equ	yRTCDebug	= $0A
 .equ	yADCChCnt	= $0B
 .equ	yButState	= $0C
 .equ	yButPress	= $0D
@@ -89,6 +90,7 @@
 .equ	iEveningH	= $A7
 .equ	iParkingL	= $A8
 .equ	iParkingH	= $A9
+.equ	iInitCnt	= $AA
 
 .equ	iButtons_F	= $AB
 .equ	iEastLim_F	= $AC

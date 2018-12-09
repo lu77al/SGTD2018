@@ -63,6 +63,8 @@ sk_BR1:
 
 	rcall	CheckJam
 
+	rcall	CheckSaveParam
+
 	rjmp	RetTact
 sk_BR2:
 
@@ -71,10 +73,22 @@ sk_BR2:
 	cpi	r23,0b00111111	; 15.2587890625 Ãö
 	brne	sk_BR3
 
-	andi	r24,0b1111
-	brne	br3_1
+	lds	r16,iInitCnt
+	subi	r16,1
+	brcs	br3_2
+	sts	iInitCnt,r16
+	cpi	r16,$FF-30
+	brsh	br3_3
+	sts	iInitCnt,r16
+	andi	r16,0b11
+	brne	br3_3
 	rcall	StartRTCRead
-br3_1:
+	rjmp	br3_3
+br3_2:
+	andi	r24,0b11111
+	brne	br3_3
+	rcall	CompareSavedPos
+br3_3:
 
 	rcall	TimeGo
 

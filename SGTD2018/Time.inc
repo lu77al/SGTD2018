@@ -72,7 +72,6 @@ cp_1:	set
 	lds	r18,iParkingH
 	ret
 
-
 OffsetAndFitRange: ; r25:r24:r23 - input/output position
 	lds	r16,iTimeOffsetL
 	lds	r17,iTimeOffsetH
@@ -151,4 +150,6 @@ UpdateTimeOffset:
 	ror	r16
 	sts	iTimeOffsetL,r16
 	sts	iTimeOffsetH,r17
+	set
+	bld	AFlags,afSaveParams
 	ret

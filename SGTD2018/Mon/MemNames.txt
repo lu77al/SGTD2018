@@ -21,7 +21,7 @@ SEGMENTBASE $60
 .equ	yRXTXCHS	= $07
 .equ	yMyAddr		= $08
 .equ	yAFlags		= $09
-.equ	yADCSaveAddr	= $0A
+.equ	yRTCDebug	= $0A
 .equ	yADCChCnt	= $0B
 .equ	yButState	= $0C
 .equ	yButPress	= $0D

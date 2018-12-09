@@ -149,6 +149,7 @@ ls_2:	lsr16	r18,r17
 ;  - limit ranges
 EastLimitSetup:
 	sbrs	AFLags,afReverse ; Skip wrong direction
+	ret
 	ldi_w	r17,r16,HALF_CIRCLE
 	ldi	r18,BYTE3(HALF_CIRCLE)
 	ldd	r19,Y+yPanPosL	

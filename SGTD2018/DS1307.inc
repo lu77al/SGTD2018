@@ -1,4 +1,3 @@
-
 ; TWI statuses after successful operation (fait for)
 .equ	TWI_S_START		= $08
 .equ	TWI_S_REPSTART		= $10
@@ -13,7 +12,7 @@
 .equ	RTC_ADDR_R	= 0b11010001
 
 ; DS1307 buffer transaction length
-.equ	RTC_BUFLEN = 23
+.equ	RTC_BUFLEN = 12
 
 Chat_RTC: ; r25 - RTC_stage
 	cpi	r25,$FF ; *** Disable TWI after generating "stop condition"
@@ -119,8 +118,20 @@ crt_2:	cpi	r25,3	; First 3 stages (START, SLA_W, REG_ADDR) are same as ReadRTC
 	rjmp	crt_15
 
 
-CheckRTCBuf:
-	ret
+CompareSavedPos:
+	ldi	XL,RTCBuf+8
+	ld	r16,X+
+	ld	r17,X+
+	ld	r18,X+
+	ldd	r19,Y+yPanPosL
+	ldd	r20,Y+yPanPosM
+	ldd	r21,Y+yPanPosH
+	cp	r16,r19
+	cpc	r17,r20
+	cpc	r18,r21
+	breq	csp_1
+	rcall	StartRTCWrite
+csp_1:	ret
 
 
 StartRTCRead:
@@ -129,3 +140,128 @@ StartRTCRead:
 	stdi	yRTCStage,1
 	std	Y+yRTCWaitStatus,ZeroReg
 	ret
+
+StartRTCWrite:
+	rcall	FormRTCBuf
+	outi	TWCR,(1<<TWINT)
+	out	TWCR,ZeroReg
+	stdi	yRTCStage,101
+	std	Y+yRTCWaitStatus,ZeroReg
+	ret
+
+/*
+ * 0  - Seconds (BCD)
+ * 1  - Minutes (BCD)
+ * 2  - Hours   (BCD)
+ * 3  - Day of week  (set 1)
+ * 4  - Date	     (set 1)
+ * 5  - Month	     (set 1)
+ * 6  - Year	     (set 0)
+ * 7  - Control register (set 0)
+ * 8  - PanelPosL
+ * 9  - PanelPosM
+ * 10 - PanelPosH
+ * 11 - CheckSum + $A5 (0..6 7-th bits, 7..12 all bits)
+ */
+
+FormRTCBuf:
+	ldi	XL,RTCBuf
+	ldd	r16,Y+ySecond
+	rcall	ConvertToBCD
+	st	X+,r16
+	andi	r16,$80
+	ldd	r16,Y+yMinute
+	rcall	ConvertToBCD
+	st	X+,r16
+	andi	r16,$80
+	ldd	r16,Y+yHour
+	rcall	ConvertToBCD
+	st	X+,r16
+	andi	r16,$80
+	ldi	r16,1
+	st	X+,r16
+	st	X+,r16
+	st	X+,r16
+	st	X+,ZeroReg
+	st	X+,ZeroReg
+	ldi	r23,$A5
+	ldd	r16,Y+yPanPosL
+	st	X+,r16
+	rcall	AddByteCS
+	ldd	r16,Y+yPanPosM
+	st	X+,r16
+	rcall	AddByteCS
+	ldd	r16,Y+yPanPosH
+	st	X+,r16
+	rcall	AddByteCS
+	st	X+,r23
+	ret
+
+CheckRTCBuf:
+	ldi	XL,RTCBuf
+crtc_2:	ld	r16,X+
+	andi	r16,$80
+	brne	crtc_1
+	cpi	XL,RTCBuf+7
+	brlo	crtc_2
+crtc_1:	ld	r16,X+
+	cpi	r16,0
+	brne	crtc_3
+	ldi	r23,$A5
+	ld	r17,X+
+	mov	r16,r17
+	rcall	AddByteCS
+	ld	r18,X+
+	mov	r16,r18
+	rcall	AddByteCS
+	ld	r19,X+
+	mov	r16,r19
+	rcall	AddByteCS
+	ld	r20,X+
+	cp	r20,r23
+	brne	crtc_3
+	std	Y+yPanPosL,r17
+	std	Y+yPanPosM,r18
+	std	Y+yPanPosH,r19
+	ldi	XL,RTCBuf
+	ld	r16,X+
+	rcall	DecodeBCD
+	std	Y+ySecond,r16
+	ld	r16,X+
+	rcall	DecodeBCD
+	std	Y+yMinute,r16
+	ld	r16,X+
+	rcall	DecodeBCD
+	std	Y+yHour,r16
+	sts	iInitCnt,ZeroReg
+crtc_3:	ret
+
+AddByteCS:
+	lsl	r23
+	brcc	abc_1
+	ori	r23,1
+abc_1:	add	r23,r16
+	brcc	abc_2
+	inc	r23
+abc_2:	ret
+
+ConvertToBCD: ; r16 -> r16 
+	ldi	r17,-$10
+tbcd_1:	subi	r17,-$10
+	subi	r16,10
+	brcc	tbcd_1
+	subi	r16,-10
+	or	r16,r17
+	ret
+
+DecodeBCD: ; r16 -> r16
+	mov	r17,r16
+	andi	r16,$0F
+	swap	r17
+	andi	r17,$0F
+	ldi	r18,10
+	mul	r17,r18
+	add	r16,r0
+	ret
+
+

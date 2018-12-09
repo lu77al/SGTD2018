@@ -105,7 +105,7 @@ SetPosOnLimit:
 	ldi	r18,0
 	lds	r19,iHalfSpanL
 	lds	r20,iHalfSpanH
-	brcc	spl_1
+	brtc	spl_1
 	sub	r16,r19
 	sbc	r17,r20
 	sbc	r18,ZeroReg

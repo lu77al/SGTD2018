@@ -48,8 +48,9 @@ DriveKeyTable:	; !!! Must be within first 256 bytes of PROM
 .include "Regular.inc"
 .include "Setup.inc"
 .include "DS1307.inc"
+.include "EEPROM.inc"
 
-.include "Tests.inc"
+;.include "Tests.inc"
 
 RESET:
 
