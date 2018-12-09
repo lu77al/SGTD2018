@@ -32,6 +32,8 @@ StopCMD:
 	sbrc	AFlags,afSetupMove
 	rcall	UpdateTimeOffset
 	rcall	StopDrive
+	set
+	bld	AFlags,afSetupMove
 	std	Y+yNextDelay,ZeroReg
 	std	Y+yDelayCntH,ZeroReg
 	stdi	yDelayCntL,255
