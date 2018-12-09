@@ -51,7 +51,7 @@
 .macro	InitPorts
 	outi	PORTB,0b000000
 	outi	DDRB, 0b111111
-	outi	PORTC,0b111111
+	outi	PORTC,0b001111
 	outi	DDRC, 0b000001
 	outi	PORTD,0b10111100
 	outi	DDRD, 0b01000100

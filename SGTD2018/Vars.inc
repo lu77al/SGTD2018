@@ -20,11 +20,7 @@
 
 .equ	XSEG = $100
 ; --- Arrays ($100..$1FF)
-;.equ	PeriodBuf = $00
-;.equ	KS_Buf  = $00
-;.equ	TimeBuf = $03
-;.equ	ADCBuf	= $20
-;.equ	InputBuf= $30
+.equ	RTCBuf  = $00
 .equ	RXBuf   = $50
 .equ	TXBuf   = $70
 
@@ -79,6 +75,9 @@
 .equ	yStopLength	= $2B
 .equ	yUreg		= $2C
 .equ	yIreg		= $2D
+.equ	yRTCStage	= $2E
+.equ	yRTCWaitStatus	= $2F
+
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1

@@ -58,6 +58,10 @@ SEGMENTBASE $60
 .equ	yStopLength	= $2B
 .equ	yUreg		= $2C
 .equ	yIreg		= $2D
+.equ	yRTCStage	= $2E
+.equ	yRTCWaitStatus	= $2F
+
+
 SEGMENTBASE $000
 
 .equ	iHalfSpanL	= $A0

@@ -71,6 +71,11 @@ sk_BR2:
 	cpi	r23,0b00111111	; 15.2587890625 Ãö
 	brne	sk_BR3
 
+	andi	r24,0b1111
+	brne	br3_1
+	rcall	StartRTCRead
+br3_1:
+
 	rcall	TimeGo
 
 	rcall	PrepareButtonsF

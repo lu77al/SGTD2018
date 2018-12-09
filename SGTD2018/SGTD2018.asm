@@ -47,7 +47,7 @@ DriveKeyTable:	; !!! Must be within first 256 bytes of PROM
 .include "Time.inc"
 .include "Regular.inc"
 .include "Setup.inc"
-
+.include "DS1307.inc"
 
 .include "Tests.inc"
 
@@ -60,6 +60,10 @@ Main:
 RetTact:
 	tskUart
 RetUart:
+	ldd	r25,Y+yRTCStage
+	cpse	r25,ZeroReg
+	rcall	Chat_RTC
+
 	rjmp	Main
 	
 ;********** BootLoader V0.0 **********
