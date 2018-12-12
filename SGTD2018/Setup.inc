@@ -28,6 +28,35 @@
  *   - set parameters (later)
  */
 
+
+SetTimeCMD:
+	ldi	r25,1
+stpt_1:	ldi	XL,Params
+	ld	r16,X+
+	std	Y+yHour,r16
+	ld	r16,X+
+	std	Y+yMinute,r16
+	ld	r16,X+
+	sbrs	r25,0
+	rcall	UpdateTimeOffset
+	std	Y+ySecond,r16
+	ldi	XL,RTCBuf+10
+	ldi	r16,$40
+	st	X,r16
+	std	Y+yNextDelay,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	stdi	yDelayCntL,15
+	ret
+
+SetTimeOffsetCMD:
+	ldi	r25,0
+	rjmp	stpt_1
+
+SetParkingCMD:
+
+	ret
+
+
 SetupDelayCMD:
 	std	Y+yLimSetupStage,ZeroReg
 	set

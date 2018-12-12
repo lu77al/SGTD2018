@@ -118,7 +118,7 @@ crt_2:	cpi	r25,3	; First 3 stages (START, SLA_W, REG_ADDR) are same as ReadRTC
 	rjmp	crt_15
 
 
-CompareSavedPos:
+CheckForRTCWrite:
 	ldi	XL,RTCBuf+8
 	ld	r16,X+
 	ld	r17,X+

@@ -22,6 +22,7 @@
 .equ	XSEG = $100
 ; --- Arrays ($100..$1FF)
 .equ	RTCBuf  = $00
+.equ	Params  = $10
 .equ	RXBuf   = $50
 .equ	TXBuf   = $70
 
@@ -79,6 +80,7 @@
 .equ	yRTCStage	= $2E
 .equ	yRTCWaitStatus	= $2F
 .equ	yLimSetupStage  = $30
+
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1

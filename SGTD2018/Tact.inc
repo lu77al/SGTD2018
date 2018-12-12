@@ -87,7 +87,7 @@ sk_BR2:
 br3_2:
 	andi	r24,0b11111
 	brne	br3_3
-	rcall	CompareSavedPos
+	rcall	CheckForRTCWrite
 br3_3:
 
 	rcall	TimeGo

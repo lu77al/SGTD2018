@@ -58,19 +58,31 @@ CheckForParking: ; r17:r16 - input minutes from 00:00 / SREG.T and r18:r17 - out
 	clt
 	lds	r18,iMorningL
 	lds	r19,iMorningH
+	lds	r20,iEveningL
+	lds	r21,iEveningH
+	cp	r18,r20
+	cpc	r19,r21
+	breq	cp_1		; M = E -> normal
+	brsh	cp_2
+	;-- M < E
 	cp	r16,r18
 	cpc	r17,r19
-	brlo	cp_1
-	lds	r18,iEveningL
-	lds	r19,iEveningH
-	cp	r18,r16
+	brlo	cp_3		; T < M -> parking
+	cp	r20,r16
 	cpc	r19,r17
-	brlo	cp_1
-	ret
-cp_1:	set
-	lds	r17,iParkingL
+	brsh	cp_1		; E >= T -> normal
+cp_3:	lds	r17,iParkingL
 	lds	r18,iParkingH
-	ret
+	ret 
+cp_2:	;-- M > E 
+	cp	r20,r16
+	cpc	r19,r17
+	brsh	cp_1		; E >= T -> normal
+	cp	r16,r18
+	cpc	r17,r19
+	brlo	cp_3		; T < M -> parking
+cp_1:	ret
+
 
 OffsetAndFitRange: ; r25:r24:r23 - input/output position
 	lds	r16,iTimeOffsetL
