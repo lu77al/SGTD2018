@@ -29,6 +29,7 @@
  */
 
 SetupDelayCMD:
+	std	Y+yLimSetupStage,ZeroReg
 	set
 	sbrc	AFlags,afActive
 	bld	AFlags,afSetupMove
@@ -39,10 +40,11 @@ SetupDelayCMD:
 	ret
 
 StopCMD:
+	std	Y+yLimSetupStage,ZeroReg
 	sbrc	AFlags,afSetupMove
 	rcall	UpdateTimeOffset
 	rcall	StopDrive
-scmd_1:	set
+	set
 	bld	AFlags,afSetupMove
 	std	Y+yNextDelay,ZeroReg
 	std	Y+yDelayCntH,ZeroReg
@@ -50,19 +52,50 @@ scmd_1:	set
 	ret
 
 MoveEastCMD:
+	ldd	r16,Y+yButState
+	sbrc	r16,btEastLimit
+	ret	
 	ldi_w	r17,r16,0
 	ldi	r18,0
 	rjmp	smv_1
 
 
 MoveWestCMD:
+	ldd	r16,Y+yButState
+	sbrc	r16,btWestLimit
+	ret	
 	ldi_w	r17,r16,FULL_CIRCLE
-	ldi	r18,BYTE2(FULL_CIRCLE)
-smv_1:	std	Y+yStopPosL,r16
+	ldi	r18,BYTE3(FULL_CIRCLE)
+smv_1:	stdi	yLimSetupStage,2
+smv_2:	ldi	r19,25
+smv_3:	std	Y+yDelayCntL,r19
+	std	Y+yNextDelay,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	set
+	bld	AFlags,afSetupMove
+	std	Y+yStopPosL,r16
 	std	Y+yStopPosM,r17
 	std	Y+yStopPosH,r18
-	rcall	DriveOn
-	rjmp	scmd_1
+	rjmp	DriveOn
+
+
+ContinueLimitSetup:
+	std	Y+yLimSetupStage,r16
+	cpi	r16,1
+	brne	cls_1
+	sbrs	AFlags,afReverse
+	rjmp	cls_2
+	ldi_w	r17,r16,FULL_CIRCLE
+	ldi	r18,BYTE3(FULL_CIRCLE)
+	rjmp	smv_2
+cls_2:	ldi_w	r17,r16,0
+	ldi	r18,0
+	rjmp	smv_2
+cls_1:	std	Y+yLimSetupStage,ZeroReg
+	ldi_w	r17,r16,HALF_CIRCLE
+	ldi	r18,BYTE3(HALF_CIRCLE)
+	ldi	r19,255
+	rjmp	smv_3
 
 
 ProcessButtons:
@@ -95,7 +128,7 @@ pb_4:
 	breq	pb_8
 	ldi	r16,(1<<btEastButton) + (1<<btWestButton)
 	and	r16,r24
-	cpi	r16,(1<<btEastButton) + (1<<btWestButton) ; And bouth buttons are pressed
+	cpi	r16,(1<<btEastButton) + (1<<btWestButton) ; And both buttons are pressed
 	brne	pb_8
 	rcall	SetupDelayCMD
 	rjmp	pb_6
@@ -164,6 +197,8 @@ ls_2:	lsr16	r18,r17
 	ror	r16
 	sts	iHalfSpanL,r16
 	sts	iHalfSpanH,r17
+	set
+	bld	AFlags,afSaveParams
 	ret
 
 ; West limit sensor "pressed" during setup move

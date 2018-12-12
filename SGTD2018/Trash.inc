@@ -49,7 +49,7 @@ MoveEastCMD:
 
 MoveWestCMD:
 	ldi_w	r17,r16,FULL_CIRCLE
-	ldi	r18,BYTE2(FULL_CIRCLE)
+	ldi	r18,BYTE3(FULL_CIRCLE)
 smv_1:	set
 	bld	AFlags,afSetup
 	std	Y+yStopPosL,r16

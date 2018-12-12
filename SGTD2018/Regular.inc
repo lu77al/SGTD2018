@@ -130,9 +130,11 @@ soh_1:	ret
 	breq	soh_1
 	set
 	bld	AFlags,afFastStop
+	sbrc	AFlags,afSetupMove
+	rjmp	StopDrive
+	set
 	bld	AFlags,afFailStop
-	rcall	StopDrive
-	rjmp	CalculateNextDelay
+	rjmp	StopDrive
 
 CalculateNextDelay:
 	ldd	r16,Y+yNextDelay

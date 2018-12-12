@@ -78,7 +78,7 @@
 .equ	yIreg		= $2D
 .equ	yRTCStage	= $2E
 .equ	yRTCWaitStatus	= $2F
-
+.equ	yLimSetupStage  = $30
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1

@@ -341,7 +341,11 @@ ctp_2:	ret
 	ldd	r17,Y+yDelayCntH
 	or	r16,r17
 	brne	ctp_2
-	ldd	r19,Y+yTargetPosL
+	ldd	r16,Y+yLimSetupStage ; Check for limit setup process
+	subi	r16,1
+	brcs	ctp_3
+	rjmp	ContinueLimitSetup
+ctp_3:	ldd	r19,Y+yTargetPosL
 	ldd	r20,Y+yTargetPosM
 	ldd	r21,Y+yTargetPosH
 	ldd	r16,Y+yPanPosL
@@ -386,6 +390,7 @@ chj_2:	rjmp	StopFail
 
 ; Stop drive with delay before next activate
 StopFail:
+	std	Y+yLimSetupStage,ZeroReg
 	set
 	bld	AFlags,afFailStop
 	rjmp	DriveOff
