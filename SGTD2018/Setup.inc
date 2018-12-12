@@ -28,11 +28,21 @@
  *   - set parameters (later)
  */
 
+SetupDelayCMD:
+	set
+	sbrc	AFlags,afActive
+	bld	AFlags,afSetupMove
+	ldi_w	r17,r16,6866
+	std	Y+yDelayCntL,r16
+	std	Y+yDelayCntH,r17
+	std	Y+yNextDelay,ZeroReg
+	ret
+
 StopCMD:
 	sbrc	AFlags,afSetupMove
 	rcall	UpdateTimeOffset
 	rcall	StopDrive
-	set
+scmd_1:	set
 	bld	AFlags,afSetupMove
 	std	Y+yNextDelay,ZeroReg
 	std	Y+yDelayCntH,ZeroReg
@@ -48,12 +58,12 @@ MoveEastCMD:
 MoveWestCMD:
 	ldi_w	r17,r16,FULL_CIRCLE
 	ldi	r18,BYTE2(FULL_CIRCLE)
-smv_1:	set
-	bld	AFlags,afSetupMove
-	std	Y+yStopPosL,r16
+smv_1:	std	Y+yStopPosL,r16
 	std	Y+yStopPosM,r17
 	std	Y+yStopPosH,r18
-	rjmp	DriveOn
+	rcall	DriveOn
+	rjmp	scmd_1
+
 
 ProcessButtons:
 	ldd	r24,Y+yButState
@@ -80,6 +90,16 @@ pb_2:
 	rcall	StopCMD
 	rjmp	pb_6
 pb_4:
+	ldd	r23,Y+yButPress  ; Press when not active
+	andi	r23,(1<<btEastButton) + (1<<btWestButton)
+	breq	pb_8
+	ldi	r16,(1<<btEastButton) + (1<<btWestButton)
+	and	r16,r24
+	cpi	r16,(1<<btEastButton) + (1<<btWestButton) ; And bouth buttons are pressed
+	brne	pb_8
+	rcall	SetupDelayCMD
+	rjmp	pb_6
+pb_8:
 	cpi	r25,40		; Long ...
 	brlo	pb_5
 	sbrs	r24,btWestButton  ; Press west

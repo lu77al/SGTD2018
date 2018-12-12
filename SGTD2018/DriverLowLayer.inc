@@ -108,13 +108,9 @@ DriveOff:
 	clt
 	bld	AFlags,afActive
 	outi	PORTB,0b010101	; Short drive
-	sbrs	AFlags,afSetupMove
-	rjmp	doff_2
-	std	Y+yNextDelay,ZeroReg
-	std	Y+yDelayCntH,ZeroReg
-	stdi	yDelayCntL,255
+	sbrc	AFlags,afSetupMove
 	rjmp	doff_1
-doff_2:	sbrs	AFlags,afFailStop
+	sbrs	AFlags,afFailStop
 	rjmp	doff_3
 	rcall	CalculateNextDelay
 	rjmp	doff_1
@@ -430,6 +426,8 @@ std_3:	std	Y+yStopPosL,r16
 	ret
 
 DelayCountdown:
+	sbrc	AFLags,afActive
+	ret	
 	ldd	r16,Y+yDelayCntL
 	ldd	r17,Y+yDelayCntH
 	subi_w	r17,r16,1
