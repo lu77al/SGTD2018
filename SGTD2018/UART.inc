@@ -166,11 +166,12 @@ cm_S2:
 cm0_st:	ld	r16,X+
 	std	Y+yRXPointer,XL
 	cpi	r16,$50	; Request
-	breq	cm0_10
+	breq	cm0_10_
 
 	cpi	r16,$51	; Move East
 	brne	cm0_1
 	rcall	MoveEastCMD
+cm0_10_:
 	rjmp	cm0_10
 cm0_1:
 	cpi	r16,$52	; Move West
@@ -183,7 +184,53 @@ cm0_2:
 	rcall	StopCMD
 	rjmp	cm0_10
 cm0_3:
-
+	cpi	r16,$54	; Set time
+	brne	cm0_4
+	ldi	r25,0
+cm0_41:	ld	r16,X+
+	std	Y+yHour,r16
+	ld	r16,X+
+	std	Y+yMinute,r16
+	ld	r16,X+
+	std	Y+ySecond,r16
+	std	Y+yRXPointer,XL
+	ldi	XL,RTCBuf+10
+	ldi	r16,$40
+	st	X,r16
+	std	Y+yNextDelay,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	stdi	yDelayCntL,15
+	sbrc	r25,1
+	rcall	UpdateTimeOffset
+	rjmp	cm0_10
+cm0_4:
+	cpi	r16,$55	; Set time offset
+	brne	cm0_5
+	ldi	r25,1
+	rjmp	cm0_41
+cm0_5:
+	cpi	r16,$56	; Set parking
+	brne	cm0_6
+	ld	r16,X+
+	sts	iMorningL,r16
+	ld	r16,X+
+	sts	iMorningH,r16
+	ld	r16,X+
+	sts	iEveningL,r16
+	ld	r16,X+
+	sts	iEveningH,r16
+	ld	r16,X+
+	sts	iParkingL,r16
+	ld	r16,X+
+	sts	iParkingH,r16
+	std	Y+yRXPointer,XL
+	set
+	bld	AFlags,afSaveParams
+	std	Y+yNextDelay,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	stdi	yDelayCntL,75
+	rjmp	cm0_10
+cm0_6:
 	rjmp	cm_S4
 cm0_10:
 	ldd	XL,Y+yTXPointer

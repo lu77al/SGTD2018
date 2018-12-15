@@ -48,9 +48,9 @@ stpt_1:	ldi	XL,Params
 	ld	r16,X+
 	std	Y+yMinute,r16
 	ld	r16,X+
+	std	Y+ySecond,r16
 	sbrs	r25,0
 	rcall	UpdateTimeOffset
-	std	Y+ySecond,r16
 	ldi	XL,RTCBuf+10
 	ldi	r16,$40
 	st	X,r16
