@@ -95,3 +95,42 @@ tsm_2:
  - regular: (speed profile) + immediate stop
  - fast: set new target pos + double acceleration profile
  */
+
+/*
+TestKeySwitching:
+	std	Y+yTargetPosL,ZeroReg
+	std	Y+yTargetPosM,ZeroReg
+	std	Y+yTargetPosH,ZeroReg
+	set
+	bld	AFlags,afSetupMove
+	rcall	DriveOn
+dbdg:	rjmp	dbdg
+
+*/
+
+
+TestCalcOffset:
+	ldi_w	r17,r16,$78
+	sts	iMorningL,r16
+	sts	iMorningH,r17
+	ldi_w	r17,r16,$528
+	sts	iEveningL,r16
+	sts	iEveningH,r17
+	ldi_w	r17,r16,$7450
+	std	Y+yPanPosL,r16
+	std	Y+yPanPosM,r17
+	stdi	yHour,$0C
+	stdi	yMinute,$24
+	rcall	UpdateTimeOffset
+	rcall	TimeToTargetPos
+	ldd	r16,Y+yPanPosL
+	ldd	r17,Y+yPanPosM
+	ldd	r18,Y+yPanPosH
+	ldd	r19,Y+yTargetPosL
+	ldd	r20,Y+yTargetPosM
+	ldd	r21,Y+yTargetPosH
+
+
+	ret
+
+

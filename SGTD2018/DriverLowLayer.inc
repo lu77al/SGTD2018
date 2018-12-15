@@ -4,35 +4,46 @@ SetKeysHigh:
 	rjmp	PC+1
 	rjmp	PC+1
 	rjmp	PC+1
+	rjmp	PC+1
 	out	PORTB,KS_High
 	reti
 
 /*** Interrupt timer1 compare B (PWM -> low) ***/
 SetKeysLow:
-	ROTOR_HS_POWER_ON	; Power hall sensors
-	out	PORTB,KS_Dead	; Keys -> dead_state
-	push	ZH
 	push	ZL
-	in	SSReg,SREG
-	rjmp	PC+1
-	ldi	ZL,0b010101
-	out	PORTB,ZL	; Keys -> low_state
-	ldi	ZH,0
-	rjmp	PC+1
-	rjmp	PC+1
 	in	ZL,PINC		; Hall sensors state
-	ROTOR_HS_POWER_OFF	; Power off hall sensors
+	out	PORTB,KS_Dead	; Keys -> dead_state
+	nop
+	push	ZH
+	ldi	ZH,0b010101
+	in	SSReg,SREG
+	andi	ZL,0b1110
+	cp	ZL,HallsBak
+	brne	skl_1
+	cp	HallsStCnt,ZeroReg
+	out	PORTB,ZH	; Keys -> low_state
+	brne	skl_2
 	std	Y+yRotorHallsPort,ZL
 	sbrc	AFlags,afReverse
 	com	ZL		; Apply direction
 	andi	ZL,0b1110
 	subi	ZL,-DriveKeyTable*2 ; Pointer to table of Keys' states
+	ldi	ZH,0
 	lpm	KS_High,Z+
 	lpm	KS_Dead,Z
+skl_3:	pop	ZH
 	pop	ZL
-	pop	ZH
 	out	SREG,SSReg
 	reti
+skl_1:	out	PORTB,ZH	; Keys -> low_state
+	mov	HallsBak,ZL
+	ldi	ZL,4
+	mov	HallsStCnt,ZL
+
+	rjmp	skl_3
+skl_2:	dec	HallsStCnt
+	rjmp	skl_3
+
 
 /*** KS_Buf (KS - keys state) *******
  * 0 - DeadTime port state
@@ -74,9 +85,9 @@ don_2:	bld	AFlags,afReverse
 	ldd	r17,Y+yButState
 	and	r16,r17
 	brne	don_1
+	ROTOR_HS_POWER_ON
 	clt
 	bld	AFlags,afFastStop
-	bld	AFlags,afStopping
 	set
 	bld	AFlags,afActive
 	std	Y+yPWML,ZeroReg
@@ -101,6 +112,7 @@ don_1:	ret
 DriveOff:
 	outi	TCCR1B,0b00001000 ; Stop timer
 	outi	TIFR,(1<<OCF1B) + (1<<OCF1A) ; Clear interrupt flags
+	rjmp	PC+1
 	out	PORTB,ZeroReg
 	rjmp	PC+1
 	rjmp	PC+1
@@ -114,13 +126,12 @@ DriveOff:
 	rjmp	doff_3
 	rcall	CalculateNextDelay
 	rjmp	doff_1
-doff_3:	std	Y+yDelayCntL,ZeroReg
+doff_3:	stdi	yDelayCntL,20
 	std	Y+yDelayCntH,ZeroReg
 	std	Y+yNextDelay,ZeroReg
 doff_1:	clt
 	bld	AFlags,afFailStop
 	bld	AFlags,afSetupMove
-	bld	AFlags,afStopping
 	ret
 
 ; Read hall state when drive isn't active
@@ -128,6 +139,14 @@ GetHallState:
 	ROTOR_HS_POWER_ON
 	rjmp	PC+1
 	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+; addition
 	rjmp	PC+1
 	rjmp	PC+1
 	rjmp	PC+1
@@ -267,6 +286,8 @@ st_1:	cpi	r20,-60
 	brsh	st_2
 	ldi	r20,-60
 st_2:
+	std	Y+yMainReg,r20
+
 ; --- Voltage
 	ldd	r16,Y+yUreg
 	cp	r20,r16
@@ -285,7 +306,7 @@ st_6:
 	rjmp	st_3
 	add	r16,r20
 	adc	r17,ZeroReg
-	ldi_w	r19,r18,2400
+	ldi_w	r19,r18,2300
 	cp	r18,r16
 	cpc	r19,r17
 	brsh	st_4
@@ -305,29 +326,30 @@ st_4:	std	Y+yPWML,r16
 	ret
 
 ; Don't allow coordinate to reach 0 or FULL_CIRCLE
-CheckFixPanPos:
+CorrectPosAtEdge: ; r20,r19 - GAP;
 	ldd	r16,Y+yPanPosL
 	ldd	r17,Y+yPanPosM
 	ldd	r18,Y+yPanPosH
-	cpi	r16,END_POS_GAP
-	cpc	r17,ZeroReg
+	cp	r16,r19
+	cpc	r17,r20
 	cpc	r18,ZeroReg
-	brge	cfp_1
-	ldi_w	r17,r16,END_POS_GAP
-	ldi	r18,0
-	rjmp	cfp_2
-cfp_1:	ldi_w	r21,r20,FULL_CIRCLE - END_POS_GAP
-	ldi	r22,BYTE3(FULL_CIRCLE - END_POS_GAP)
-	cp	r20,r16
-	cpc	r21,r17
-	cpc	r22,r18
-	brlo	cfp_3
+	brsh	gcp_1
+	std	Y+yPanPosL,r19
+	std	Y+yPanPosM,r20
 	ret
-cfp_3:	movw	r17:r16,r21:r20
-	mov	r18,r22
-cfp_2:	std	Y+yPanPosL,r16
-	std	Y+yPanPosM,r17
-	std	Y+yPanPosH,r18
+gcp_1:	ldi_w	r21,r22,FULL_CIRCLE
+	ldi	r23,BYTE3(FULL_CIRCLE)
+	sub	r21,r19
+	sbc	r22,r20
+	sbc	r23,ZeroReg
+	cp	r21,r16
+	cpc	r22,r17
+	cpc	r23,r18
+	brlo	gcp_2
+	ret
+gcp_2:	std	Y+yPanPosL,r21
+	std	Y+yPanPosM,r22
+	std	Y+yPanPosH,r23
 	ret
 
 ; Start (activate) drive if panel position differs target position
@@ -395,34 +417,39 @@ StopFail:
 	bld	AFlags,afFailStop
 	rjmp	DriveOff
 
+
+
 ; Start smooth drive stop
 StopDrive:
-	sbrc	AFlags,afActive
-	sbrc	AFlags,afStopping
-	ret
-	set
-	bld	AFlags,afStopping
+	sbrs	AFlags,afActive
+std_5:	ret
 	ldd	r16,Y+yStopLength
-	ldd	r17,Y+yAccelCnt
-	cp	r16,r17
-	brlo	std_4
-	mov	r16,r17
-std_4:	ldi	r19,120
+	ldi	r19,120
 	sbrc	AFlags,afFastStop
 	ldi	r19,60
-	cp	r16,r19
-	brsh	std_1
-	mov	r19,r16
-std_1:	ldd	r16,Y+yPanPosL
+	ldd	r18,Y+yAccelCnt
+	cp	r18,r19
+	brsh	std_6
+	mov	r19,r18
+std_6:	cp	r16,r19
+	brlo	std_5
+	mov	r25,r16
+	ldi_w	r20,r19,END_POS_GAP+150 
+	rcall	CorrectPosAtEdge
+	subi	r25,2
+	brcc	std_7
+	ldi	r25,0
+std_7:	std	Y+yStopLength,r25
+	ldd	r16,Y+yPanPosL
 	ldd	r17,Y+yPanPosM
 	ldd	r18,Y+yPanPosH
 	sbrc	AFlags,afReverse
 	rjmp	std_2
-	add	r16,r19
+	add	r16,r25
 	adc	r17,ZeroReg
 	adc	r18,ZeroReg
 	rjmp	std_3
-std_2:	sub	r16,r19
+std_2:	sub	r16,r25
 	sbc	r17,ZeroReg
 	sbc	r18,ZeroReg
 std_3:	std	Y+yStopPosL,r16

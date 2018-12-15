@@ -5,7 +5,7 @@
 	.equ	afReverse    = 1
 	.equ	afFastStop   = 2
 	.equ	afFailStop   = 3
-	.equ	afStopping   = 4
+;	.equ	afStopping   = 4
 	.equ	afSetupMove  = 5
 	.equ	afWaitButRel = 6
 	.equ	afSaveParams = 7
@@ -16,6 +16,9 @@
 
 .def	KS_Dead    = r5
 .def	KS_High    = r6
+.def	HallsBak   = r7
+.def	HallsStCnt = r8
+
 
 #define	ZeroReg	YH
 
@@ -40,8 +43,8 @@
 .equ	yRXTXCHS	= $07
 .equ	yMyAddr		= $08
 .equ	yAFlags		= $09
-.equ	yRTCDebug	= $0A
-.equ	yADCChCnt	= $0B
+
+.equ	yMainReg	= $0B
 .equ	yButState	= $0C
 .equ	yButPress	= $0D
 .equ	yButRelease	= $0E
@@ -80,6 +83,8 @@
 .equ	yRTCStage	= $2E
 .equ	yRTCWaitStatus	= $2F
 .equ	yLimSetupStage  = $30
+.equ	yRTCDebug	= $31
+
 
 
 .equ	iHalfSpanL	= $A0
@@ -93,7 +98,6 @@
 .equ	iParkingL	= $A8
 .equ	iParkingH	= $A9
 .equ	iInitCnt	= $AA
-
 .equ	iButtons_F	= $AB
 .equ	iEastLim_F	= $AC
 .equ	iWestLim_F	= $AD

@@ -56,6 +56,8 @@ RESET:
 
 .include "Init.inc"
 
+;	rcall	TestCalcOffset
+
 Main:
 	tskTact
 RetTact:

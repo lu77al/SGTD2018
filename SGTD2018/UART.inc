@@ -159,13 +159,23 @@ cm_S2:
 	ld	r16,X+
 	std	Y+yRXPointer,XL
 
-; ***  ***
-/*
+; *** PhoneCMD ***
 	cpi	r16,$00
 	brne	cm0_0
-	rjmp	cm0_0
-	ld	r25,X+
+	ld	r16,X+
 	std	Y+yRXPointer,XL
+	cpi	r16,$51	; Move East
+	brne	cm0_1
+	rcall	MoveEastCMD
+	rjmp	cm0_10
+cm0_1:
+	cpi	r16,$52	; Move West
+	brne	cm0_2
+	rcall	MoveWestCMD
+	rjmp	cm0_10
+cm0_2:
+
+cm0_10:
 	ldd	XL,Y+yTXPointer
 	ldi	r16,$80+$00
 	st	X+,r16
@@ -173,7 +183,7 @@ cm_S2:
 	std	Y+yTXPointer,XL
 	rjmp	cm_S4
 cm0_0:
-*/
+
 
 	cpi	r16,$70 ; *** Запрос участка памяти ***
 	brne	cm70_0

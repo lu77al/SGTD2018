@@ -12,7 +12,7 @@
 .equ	JAM_INIT_PATH = 18	; Tics for jam detection (from start)
 
 .equ	PWM_PERIOD = 1600	; f = 8e6 / 1600 = 5000Hz
-.equ	PWM_MIN_PULSE = 24
+.equ	PWM_MIN_PULSE = 80
 
 .equ	FULL_SECOND = 62500
 .equ	SECOND_FRACTION = 4096

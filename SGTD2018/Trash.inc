@@ -1,3 +1,71 @@
+DriveKeyTable:	; !!! Must be within first 256 bytes of PROM
+;HS	   Dead	   High         Halls
+.db	0b000000,0b101010 ; Not normal state (is used for key tests)
+;000	  0 0 0    + + +    
+.db	0b000001,0b100001
+;001	  0 0 -    + 0 -   Ok
+.db	0b000100,0b000110
+;010	  0 - 0    0 - +   Ok
+.db	0b000100,0b100100
+;011	  0 - 0    + - 0   Ok
+.db	0b010000,0b011000
+;100	  - 0 0    - + 0   Ok
+.db	0b000001,0b001001
+;101	  0 0 -    0 + -   Ok
+.db	0b010000,0b010010
+;110	  - 0 0    - 0 +   Ok
+.db	0b000000,0b101010 ; Not normal state (is used for key tests) 
+;111	  0 0 0    + + +  
+
+/*** Interrupt timer1 compare A (PWM -> high) ***/
+SetKeysHigh:
+	ROTOR_HS_POWER_ON	; Power hall sensors
+	push	ZH
+	ldi	ZH,0
+	push	ZL
+	in	SSReg,SREG
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	in	ZL,PINC		; Hall sensors state
+	ROTOR_HS_POWER_OFF	; Power off hall sensors
+	std	Y+yRotorHallsPort,ZL
+	sbrc	AFlags,afReverse
+	com	ZL		; Apply direction
+	andi	ZL,0b1110
+	subi	ZL,-DriveKeyTable*2 ; Pointer to table of Keys' states
+	lpm	KS_Dead,Z+
+	out	PORTB,KS_Dead	; Keys -> dead_state
+	lpm	KS_High,Z+
+	pop	ZL
+	pop	ZH
+	out	SREG,SSReg
+	rjmp	PC+1
+	rjmp	PC+1
+	out	PORTB,KS_High	; Keys -> high_state
+	reti
+
+/*** Interrupt timer1 compare B (PWM -> low) ***/
+SetKeysLow:
+	out	PORTB,KS_Dead	; Keys -> dead_state
+	push	r16
+	ldi	r16,0b010101
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	out	PORTB,r16	; Keys -> low_state
+	pop	r16
+	reti
+
+
 /* Buttons interface V1
  *   Enter setup - long press both
  *   Exit setup  - press both

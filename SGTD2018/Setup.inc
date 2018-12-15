@@ -28,6 +28,17 @@
  *   - set parameters (later)
  */
 
+DebugCmdStart:
+	ldi	XL,Params+15
+	ld	r16,X
+	st	X,ZeroReg
+	cpi	r16,1
+	breq	SetTimeCMD
+	cpi	r16,2
+	breq	SetTimeOffsetCMD
+	cpi	r16,3
+	breq	SetParkingCMD
+	ret
 
 SetTimeCMD:
 	ldi	r25,1
@@ -53,9 +64,24 @@ SetTimeOffsetCMD:
 	rjmp	stpt_1
 
 SetParkingCMD:
-
-	ret
-
+	ldi	XL,Params
+	ld	r16,X+
+	sts	iMorningL,r16
+	ld	r16,X+
+	sts	iMorningH,r16
+	ld	r16,X+
+	sts	iEveningL,r16
+	ld	r16,X+
+	sts	iEveningH,r16
+	ld	r16,X+
+	sts	iParkingL,r16
+	ld	r16,X+
+	sts	iParkingH,r16
+	set
+	bld	AFlags,afSaveParams
+	std	Y+yNextDelay,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	stdi	yDelayCntL,75
 
 SetupDelayCMD:
 	std	Y+yLimSetupStage,ZeroReg
@@ -69,7 +95,10 @@ SetupDelayCMD:
 	ret
 
 StopCMD:
+	ldd	r16,Y+yLimSetupStage
 	std	Y+yLimSetupStage,ZeroReg
+	sbrs	AFlags,afActive
+	rjmp	stcm_1
 	sbrc	AFlags,afSetupMove
 	rcall	UpdateTimeOffset
 	rcall	StopDrive
@@ -79,6 +108,10 @@ StopCMD:
 	std	Y+yDelayCntH,ZeroReg
 	stdi	yDelayCntL,255
 	ret
+stcm_1:	cpi	r16,0
+	breq	stcm_2
+	rcall	UpdateTimeOffset
+stcm_2:	ret
 
 MoveEastCMD:
 	ldd	r16,Y+yButState
@@ -95,7 +128,9 @@ MoveWestCMD:
 	ret	
 	ldi_w	r17,r16,FULL_CIRCLE
 	ldi	r18,BYTE3(FULL_CIRCLE)
-smv_1:	stdi	yLimSetupStage,2
+smv_1:	sbrc	AFlags,afActive
+	ret
+	stdi	yLimSetupStage,3
 smv_2:	ldi	r19,25
 smv_3:	std	Y+yDelayCntL,r19
 	std	Y+yNextDelay,ZeroReg
@@ -110,7 +145,7 @@ smv_3:	std	Y+yDelayCntL,r19
 
 ContinueLimitSetup:
 	std	Y+yLimSetupStage,r16
-	cpi	r16,1
+	cpi	r16,2
 	brne	cls_1
 	sbrs	AFlags,afReverse
 	rjmp	cls_2
@@ -120,11 +155,18 @@ ContinueLimitSetup:
 cls_2:	ldi_w	r17,r16,0
 	ldi	r18,0
 	rjmp	smv_2
-cls_1:	std	Y+yLimSetupStage,ZeroReg
+cls_1:	cpi	r16,1
+	brne	cls_3
 	ldi_w	r17,r16,HALF_CIRCLE
 	ldi	r18,BYTE3(HALF_CIRCLE)
-	ldi	r19,255
+	ldi	r19,5
 	rjmp	smv_3
+cls_3:	std	Y+yLimSetupStage,ZeroReg
+	rcall	UpdateTimeOffset
+	stdi	yDelayCntL,255
+	std	Y+yNextDelay,ZeroReg
+	std	Y+yDelayCntH,ZeroReg
+	ret
 
 
 ProcessButtons:
@@ -158,8 +200,10 @@ pb_4:
 	ldi	r16,(1<<btEastButton) + (1<<btWestButton)
 	and	r16,r24
 	cpi	r16,(1<<btEastButton) + (1<<btWestButton) ; And both buttons are pressed
-	brne	pb_8
-	rcall	SetupDelayCMD
+	breq	pb_9
+	rcall	StopCmd
+	rjmp	pb_3
+pb_9:	rcall	SetupDelayCMD
 	rjmp	pb_6
 pb_8:
 	cpi	r25,40		; Long ...

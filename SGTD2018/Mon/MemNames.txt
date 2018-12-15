@@ -21,8 +21,8 @@ SEGMENTBASE $60
 .equ	yRXTXCHS	= $07
 .equ	yMyAddr		= $08
 .equ	yAFlags		= $09
-.equ	yRTCDebug	= $0A
-.equ	yADCChCnt	= $0B
+.equ	yRegDisabled	= $0A
+.equ	yMainReg	= $0B
 .equ	yButState	= $0C
 .equ	yButPress	= $0D
 .equ	yButRelease	= $0E
@@ -60,6 +60,9 @@ SEGMENTBASE $60
 .equ	yIreg		= $2D
 .equ	yRTCStage	= $2E
 .equ	yRTCWaitStatus	= $2F
+.equ	yLimSetupStage  = $30
+.equ	yRTCDebug	= $31
+
 
 
 SEGMENTBASE $000
@@ -74,7 +77,7 @@ SEGMENTBASE $000
 .equ	iEveningH	= $A7
 .equ	iParkingL	= $A8
 .equ	iParkingH	= $A9
-
+.equ	iInitCnt	= $AA
 .equ	iButtons_F	= $AB
 .equ	iEastLim_F	= $AC
 .equ	iWestLim_F	= $AD

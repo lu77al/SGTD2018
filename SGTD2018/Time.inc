@@ -43,9 +43,10 @@ TimeToTargetPos:
 	sub	r24,r14
 	sbc	r25,r15
 	subi_w	r25,r24,-MAX_POS_DIFF_MIN ; Minutes from 00:00 with step DIFF*2
-	mov	r18,r25
-	mov	r17,r24
-tt_1:	ldi	r16,0
+	movw	r17:r16,r25:r24
+tt_1:	mov	r18,r17
+	mov	r17,r16
+	ldi	r16,0
 	ldi_w	r20,r19,12567
 	rcall	M24x16		; r25:r24:r23 Converted to tics
 	rcall	OffsetAndFitRange
@@ -54,7 +55,7 @@ tt_1:	ldi	r16,0
 	std	Y+yTargetPosH,r25
 	ret
 
-CheckForParking: ; r17:r16 - input minutes from 00:00 / SREG.T and r18:r17 - output
+CheckForParking: ; r17:r16 - input minutes from 00:00 / SREG.T and r17:r16 - output
 	clt
 	lds	r18,iMorningL
 	lds	r19,iMorningH
@@ -69,14 +70,15 @@ CheckForParking: ; r17:r16 - input minutes from 00:00 / SREG.T and r18:r17 - out
 	cpc	r17,r19
 	brlo	cp_3		; T < M -> parking
 	cp	r20,r16
-	cpc	r19,r17
+	cpc	r21,r17
 	brsh	cp_1		; E >= T -> normal
-cp_3:	lds	r17,iParkingL
-	lds	r18,iParkingH
+cp_3:	lds	r16,iParkingL
+	lds	r17,iParkingH
+	set
 	ret 
 cp_2:	;-- M > E 
 	cp	r20,r16
-	cpc	r19,r17
+	cpc	r21,r17
 	brsh	cp_1		; E >= T -> normal
 	cp	r16,r18
 	cpc	r17,r19
@@ -91,6 +93,7 @@ OffsetAndFitRange: ; r25:r24:r23 - input/output position
 	sbrc	r17,7
 	ldi	r18,$FF
 	lsl16	r17,r16		; Prepare offset (unpack 16bit)
+	rol	r18
 	lsl16	r17,r16
 	rol	r18
 	add	r23,r16		; Apply offset

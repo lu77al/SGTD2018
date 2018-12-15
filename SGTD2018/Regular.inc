@@ -49,6 +49,14 @@ ReadBLS: ; Read buttons and limit sensors
 	rjmp	PC+1
 	rjmp	PC+1
 	rjmp	PC+1
+
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
+	rjmp	PC+1
 	lds	r21,iButtons_F
 	ldd	r17,Y+yButState ; Prev_State
 	ldd	r18,Y+yButState
@@ -119,8 +127,7 @@ spl_2:	std	Y+yPanPosL,r16
 	ret
 
 StopOnLimits:
-	sbrc	AFlags,afActive	; Skip not active and already stopping
-	sbrc	AFlags,afStopping
+	sbrs	AFlags,afActive	; Skip not active and already stopping
 soh_1:	ret
 	ldd	r16,Y+yButState
 	ldi	r17,(1<<btWestLimit)

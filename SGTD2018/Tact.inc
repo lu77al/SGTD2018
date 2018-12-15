@@ -38,7 +38,8 @@ rxtm_1:
 	cpi	r23,0b00001111	; 15.2587890625 Ãö
 	brne	skBr0
 
-	rcall	CheckFixPanPos	; Don't allow reach 0 and FULL_CIRCLE
+	ldi_w	r20,r19,END_POS_GAP
+	rcall	CorrectPosAtEdge	; Don't allow reach 0 and FULL_CIRCLE
 
 	rcall	CheckTargetPos
 
@@ -64,6 +65,8 @@ sk_BR1:
 	rcall	CheckJam
 
 	rcall	CheckSaveParam
+
+	rcall	DebugCmdStart
 
 	rjmp	RetTact
 sk_BR2:
