@@ -156,8 +156,19 @@ GetHallState:
 	rjmp	PC+1
 	in	r16,PINC
 	ROTOR_HS_POWER_OFF	; Power off hall sensors
+	cp	r16,HallsBak
+	brne	ghs_1
+	cp	HallsStCnt,ZeroReg
+	brne	ghs_2
 	std	Y+yRotorHallsPort,r16
 	ret
+ghs_1:	mov	HallsBak,r16
+	ldi	r16,10
+	mov	HallsStCnt,r16
+	ret
+ghs_2:	dec	HallsStCnt
+	ret
+
 
 /*** Track rotor position and speed (step period) ***/
 TrackRotor:

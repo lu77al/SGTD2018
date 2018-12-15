@@ -31,6 +31,8 @@
 */
 
 #define	LED		PORTD,6
+#define	LED_ON		sbi LED
+#define	LED_OFF		cbi LED
 
 #define	ROTOR_HS_POWER  PORTC,0
 #define	ROTOR_HS_POWER_ON  cbi ROTOR_HS_POWER

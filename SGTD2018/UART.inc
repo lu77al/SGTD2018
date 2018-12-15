@@ -161,9 +161,13 @@ cm_S2:
 
 ; *** PhoneCMD ***
 	cpi	r16,$00
-	brne	cm0_0
-	ld	r16,X+
+	breq	cm0_st
+	rjmp	cm0_0
+cm0_st:	ld	r16,X+
 	std	Y+yRXPointer,XL
+	cpi	r16,$50	; Request
+	breq	cm0_10
+
 	cpi	r16,$51	; Move East
 	brne	cm0_1
 	rcall	MoveEastCMD
@@ -174,16 +178,59 @@ cm0_1:
 	rcall	MoveWestCMD
 	rjmp	cm0_10
 cm0_2:
+	cpi	r16,$53	; Stop
+	brne	cm0_3
+	rcall	StopCMD
+	rjmp	cm0_10
+cm0_3:
 
+	rjmp	cm_S4
 cm0_10:
 	ldd	XL,Y+yTXPointer
 	ldi	r16,$80+$00
 	st	X+,r16
-	st	X+,r25
+	ldd	r16,Y+yHour
+	st	X+,r16
+	ldd	r16,Y+yMinute
+	st	X+,r16
+	ldd	r16,Y+ySecond
+	st	X+,r16
+	ldd	r16,Y+yPanPosL
+	st	X+,r16
+	ldd	r16,Y+yPanPosM
+	st	X+,r16
+	ldd	r16,Y+yPanPosH
+	st	X+,r16
+	st	X+,AFlags
+	ldd	r16,Y+yStopPosL
+	st	X+,r16
+	ldd	r16,Y+yStopPosM
+	st	X+,r16
+	ldd	r16,Y+yStopPosH
+	st	X+,r16
+	lds	r16,iHalfSpanL
+	st	X+,r16
+	lds	r16,iHalfSpanH
+	st	X+,r16
+	lds	r16,iTimeOffsetL
+	st	X+,r16
+	lds	r16,iTimeOffsetH
+	st	X+,r16
+	lds	r16,iMorningL
+	st	X+,r16
+	lds	r16,iMorningH
+	st	X+,r16
+	lds	r16,iEveningL
+	st	X+,r16
+	lds	r16,iEveningH
+	st	X+,r16
+	lds	r16,iParkingL
+	st	X+,r16
+	lds	r16,iParkingH
+	st	X+,r16
 	std	Y+yTXPointer,XL
 	rjmp	cm_S4
 cm0_0:
-
 
 	cpi	r16,$70 ; *** Запрос участка памяти ***
 	brne	cm70_0

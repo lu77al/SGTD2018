@@ -110,6 +110,44 @@ sk_BR3:
 
 	std	Y+yAFlags,AFlags
 
+
+	sbrc	AFlags,afActive
+	rjmp	i_3	
+	ldd	r24,Y+yMainCntM
+	ldd	r16,Y+yDelayCntL
+	ldd	r17,Y+yDelayCntH
+	cp	r16,ZeroReg
+	cpc	r17,ZeroReg
+	brne	i_1
+	andi	r24,0b11111
+	cpi	r24,0b00010
+	breq	i_2
+	ldd	r18,Y+yButState
+	andi	r18,(1<<btEastLimit) + (1<<btWestLimit)
+	breq	i_3
+	cpi	r24,0b00100
+	breq	i_2
+	sbrs	r18,btWestLimit
+	rjmp	i_3
+	cpi	r24,0b00110
+	breq	i_2
+	rjmp	i_3
+i_1:
+	cpi	r17,3
+	brsh	i_5
+	andi	r24,0b1111
+	breq	i_2
+	rjmp	i_3
+i_5:	andi	r24,0b111
+	breq	i_2
+	rjmp	i_3
+	
+
+i_3:	LED_OFF
+	rjmp	i_4
+i_2:	LED_ON
+i_4:
+
 	rjmp	RetTact
 sk_BR4:
 
