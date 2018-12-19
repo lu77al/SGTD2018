@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     public TextView textStatus;
     public TextView textCounter;
 
+    boolean connected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setup() { // Search for paired tracker
+        if (connected) return;
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         BluetoothDevice tracker = null;
         for (BluetoothDevice device : pairedDevices) {
@@ -125,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() { // Connect device here
-            boolean connected = false;
+            if (connected) return;
             try {
                 bluetoothSocket.connect();
                 connected = true;
@@ -144,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                     e1.printStackTrace();
                 }
             }
-            if(connected) {  // Start work thread if connected
+            if (connected) {  // Start work thread if connected
                 runOnUiThread(new Runnable() {
 
                     @Override
@@ -152,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     textStatus.setText("Connected " + name);
                     }
                 });
+                timerHandler.postDelayed(timerRunnable, 1000);
                 myThreadConnected = new ThreadConnected(bluetoothSocket);
                 myThreadConnected.start();
             }
@@ -254,12 +258,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-/////////////////// Buttons /////////////////////
-
-    public void onClickRequest(View v) {
+    private void request() {
         if (myThreadConnected==null) return;
         byte[] bytesToSend = {0x14, 0x02, 0x51, 0x10, 0x00, 0x50, (byte)0xC7};
         myThreadConnected.write(bytesToSend );
+    }
+
+/////////////////// Timer /////////////////////
+
+    Handler timerHandler = new Handler();
+    Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (myThreadConnected !=null) request();
+            timerHandler.postDelayed(this, 500);
+        }
+    };
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        timerHandler.removeCallbacks(timerRunnable);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        timerHandler.postDelayed(timerRunnable, 1000);
+    }
+
+    /////////////////// Buttons /////////////////////
+
+    public void onClickRequest(View v) {
+        request();
     }
 
 }
