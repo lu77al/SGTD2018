@@ -38,7 +38,10 @@ skl_3:	pop	ZH
 skl_1:	out	PORTB,ZH	; Keys -> low_state
 	mov	HallsBak,ZL
 	ldi	ZL,4
-	mov	HallsStCnt,ZL
+	cp	HallsStCnt,ZeroReg
+	breq	skl_4
+	std	Y+yIrregular,HallsStCnt
+skl_4:	mov	HallsStCnt,ZL
 
 	rjmp	skl_3
 skl_2:	dec	HallsStCnt
@@ -204,8 +207,11 @@ tr_4:	sbrs	AFlags,afActive	; If PWM isn't active -> get halls port state
 	rjmp	tr_3
 tr_2:	lpm	r17,Z+
 	cp	r16,r17	; is it step to east?
-	brne	tr_1
-	sbrc	AFlags,afReverse
+	breq	tr_8
+	ldi	r24,$77
+	std	Y+yIrregular,r24
+	rjmp	tr_1
+tr_8:	sbrc	AFlags,afReverse
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,1  ; decrease position
 	sbci	r20,0

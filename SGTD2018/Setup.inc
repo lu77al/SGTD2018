@@ -203,7 +203,9 @@ pb_4:
 	breq	pb_9
 	rcall	StopCmd
 	rjmp	pb_3
-pb_9:	rcall	SetupDelayCMD
+pb_9:
+;	rcall	SetName
+	rcall	SetupDelayCMD
 	rjmp	pb_6
 pb_8:
 	cpi	r25,40		; Long ...

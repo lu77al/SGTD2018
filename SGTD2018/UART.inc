@@ -48,6 +48,7 @@ rxtm_1:
 	ld	r16,X+
 	cp	XL,r17
 	brne	uart_2
+	sbrs	BFlags,bfNoCHS
 	ldd	r16,Y+yRXTXCHS
 uart_2:	out	UDR,r16   ; отправить очереждной байт в буфер
 	std	Y+yTXPointer,XL
@@ -58,6 +59,8 @@ uart_2:	out	UDR,r16   ; отправить очереждной байт в буфер
 	rjmp	RetUart
 uart_1:
 #ifdef	UART_DIR
+	clt
+	bld	BFlags,bfNoCHS
 	sbic	UCSRA,TXC ; ++ Обработка в режиме приема
 	cbi	UART_DIR  ;  переключить микросхему на прием после передачи крайнего байта
 #endif
@@ -350,8 +353,27 @@ cm_S3:	lds	r16,XSEG+RXBuf+2
 	ldd	r17,Y+yMyAddr
 	rjmp	RetCMDProc
 
+/*
+SetName:
+	ldi_w	ZH,ZL,ModuleName*2
+	ldi	XL,TXBuf
+	std	Y+yTXPointer,XL
+stn_2:	lpm	r16,Z+
+	cpi	r16,0
+	breq	stn_1
+	st	X+,r16
+	rjmp	stn_2
+stn_1:	std	Y+yTXEnd,XL
+	set
+	bld	BFlags,bfNoCHS
+	ret	
+
+
+ModuleName:
+.db	"AT+NAME=Svit_Vitru_TSV_025",13,10,0
+
+;.db	"AT5",13,10,0
 
 
 
-
-
+*/

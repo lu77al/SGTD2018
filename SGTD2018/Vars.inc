@@ -11,8 +11,7 @@
 	.equ	afSaveParams = 7
 
 .def	BFlags	= r4
-	.equ	bfRTCRead  = 0
-	.equ	bfRTCWrite = 1
+	.equ	bfNoCHS  = 0
 
 .def	KS_Dead    = r5
 .def	KS_High    = r6
@@ -43,7 +42,7 @@
 .equ	yRXTXCHS	= $07
 .equ	yMyAddr		= $08
 .equ	yAFlags		= $09
-
+.equ	yIrregular	= $0A
 .equ	yMainReg	= $0B
 .equ	yButState	= $0C
 .equ	yButPress	= $0D
