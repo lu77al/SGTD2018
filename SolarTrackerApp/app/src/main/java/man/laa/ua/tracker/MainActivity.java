@@ -187,24 +187,61 @@ public class MainActivity extends AppCompatActivity {
             connectedOutputStream = out;
         }
 
+        private void showText(final TextView view, String text) {
+            outputText = text;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    view.setText(outputText);
+                }
+            });
+        }
+/*
+>>>14-02-51-10-00-50-C7-
+   00-01-02-03-04-05-06-07-08-09-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25
+<<<14-15-10-51-80-12-3B-3B-8F-A6-00-00-8E-A6-00-C2-1C-E3-F4-78-00-28-05-78-00-CD-
+   [---HEADER---][H--M--S][PanPos-][F][StopPos][HSPN][OFFS][MRNG][EVNG][PRKG][CS]
+*/
         @Override
         public void run() { // Listen bluetooth input
-            int count = 0;
+            byte header[] = {0x14, 0x15, 0x10, 0x51, (byte)0x80};
+            byte in[] = new byte[32];
+            int pnt = 0;
+            byte[] inputByte = new byte[1];
             while (true) {
                 try {
-                    byte[] buffer = new byte[1];
-                    int bytes = connectedInputStream.read(buffer);
-                    count++;
-                    outputText = Integer.toString(count);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            textCounter.setText(outputText);
-                        }
-                    });
+                    int inputLen = connectedInputStream.read(inputByte);
                 } catch (IOException e) {
                     break;
                 }
+                byte input = inputByte[0];
+                in[pnt] = input;
+                if ((pnt < header.length) && (header[pnt] != input)) {
+                    pnt = 0;
+                } else {
+                    pnt++;
+                }
+                if (pnt < 26) continue;
+                byte checkSum = 0;
+                for (int i = 0; i < 25; i++) checkSum += in[i];
+                pnt = 0;
+                if (checkSum != in[25]) continue;
+                showText(textCounter,
+                        Integer.toString(in[5]) + ":" +
+                             Integer.toString(in[6]) + ":" +
+                             Integer.toString(in[7]) + ":"
+                );
+
+/*
+                    count++;
+                outputText = Integer.toString(count);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textCounter.setText(outputText);
+                    }
+                });
+ */
             }
         }
 

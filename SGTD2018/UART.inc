@@ -162,7 +162,6 @@ cm_S2:
 	ld	r16,X+
 	std	Y+yRXPointer,XL
 
-; *** PhoneCMD ***
 	cpi	r16,$00
 	breq	cm0_st
 	rjmp	cm0_0
