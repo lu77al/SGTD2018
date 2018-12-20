@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.IOException;
@@ -29,8 +32,12 @@ public class MainActivity extends AppCompatActivity {
     ThreadConnectBTdevice myThreadConnectBTdevice;
     ThreadConnected myThreadConnected;
 
-    public TextView textStatus;
-    public TextView textTrackerTime;
+// Visual Components
+    public CheckBox checkTime, checkParking, checkPosition, checkAutoTime;
+    public TextView textStatus, textTrackerTime, textMorning, textEvening, textParking;
+    public TextView textAbsEast, textAbsPos, textAbsWest, textRttEast, textRttPos, textRttWest;
+    public Button buttonMoveEast, buttonHold, buttonMoveWest;
+    public EditText editTrackerTime, editMorning, editEvening, editParking;
 
     boolean connected = false;
 
@@ -39,7 +46,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+    // Find visual components
+
+
         final String UUID_STRING_WELL_KNOWN_SPP = "00001101-0000-1000-8000-00805F9B34FB";
+
+        checkTime = findViewById(R.id.checkTime);
+        checkParking = findViewById(R.id.checkParking);
+        checkPosition = findViewById(R.id.checkPosition);
+        checkAutoTime = findViewById(R.id.checkAutoTime);
+
+        textStatus = findViewById(R.id.textStatus);
+        textTrackerTime = findViewById(R.id.textTrackerTime);
+        textMorning = findViewById(R.id.textMorning);
+        textEvening = findViewById(R.id.textEvening);
+        textParking = findViewById(R.id.textParking);
+
+        textAbsEast = findViewById(R.id.textAbsEast);
+        textAbsPos = findViewById(R.id.textAbsPos);
+        textAbsWest = findViewById(R.id.textAbsWest);
+        textRttEast = findViewById(R.id.textRttEast);
+        textRttPos = findViewById(R.id.textRttPos);
+        textRttWest = findViewById(R.id.textRttWest);
+
+        buttonMoveEast = findViewById(R.id.buttonMoveEast);
+        buttonHold = findViewById(R.id.buttonHold);
+        buttonMoveWest = findViewById(R.id.buttonMoveWest);
+
+        editTrackerTime = findViewById(R.id.editTrackerTime);
+        editMorning = findViewById(R.id.editMorning);
+        editEvening = findViewById(R.id.editEvening);
+        editParking = findViewById(R.id.editParking);
 
         textStatus = findViewById(R.id.textStatus);
         textTrackerTime = findViewById(R.id.textTrackerTime);
@@ -206,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
    [---HEADER---][H--M--S][PanPos-][F][StopPos][HSPN][OFFS][MRNG][EVNG][PRKG][CS]
 */
         private void decode(byte in[]) {
+            // Tracker RTC
             String time = String.format("%02d:%02d:%02d", in[5], in[6], in[7]);
             showText(textTrackerTime, time);
         }

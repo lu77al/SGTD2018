@@ -21,8 +21,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:text="Search for tracker..."
             android:textSize="18sp"
             android:visibility="visible" />
@@ -33,157 +33,216 @@
     <RelativeLayout
         android:id="@+id/layoutTime"
         android:layout_width="match_parent"
+        android:focusableInTouchMode="true"
         android:layout_height="wrap_content"
         android:background="#ffffbb"
         android:layout_below="@+id/layoutStatus">
 
-        <CheckBox
-            android:id="@+id/checkTime"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:checked="false"
-            android:text="------ TIME ------"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="18sp" />
+            android:focusableInTouchMode="true">
 
-        <TextView
-            android:id="@+id/textTrackerTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/editTrackerTime"
-            android:layout_marginLeft="10dp"
-            android:text="00:00:00"
-            android:textSize="30sp"/>
+            <CheckBox
+                android:id="@+id/checkTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="TIME"
+                android:textSize="18sp" />
 
-        <EditText
-            android:id="@+id/editTrackerTime"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/checkTime"
-            android:layout_toRightOf="@id/textTrackerTime"
-            android:layout_marginLeft="8dp"
-            android:inputType="time"
-            android:text="00:00:00"
-            android:textSize="30sp" />
+            <CheckBox
+                android:id="@+id/checkAutoTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="COPY SYSTEM TIME"
+                android:layout_alignBaseline="@id/checkTime"
+                android:layout_toEndOf="@id/checkTime"
+                android:layout_marginStart="20dp"
+                android:textSize="18sp" />
 
-        <CheckBox
-            android:id="@+id/checkAutoTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="auto"
-            android:layout_alignBaseline="@id/editTrackerTime"
-            android:layout_toRightOf="@id/editTrackerTime"
-            android:layout_marginLeft="5dp"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textTrackerTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/checkTime"
+                android:textSize="30sp"
+                android:text="00:00:00" />
 
-        <Button
-            android:id="@+id/buttonSetTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="   SET TIME   "
-            android:layout_below="@id/editTrackerTime"
-            android:layout_marginLeft="10dp"
-            android:textSize="18sp" />
+            <EditText
+                android:id="@+id/editTrackerTime"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/textTrackerTime"
+                android:layout_alignBaseline="@id/textTrackerTime"
+                android:layout_marginStart="35dp"
+                android:layout_width="130dp"
+                android:inputType="time"
+                android:textSize="30sp"
+                android:text="00:00:00" />
 
-        <Button
-            android:id="@+id/buttonSetOffset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="   SET OFFSET   "
-            android:layout_alignBaseline="@id/buttonSetTime"
-            android:layout_toRightOf="@id/buttonSetTime"
-            android:layout_marginLeft="20dp"
-            android:layout_marginBottom="10dp"
-            android:textSize="18sp" />
+            <Button
+                android:id="@+id/buttonSetTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:layout_below="@id/editTrackerTime"
+                android:layout_marginTop="-8dp"
+                android:textSize="18sp"
+                android:text="   SET TIME   "
+                />
+
+            <Button
+                android:id="@+id/buttonSetOffset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:text="   SET OFFSET   "
+                android:layout_alignBaseline="@id/buttonSetTime"
+                android:layout_toRightOf="@id/buttonSetTime"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="18sp" />
+
+        </RelativeLayout>
+
+
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/layoutParking"
         android:layout_width="match_parent"
+        android:focusableInTouchMode="true"
         android:layout_height="wrap_content"
         android:background="#ffccff"
         android:layout_below="@+id/layoutTime">
 
-        <CheckBox
-            android:id="@+id/checkParking"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:checked="false"
-            android:text="------ PARKING POSITION ------"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="18sp" />
+            android:focusableInTouchMode="true">
 
-        <TextView
-            android:id="@+id/textMorning"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/editMorning"
-            android:layout_marginLeft="15dp"
-            android:text="MORNING - 00:00:00"
-            android:textSize="24sp"/>
+            <CheckBox
+                android:id="@+id/checkParking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:textSize="18sp"
+                android:text="PARKING SETTINGS"
+                />
 
-        <EditText
-            android:id="@+id/editMorning"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/checkParking"
-            android:layout_toRightOf="@id/textMorning"
-            android:layout_marginLeft="15dp"
-            android:inputType="time"
-            android:text="00:00:00"
-            android:textSize="24sp"/>
+            <TextView
+                android:id="@+id/textEveningTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textEvening"
+                android:textSize="16sp"
+                android:text="EVENING:"/>
 
-        <TextView
-            android:id="@+id/textEvening"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/editEvening"
-            android:layout_alignRight="@id/textMorning"
-            android:text="EVENING - 00:00:00"
-            android:textSize="24sp"/>
+            <TextView
+                android:id="@+id/textEvening"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/checkParking"
+                android:layout_alignEnd="@id/textMorning"
+                android:textSize="24sp"
+                android:text="00:00:00"/>
 
-        <EditText
-            android:id="@+id/editEvening"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/editMorning"
-            android:layout_alignLeft="@id/editMorning"
-            android:inputType="time"
-            android:text="00:00:00"
-            android:textSize="24sp"/>
+            <EditText
+                android:id="@+id/editEvening"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textEvening"
+                android:layout_alignEnd="@id/editMorning"
+                android:inputType="time"
+                android:textSize="24sp"
+                android:text="00:00:00"/>
 
-        <TextView
-            android:id="@+id/textParking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/editParking"
-            android:layout_alignRight="@id/textMorning"
-            android:text="PARKING - 00:00:00"
-            android:textSize="24sp"/>
+            <TextView
+                android:id="@+id/textMorningTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textMorning"
+                android:textSize="16sp"
+                android:text="MORNING:"/>
 
-        <EditText
-            android:id="@+id/editParking"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/editEvening"
-            android:layout_alignLeft="@id/editMorning"
-            android:inputType="time"
-            android:text="00:00:00"
-            android:textSize="24sp"/>
+            <TextView
+                android:id="@+id/textMorning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textEvening"
+                android:layout_toEndOf="@id/textMorningTitle"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:textSize="24sp"
+                android:text="00:00:00"/>
 
-        <Button
-            android:id="@+id/buttonSetParking"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SEND PARAMETERS"
-            android:layout_below="@id/editParking"
-            android:layout_marginRight="25dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginBottom="10dp"
-            android:textSize="18sp" />
+            <EditText
+                android:id="@+id/editMorning"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/textMorning"
+                android:layout_alignBaseline="@id/textMorning"
+                android:layout_marginStart="12dp"
+                android:inputType="time"
+                android:textSize="24sp"
+                android:text="00:00:00"/>
+
+
+            <TextView
+                android:id="@+id/textParkingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textParking"
+                android:textSize="16sp"
+                android:text="PARKING:"/>
+
+            <TextView
+                android:id="@+id/textParking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textMorning"
+                android:layout_alignEnd="@id/textMorning"
+                android:layout_marginTop="5dp"
+                android:textSize="24sp"
+                android:text="00:00:00"/>
+
+            <EditText
+                android:id="@+id/editParking"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textParking"
+                android:layout_alignEnd="@id/editMorning"
+                android:inputType="time"
+                android:textSize="24sp"
+                android:text="00:00:00"/>
+
+            <Button
+                android:id="@+id/buttonSetParking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:layout_below="@id/editParking"
+                android:layout_marginTop="-8dp"
+                android:textSize="18sp"
+                android:text=" SET PARAMS "/>
+
+            <Button
+                android:id="@+id/buttonGetParking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:layout_toEndOf="@id/buttonSetParking"
+                android:layout_marginStart="20dp"
+                android:layout_alignBaseline="@id/buttonSetParking"
+                android:layout_marginBottom="5dp"
+                android:textSize="18sp"
+                android:text=" GET PARAMS "/>
+
+        </RelativeLayout>
+
 
     </RelativeLayout>
 
@@ -195,122 +254,130 @@
         android:focusableInTouchMode="true"
         android:layout_below="@+id/layoutParking">
 
-        <CheckBox
-            android:id="@+id/checkPosition"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:checked="false"
-            android:text="------ POSITION ------"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="18sp" />
+            android:focusableInTouchMode="true">
 
-        <TextView
-            android:id="@+id/textAbsHeader"
-            android:layout_below="@id/checkPosition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="ABS"
-            android:textSize="18sp" />
+            <CheckBox
+                android:id="@+id/checkPosition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:textSize="18sp"
+                android:text="PANEL POSITION" />
 
-        <TextView
-            android:id="@+id/textAbsEast"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/textAbsHeader"
-            android:layout_alignBaseline="@id/textAbsHeader"
-            android:layout_marginLeft="10dp"
-            android:text="E{06:40:40}"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textAbsHeader"
+                android:layout_below="@id/checkPosition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="A" />
 
-        <TextView
-            android:id="@+id/textAbsPos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/textAbsHeader"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/textAbsEast"
-            android:text="14:20:15"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/textAbsEast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/textAbsHeader"
+                android:layout_alignBaseline="@id/textAbsHeader"
+                android:layout_marginStart="7dp"
+                android:textSize="18sp"
+                android:text="E{00:00:00}" />
 
-        <TextView
-            android:id="@+id/textAbsWest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/textAbsPos"
-            android:layout_alignBaseline="@id/textAbsHeader"
-            android:layout_marginLeft="10dp"
-            android:text="{06:40:40}W"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textAbsPos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textAbsHeader"
+                android:layout_marginStart="12dp"
+                android:layout_toEndOf="@id/textAbsEast"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="00:00:00" />
 
-        <TextView
-            android:id="@+id/textRttHeader"
-            android:layout_below="@id/textAbsHeader"
-            android:layout_alignLeft="@id/textAbsHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="RTT"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textAbsWest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/textAbsPos"
+                android:layout_alignBaseline="@id/textAbsHeader"
+                android:layout_marginStart="12dp"
+                android:textSize="18sp"
+                android:text="{00:00:00}W" />
 
-        <TextView
-            android:id="@+id/textRttEast"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/textRttHeader"
-            android:layout_alignLeft="@id/textAbsEast"
-            android:text="E{06:40:40}"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textRttHeader"
+                android:layout_below="@id/textAbsHeader"
+                android:layout_alignEnd="@id/textAbsHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="R" />
 
-        <TextView
-            android:id="@+id/textRttPos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/textRttHeader"
-            android:layout_alignLeft="@id/textAbsPos"
-            android:text="14:20:15"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/textRttEast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textRttHeader"
+                android:layout_alignEnd="@id/textAbsEast"
+                android:textSize="18sp"
+                android:text="E{00:00:00}" />
 
-        <TextView
-            android:id="@+id/textRttWest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/textRttHeader"
-            android:layout_alignLeft="@id/textAbsWest"
-            android:text="{06:40:40}W"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textRttPos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textRttHeader"
+                android:layout_alignEnd="@id/textAbsPos"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="00:00:00" />
 
-        <Button
-            android:id="@+id/buttonFix"
-            android:layout_width="wrap_content"
-            android:layout_height="70dp"
-            android:text=" HOLD "
-            android:layout_below="@id/textRttHeader"
-            android:focusableInTouchMode="true"
-            android:layout_centerHorizontal="true"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textRttWest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textRttHeader"
+                android:layout_alignEnd="@id/textAbsWest"
+                android:textSize="18sp"
+                android:text="{00:00:00}W" />
 
-        <Button
-            android:id="@+id/buttonMoveEast"
-            android:layout_width="wrap_content"
-            android:layout_height="70dp"
-            android:text="--- EAST ---"
-            android:layout_below="@id/textRttHeader"
-            android:layout_toLeftOf="@id/buttonFix"
-            android:layout_marginRight="5dp"
-            android:textSize="18sp" />
+            <Button
+                android:id="@+id/buttonHold"
+                android:layout_width="wrap_content"
+                android:layout_height="85dp"
+                android:layout_below="@id/textRttHeader"
+                android:layout_centerHorizontal="true"
+                android:focusableInTouchMode="true"
+                android:textSize="18sp"
+                android:text="HOLD" />
 
-        <Button
-            android:id="@+id/buttonMoveWest"
-            android:layout_width="wrap_content"
-            android:layout_height="70dp"
-            android:text="--- WEST ---"
-            android:layout_below="@id/textRttHeader"
-            android:layout_toRightOf="@id/buttonFix"
-            android:layout_marginLeft="5dp"
-            android:textSize="18sp" />
+            <Button
+                android:id="@+id/buttonMoveEast"
+                android:layout_width="wrap_content"
+                android:layout_height="85dp"
+                android:layout_below="@id/textRttHeader"
+                android:layout_toStartOf="@id/buttonHold"
+                android:layout_marginEnd="7dp"
+                android:focusableInTouchMode="true"
+                android:textSize="18sp"
+                android:text="GO\nEAST" />
+
+            <Button
+                android:id="@+id/buttonMoveWest"
+                android:layout_width="wrap_content"
+                android:layout_height="85dp"
+                android:layout_below="@id/textRttHeader"
+                android:layout_toEndOf="@id/buttonHold"
+                android:layout_marginStart="7dp"
+                android:focusableInTouchMode="true"
+                android:textSize="18sp"
+                android:text="GO\nWEST" />
+
+        </RelativeLayout>
+
     </RelativeLayout>
 
 
