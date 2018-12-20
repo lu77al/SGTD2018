@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     ThreadConnected myThreadConnected;
 
     public TextView textStatus;
-    public TextView textCounter;
+    public TextView textTrackerTime;
 
     boolean connected = false;
 
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         final String UUID_STRING_WELL_KNOWN_SPP = "00001101-0000-1000-8000-00805F9B34FB";
 
         textStatus = findViewById(R.id.textStatus);
-        textCounter = findViewById(R.id.textCounter);
+        textTrackerTime = findViewById(R.id.textTrackerTime);
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)){
             Toast.makeText(this, "BLUETOOTH NOT support", Toast.LENGTH_LONG).show();
@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
         if (bluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not supported on this hardware platform", Toast.LENGTH_LONG).show();
             finish();
-            return;
         }
     }
 
@@ -161,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        public void cancel() {
+        void cancel() {
             Toast.makeText(getApplicationContext(), "Close - BluetoothSocket", Toast.LENGTH_LONG).show();
             try {
                 bluetoothSocket.close();
@@ -178,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
         private String outputText;
 
-        public ThreadConnected(BluetoothSocket socket) {
+        ThreadConnected(BluetoothSocket socket) {
             InputStream in = null;
             OutputStream out = null;
             try {
@@ -206,6 +205,11 @@ public class MainActivity extends AppCompatActivity {
 <<<14-15-10-51-80-12-3B-3B-8F-A6-00-00-8E-A6-00-C2-1C-E3-F4-78-00-28-05-78-00-CD-
    [---HEADER---][H--M--S][PanPos-][F][StopPos][HSPN][OFFS][MRNG][EVNG][PRKG][CS]
 */
+        private void decode(byte in[]) {
+            String time = String.format("%02d:%02d:%02d", in[5], in[6], in[7]);
+            showText(textTrackerTime, time);
+        }
+
         @Override
         public void run() { // Listen bluetooth input
             byte header[] = {0x14, 0x15, 0x10, 0x51, (byte)0x80};
@@ -229,27 +233,11 @@ public class MainActivity extends AppCompatActivity {
                 byte checkSum = 0;
                 for (int i = 0; i < 25; i++) checkSum += in[i];
                 pnt = 0;
-                if (checkSum != in[25]) continue;
-                showText(textCounter,
-                        Integer.toString(in[5]) + ":" +
-                             Integer.toString(in[6]) + ":" +
-                             Integer.toString(in[7]) + ":"
-                );
-
-/*
-                    count++;
-                outputText = Integer.toString(count);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        textCounter.setText(outputText);
-                    }
-                });
- */
+                if (checkSum == in[25]) decode(in);
             }
         }
 
-        public void write(byte[] buffer) {
+        void write(byte[] buffer) {
             try {
                 connectedOutputStream.write(buffer);
             } catch (IOException e) {
