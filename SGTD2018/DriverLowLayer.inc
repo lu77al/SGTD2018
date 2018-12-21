@@ -140,6 +140,7 @@ doff_1:	clt
 ; Read hall state when drive isn't active
 GetHallState:
 	ROTOR_HS_POWER_ON
+
 	rjmp	PC+1
 	rjmp	PC+1
 	rjmp	PC+1
@@ -179,9 +180,7 @@ TrackRotor:
 	inc	r16
 	breq	tr_4
 	std	Y+yCurPeriod,r16
-tr_4:	sbrs	AFlags,afActive	; If PWM isn't active -> get halls port state
-	rcall	GetHallState
-	ldd	r16,Y+yRotorHallsPort
+tr_4:	ldd	r16,Y+yRotorHallsPort
 	andi	r16,0b1110	; Actual state of rotor sensors
 	ldd	ZL,Y+yRotorState ; Recorded state
 	cp	r16,ZL
@@ -228,6 +227,8 @@ tr_1:	ldd	r16,Y+yDummyPeriod
 	inc	r16
 	std	Y+yDummyPeriod,r16
 	breq	tr_6
+	sbrs	AFlags,afActive	; If PWM isn't active -> get halls port state
+	rjmp	GetHallState
 	ret
 tr_6:	ldi	r25,$FF
 	rjmp	tr_7
@@ -236,7 +237,8 @@ tr_5:	std	Y+yCurPeriod,ZeroReg
 tr_7:	std	Y+yLastPeriod,r25
 
 	sbrs	AFlags,afActive
-	ret
+	rjmp	GetHallState	; If PWM isn't active -> get halls port state
+
 
 ; *** Set speed ***
 	sbrs	AFlags,afReverse	; Calculate rest of target path

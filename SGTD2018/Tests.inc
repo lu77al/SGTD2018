@@ -129,8 +129,31 @@ TestCalcOffset:
 	ldd	r19,Y+yTargetPosL
 	ldd	r20,Y+yTargetPosM
 	ldd	r21,Y+yTargetPosH
-
-
 	ret
+
+
+TestOffsetBothSides:
+	ldi_w	r17,r16,HALF_CIRCLE + (HALF_CIRCLE / 6)
+	std	Y+yPanPosL,r16
+	std	Y+yPanPosM,r17
+	std	Y+yPanPosH,ZeroReg
+	stdi	yHour,12
+	stdi	yMinute,0
+	stdi	ySecond,0
+	rcall	UpdateTimeOffset
+	ldi_w	r17,r16,HALF_CIRCLE
+	std	Y+yPanPosL,r16
+	std	Y+yPanPosM,r17
+	std	Y+yPanPosH,ZeroReg
+	rcall	UpdateTimeFromPanPos
+	rcall	TimeToTargetPos
+	ldd	r16,Y+yPanPosL
+	ldd	r17,Y+yPanPosM
+	ldd	r18,Y+yPanPosH
+	ldd	r19,Y+yTargetPosL
+	ldd	r20,Y+yTargetPosM
+	ldd	r21,Y+yTargetPosH
+	ret
+
 
 

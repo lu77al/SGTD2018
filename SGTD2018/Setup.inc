@@ -100,7 +100,7 @@ StopCMD:
 	sbrs	AFlags,afActive
 	rjmp	stcm_1
 	sbrc	AFlags,afSetupMove
-	rcall	UpdateTimeOffset
+	rcall	UpdateTimeFromPanPos
 	rcall	StopDrive
 	set
 	bld	AFlags,afSetupMove
@@ -110,7 +110,7 @@ StopCMD:
 	ret
 stcm_1:	cpi	r16,0
 	breq	stcm_2
-	rcall	UpdateTimeOffset
+	rcall	UpdateTimeFromPanPos
 stcm_2:	ret
 
 MoveEastCMD:
@@ -162,7 +162,7 @@ cls_1:	cpi	r16,1
 	ldi	r19,5
 	rjmp	smv_3
 cls_3:	std	Y+yLimSetupStage,ZeroReg
-	rcall	UpdateTimeOffset
+	rcall	UpdateTimeFromPanPos
 	stdi	yDelayCntL,255
 	std	Y+yNextDelay,ZeroReg
 	std	Y+yDelayCntH,ZeroReg

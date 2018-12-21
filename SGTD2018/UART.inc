@@ -250,7 +250,13 @@ cm0_10:
 	st	X+,r16
 	ldd	r16,Y+yPanPosH
 	st	X+,r16
-	st	X+,AFlags
+	mov	r16,AFlags
+	andi	r16,0b11
+	ldd	r17,Y+yButState
+	swap	r17
+	andi	r17,$F0
+	or	r16,r17
+	st	X+,r16
 	ldd	r16,Y+yStopPosL
 	st	X+,r16
 	ldd	r16,Y+yStopPosM
@@ -262,6 +268,8 @@ cm0_10:
 	lds	r16,iHalfSpanH
 	st	X+,r16
 	lds	r16,iTimeOffsetL
+	st	X+,r16
+	lds	r16,iTimeOffsetM
 	st	X+,r16
 	lds	r16,iTimeOffsetH
 	st	X+,r16

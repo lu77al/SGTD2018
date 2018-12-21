@@ -10,6 +10,9 @@ SaveParams:
 	lds	r16,iTimeOffsetL
 	rcall	EEWrite
 	rcall	AddByteCS
+	lds	r16,iTimeOffsetM
+	rcall	EEWrite
+	rcall	AddByteCS
 	lds	r16,iTimeOffsetH
 	rcall	EEWrite
 	rcall	AddByteCS
@@ -46,6 +49,9 @@ ReadParams:
 	rcall	AddByteCS
 	rcall	EERead
 	sts	iTimeOffsetL,r16
+	rcall	AddByteCS
+	rcall	EERead
+	sts	iTimeOffsetM,r16
 	rcall	AddByteCS
 	rcall	EERead
 	sts	iTimeOffsetH,r16
@@ -86,9 +92,9 @@ DefaultParams:
 	ldi_w	r17,r16,70693/24*5  
 	sts	iHalfSpanL,r16
 	sts	iHalfSpanH,r17
-	ldi_w	r17,r16,0  
-	sts	iTimeOffsetL,r16
-	sts	iTimeOffsetH,r17
+	sts	iTimeOffsetL,ZeroReg
+	sts	iTimeOffsetM,ZeroReg
+	sts	iTimeOffsetH,ZeroReg
 	rjmp	SaveParams
 
 CheckSaveParam:

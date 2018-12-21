@@ -56,9 +56,9 @@ RESET:
 
 .include "Init.inc"
 
-;	rcall	SetName
-
 ;	rcall	TestCalcOffset
+	
+;	rcall	TestOffsetBothSides
 
 Main:
 	tskTact

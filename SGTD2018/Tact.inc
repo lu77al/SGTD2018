@@ -9,7 +9,8 @@ InitTact:
 	rjmp	Tact
 .endm
 
-Tact:	outi	TIFR,1<<TOV2
+Tact:	ROTOR_HS_POWER_ON
+	outi	TIFR,1<<TOV2
 
 ;**** RXTimer ****
 	ldd	r16,Y+yRXTimer
@@ -22,8 +23,6 @@ Tact:	outi	TIFR,1<<TOV2
 rxtm_1:
 ;**** RXTimer ****
 
-	rcall	TrackRotor
-
 ;-- MainCnt 24bit
 	ldd	r23,Y+yMainCntL
 	ldd	r24,Y+yMainCntM
@@ -33,6 +32,12 @@ rxtm_1:
 	std	Y+yMainCntL,r23
 	std	Y+yMainCntM,r24
 	std	Y+yMainCntH,r25
+
+	ldd	r23,Y+yMainCntL
+	ldd	r24,Y+yMainCntM
+	ldd	r25,Y+yMainCntH
+
+	rcall	TrackRotor
 
 ;--- Br0 ---
 	cpi	r23,0b00001111	; 15.2587890625 關
@@ -110,7 +115,20 @@ sk_BR3:
 
 	std	Y+yAFlags,AFlags
 
-
+	lds	r16,iLedLightCnt
+	subi	r16,1
+	brcs	i_6
+	sts	iLedLightCnt,r16
+	rjmp	i_2
+i_6:
+	ldd	r16,Y+yButState
+	andi	r16,(1<<btEastLimit) + (1<<btWestLimit)
+	breq	i_7
+	ldd	r24,Y+yMainCntM
+	sbrs	r24,0
+	rjmp	i_2
+	rjmp	i_3
+i_7:
 	sbrc	AFlags,afActive
 	rjmp	i_3	
 	ldd	r24,Y+yMainCntM
@@ -152,7 +170,17 @@ i_4:
 sk_BR4:
 
 ;--- Br ---
-	andi	r23,0b00011111	; 122.0703125 關
+	andi	r23,0b01111111	; 30.517578125 關
+	cpi	r23,0b00000110
+	brne	sk_BR5_0
+
+	LIMIT_HS_POWER_ON
+
+	rjmp	RetTact
+sk_BR5_0:
+
+;--- Br ---
+	andi	r23,0b01111111	; 30.517578125 關
 	cpi	r23,0b00000111
 	brne	sk_BR5
 
@@ -160,7 +188,7 @@ sk_BR4:
 
 	rcall	TestLimitPressed
 
-	rcall	StopOnLimits	
+	rcall	StopOnLimits
 
 	rjmp	RetTact
 sk_BR5:

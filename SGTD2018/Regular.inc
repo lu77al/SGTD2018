@@ -42,21 +42,6 @@ pbf_40:
 
 ReadBLS: ; Read buttons and limit sensors
 	LIMIT_HS_POWER_ON
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
 	lds	r21,iButtons_F
 	ldd	r17,Y+yButState ; Prev_State
 	ldd	r18,Y+yButState
@@ -93,19 +78,23 @@ TestLimitPressed:
 	mov	r16,r25
 	andi	r16,$FF - (1<<btEastLimit) - (1<<btWestLimit)
 	std	Y+yButPress,r16
+	ldi	r24,45
 	sbrs	r25,btEastLimit	; East limit trigger
 	rjmp	ph_1
+	sts	iLedLightCnt,r24
 	sbrc	AFlags,afSetupMove
 	rcall	EastLimitSetup
 	set
 	rjmp	ph_2
 ph_1:	sbrs	r25,btWestLimit	; West limit trigger
 	ret
+	sts	iLedLightCnt,r24
 	sbrc	AFlags,afSetupMove
 	rcall	WestLimitSetup
 	clt
 ph_2:	rcall	SetPosOnLimit
-	rjmp	UpdateTimeOffset
+	ret
+;	rjmp	UpdateTimeOffset
 
 
 SetPosOnLimit:

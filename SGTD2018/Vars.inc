@@ -88,8 +88,8 @@
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1
-.equ	iTimeOffsetL	= $A2	; /2
-.equ	iTimeOffsetH	= $A3
+.equ	iTimeOffsetL	= $A2
+.equ	iTimeOffsetM	= $A3
 .equ	iMorningL	= $A4
 .equ	iMorningH	= $A5
 .equ	iEveningL	= $A6
@@ -112,3 +112,5 @@
 .equ	iUH		= $B7
 .equ	iUL		= $B8
 .equ	iSleepCnt	= $B9
+.equ	iTimeOffsetH	= $BA
+.equ	iLedLightCnt	= $BB
