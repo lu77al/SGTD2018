@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,12 +41,25 @@ public class MainActivity extends AppCompatActivity {
     public TextView textStatus, textTrackerTime, textMorning, textEvening, textParking;
     public TextView textAbsEast, textAbsPos, textAbsWest, textRttEast, textRttPos, textRttWest;
     public TextView textDriveState;
-    public Button buttonMoveEast, buttonHold, buttonMoveWest;
+    public Button buttonMoveEast, buttonHold, buttonMoveWest, buttonSetParking, buttonSetTime, buttonSetOffset;
     public EditText editTrackerTime, editMorning, editEvening, editParking;
 
     boolean fillParkingParams = true;
 
+    final static int CMD_NONE = 0;
+    final static int CMD_SET_TIME = 1;
+    final static int CMD_SET_OFFSET = 2;
+    final static int CMD_SET_PARKING = 3;
+    final static int CMD_GO_EAST = 4;
+    final static int CMD_GO_WEST = 5;
+    final static int CMD_HOLD = 6;
+    final static int CMD_STOP = 7;
+
+    int userCommand = CMD_NONE;
+
     boolean connected = false;
+
+    boolean driveActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
         buttonMoveEast = findViewById(R.id.buttonMoveEast);
         buttonHold = findViewById(R.id.buttonHold);
         buttonMoveWest = findViewById(R.id.buttonMoveWest);
+        buttonSetParking = findViewById(R.id.buttonSetParking);
+        buttonSetTime = findViewById(R.id.buttonSetTime);
+        buttonSetOffset = findViewById(R.id.buttonSetOffset);
 
         editTrackerTime = findViewById(R.id.editTrackerTime);
         editMorning = findViewById(R.id.editMorning);
@@ -87,6 +104,15 @@ public class MainActivity extends AppCompatActivity {
 
         textStatus = findViewById(R.id.textStatus);
         textTrackerTime = findViewById(R.id.textTrackerTime);
+
+        buttonMoveEast.setEnabled(false);
+        buttonMoveWest.setEnabled(false);
+        buttonHold.setEnabled(false);
+        buttonSetParking.setEnabled(false);
+        buttonSetTime.setEnabled(false);
+        buttonSetOffset.setEnabled(false);
+
+        checBoxChanges();
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)){
             Toast.makeText(this, "BLUETOOTH NOT support", Toast.LENGTH_LONG).show();
@@ -275,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
             int halfSpan = in[15] + 256 * in[16];
             int flags = in[11];
             final boolean active = (flags & 1) != 0;
+            driveActive = active;
             final boolean reverse = (flags & 2) != 0;
             boolean eastLimit =  (flags & 0x10) != 0;
             boolean westLimit =  (flags & 0x20) != 0;
@@ -288,6 +315,9 @@ public class MainActivity extends AppCompatActivity {
             final String panPosRel = posToTime(panPos - offset);
             final String eastLimitRel = "E{" + posToTime(FULL_CIRCLE_T / 2 - halfSpan - offset) + "}";
             final String westLimitRel = "{" + posToTime(FULL_CIRCLE_T / 2 + halfSpan - offset) + "}W";
+            final String eastButton = driveActive ? "STOP" : "GO\nEAST";
+            final String westButton = driveActive ? "STOP" : "GO\nWEST";
+            final String holdButton = driveActive ? "  STOP  " : "  HOLD  ";
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -321,6 +351,9 @@ public class MainActivity extends AppCompatActivity {
                     textRttEast.setTextColor(eastLimitColor);
                     textAbsWest.setTextColor(westLimitColor);
                     textRttWest.setTextColor(westLimitColor);
+                    buttonMoveEast.setText(eastButton);
+                    buttonMoveWest.setText(westButton);
+                    buttonHold.setText(holdButton);
                 }
             });
 
@@ -366,10 +399,93 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private int[] formSetTime() {
+        String time = editTrackerTime.getText().toString();
+        if (time.length() != 8) return null;
+        String timeChunks[] = time.split(":");
+        if (timeChunks.length != 3) return null;
+        int hour, minute, second;
+        try {
+            hour = Integer.parseInt(timeChunks[0]);
+            minute = Integer.parseInt(timeChunks[1]);
+            second = Integer.parseInt(timeChunks[2]);
+        } catch ( NumberFormatException e) {
+            return null;
+        }
+        if ((hour < 0) || (hour > 23) ||
+            (minute < 0) || (minute > 59) ||
+            (second < 0) || (second > 59)) return null;
+        return new int[]{0x55, hour, minute, second};
+    }
+
+    private int parseParkingPoint(String time) {
+        String timeChunks[] = time.split(":");
+        if (timeChunks.length != 2) return -1;
+        int hour, minute;
+        try {
+            hour = Integer.parseInt(timeChunks[0]);
+            minute = Integer.parseInt(timeChunks[1]);
+        } catch ( NumberFormatException e) {
+            return -1;
+        }
+        if ((hour < 0) || (hour > 23) ||
+            (minute < 0) || (minute > 59)) return -1;
+        return hour * 60 + minute;
+    }
+
+    private int[] formSetParking() {
+        int evening = parseParkingPoint(editEvening.getText().toString());
+        int morming = parseParkingPoint(editMorning.getText().toString());
+        int parking = parseParkingPoint(editParking.getText().toString());
+        if ((evening == -1) || (morming == -1) || (parking == -1)) return null;
+        return new int[]{0x57, morming % 256, morming / 256, evening % 256, evening / 256, parking % 256, parking / 256};
+    }
+
     private void request() {
         if (myThreadConnected==null) return;
-        byte[] bytesToSend = {0x14, 0x02, 0x51, 0x10, 0x00, 0x50, (byte)0xC7};
-        myThreadConnected.write(bytesToSend );
+        int[] request = null;
+        switch (userCommand) {
+            case CMD_GO_EAST:
+                request = new int[]{0x51};
+                break;
+            case CMD_GO_WEST:
+                request = new int[]{0x52};
+                break;
+            case CMD_STOP:
+                request = new int[]{0x53};
+                break;
+            case CMD_HOLD:
+                request = new int[]{0x54};
+                break;
+            case CMD_SET_TIME:
+                request = formSetTime();
+                break;
+            case CMD_SET_OFFSET:
+                request = formSetTime();
+                if (request != null) request[0] = 0x56;
+                break;
+            case CMD_SET_PARKING:
+                request = formSetParking();
+                break;
+        }
+        if (request == null) {
+            request = new int[]{0x50};
+        }
+
+        byte[] bytesToSend = new byte[request.length + 6];
+        bytesToSend[0] = 0x14;
+        bytesToSend[1] = (byte)(request.length + 1);
+        bytesToSend[2] = 0x51;
+        bytesToSend[3] = 0x10;
+        bytesToSend[4] = 0x00;
+        for (int i = 0; i < request.length; i++) {
+            bytesToSend[5 + i] = (byte)request[i];
+        }
+        byte checkSum = 0;
+        for (int i = 0; i < bytesToSend.length - 1; i++) checkSum += bytesToSend[i];
+        bytesToSend[bytesToSend.length - 1] = checkSum;
+        myThreadConnected.write(bytesToSend);
+        userCommand = CMD_NONE;
     }
 
 /////////////////// Timer /////////////////////
@@ -405,10 +521,78 @@ public class MainActivity extends AppCompatActivity {
 
     /////////////////// Buttons /////////////////////
 
+    public void onClickSetTime(View v) {
+        if (!checkTime.isChecked()) return;
+        if (driveActive) return;
+        userCommand = CMD_SET_TIME;
+    }
+
+    public void onClickSetOffset(View v) {
+        if (!checkTime.isChecked()) return;
+        if (driveActive) return;
+        userCommand = CMD_SET_OFFSET;
+    }
+
+    public void onClickSetParking(View v) {
+        if (!checkParking.isChecked()) return;
+        if (driveActive) return;
+        userCommand = CMD_SET_PARKING;
+    }
+
     public void onClickGetParams(View v) {
         editEvening.setText(textEvening.getText());
         editMorning.setText(textMorning.getText());
         editParking.setText(textParking.getText());
     }
 
+    public void onClickGoEast(View v) {
+        if (!checkPosition.isChecked()) return;
+        if (!driveActive) {
+            userCommand = CMD_GO_EAST;
+        } else {
+            userCommand = CMD_STOP;
+        }
+    }
+
+    public void onClickGoWest(View v) {
+        if (!checkPosition.isChecked()) return;
+        if (!driveActive) {
+            userCommand = CMD_GO_WEST;
+        } else {
+            userCommand = CMD_STOP;
+        }
+    }
+
+    public void onClickHold(View v) {
+        if (!checkPosition.isChecked()) return;
+        if (!driveActive) {
+            userCommand = CMD_HOLD;
+        } else {
+            userCommand = CMD_STOP;
+        }
+    }
+
+    private void checBoxChanges() {
+        checkPosition.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                buttonMoveEast.setEnabled(isChecked);
+                buttonMoveWest.setEnabled(isChecked);
+                buttonHold.setEnabled(isChecked);
+            }
+        });
+        checkParking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                buttonSetParking.setEnabled(isChecked);
+            }
+        });
+        checkTime.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                buttonSetTime.setEnabled(isChecked);
+                buttonSetOffset.setEnabled(isChecked);
+            }
+        });
+    }
 }

@@ -186,7 +186,12 @@ cm0_2:
 	rcall	StopCMD
 	rjmp	cm0_10
 cm0_3:
-	cpi	r16,$54	; Set time
+	cpi	r16,$54	; Delay
+	brne	cm0_7
+	rcall	SetupDelayCMD
+	rjmp	cm0_10
+cm0_7:
+	cpi	r16,$55	; Set time
 	brne	cm0_4
 	ldi	r25,0
 cm0_41:	ld	r16,X+
@@ -206,12 +211,12 @@ cm0_41:	ld	r16,X+
 	rcall	UpdateTimeOffset
 	rjmp	cm0_10
 cm0_4:
-	cpi	r16,$55	; Set time offset
+	cpi	r16,$56	; Set time offset
 	brne	cm0_5
 	ldi	r25,1
 	rjmp	cm0_41
 cm0_5:
-	cpi	r16,$56	; Set parking
+	cpi	r16,$57	; Set parking
 	brne	cm0_6
 	ld	r16,X+
 	sts	iMorningL,r16
