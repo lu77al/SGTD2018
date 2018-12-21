@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,8 +39,11 @@ public class MainActivity extends AppCompatActivity {
     public CheckBox checkTime, checkParking, checkPosition, checkAutoTime;
     public TextView textStatus, textTrackerTime, textMorning, textEvening, textParking;
     public TextView textAbsEast, textAbsPos, textAbsWest, textRttEast, textRttPos, textRttWest;
+    public TextView textDriveState;
     public Button buttonMoveEast, buttonHold, buttonMoveWest;
     public EditText editTrackerTime, editMorning, editEvening, editParking;
+
+    boolean fillParkingParams = true;
 
     boolean connected = false;
 
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         textEvening = findViewById(R.id.textEvening);
         textParking = findViewById(R.id.textParking);
 
+        textDriveState = findViewById(R.id.textDriveState);
         textAbsEast = findViewById(R.id.textAbsEast);
         textAbsPos = findViewById(R.id.textAbsPos);
         textAbsWest = findViewById(R.id.textAbsWest);
@@ -238,20 +245,93 @@ public class MainActivity extends AppCompatActivity {
         }
 /*
 >>>14-02-51-10-00-50-C7-
-   00-01-02-03-04-05-06-07-08-09-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25
-<<<14-15-10-51-80-12-3B-3B-8F-A6-00-00-8E-A6-00-C2-1C-E3-F4-78-00-28-05-78-00-CD-
-   [---HEADER---][H--M--S][PanPos-][F][StopPos][HSPN][OFFS][MRNG][EVNG][PRKG][CS]
+   00-01-02-03-04-05-06-07-08-09-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26
+<<<14-16-10-51-80-12-3B-3B-8F-A6-00-00-8E-A6-00-C2-1C-E3-F4-FF-78-00-28-05-78-00-CD-
+   [---HEADER---][H--M--S][PanPos-][F][StopPos][HSPN][OFFSET-][MRNG][EVNG][PRKG][CS]
 */
-        private void decode(byte in[]) {
-            // Tracker RTC
-            String time = String.format("%02d:%02d:%02d", in[5], in[6], in[7]);
-            showText(textTrackerTime, time);
+        final static int FULL_CIRCLE_T = 70693;
+
+        private String posToTime(int pos) {
+            while (pos < 0) pos += FULL_CIRCLE_T;
+            while (pos >= FULL_CIRCLE_T) pos -= FULL_CIRCLE_T;
+            int second = (int)(pos * 1.222186072171219215481);
+            int hour = second / 3600;
+            second %= 3600;
+            int minute = second / 60;
+            second %= 60;
+            return String.format(Locale.getDefault(), "%02d:%02d:%02d", hour, minute, second);
         }
+
+        private void decode(int in[]) {
+            final String time = String.format(Locale.getDefault(), "%02d:%02d:%02d", in[5], in[6], in[7]);
+            int morning = in[20] + 256 * in[21];
+            final String morningTime = String.format(Locale.getDefault(), "%02d:%02d", morning / 60, morning % 60);
+            int evening = in[22] + 256 * in[23];
+            final String eveningTime = String.format(Locale.getDefault(), "%02d:%02d", evening / 60, evening % 60);
+            int parking = in[24] + 256 * in[25];
+            final String parkingTime = String.format(Locale.getDefault(), "%02d:%02d", parking / 60, parking % 60);
+            int offset = in[17] + 256 * in[18] + 65536 * in[19];
+            if (offset >= 0x800000) offset -= 0x1000000;
+            int halfSpan = in[15] + 256 * in[16];
+            int flags = in[11];
+            final boolean active = (flags & 1) != 0;
+            final boolean reverse = (flags & 2) != 0;
+            boolean eastLimit =  (flags & 0x10) != 0;
+            boolean westLimit =  (flags & 0x20) != 0;
+            final int eastLimitColor = eastLimit ? Color.RED : Color.GRAY;
+            final int westLimitColor = westLimit ? Color.RED : Color.GRAY;
+            final int target = in[12] + 256 * in[13] + 65536 * in[14];
+            int panPos = in[8] + 256 * in[9] + 65536 * in[10];
+            final String panPosAbs = posToTime(panPos);
+            final String eastLimitAbs = "E{" + posToTime(FULL_CIRCLE_T / 2 - halfSpan) + "}";
+            final String westLimitAbs = "{" + posToTime(FULL_CIRCLE_T / 2 + halfSpan) + "}W";
+            final String panPosRel = posToTime(panPos - offset);
+            final String eastLimitRel = "E{" + posToTime(FULL_CIRCLE_T / 2 - halfSpan - offset) + "}";
+            final String westLimitRel = "{" + posToTime(FULL_CIRCLE_T / 2 + halfSpan - offset) + "}W";
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    textTrackerTime.setText(time);
+                    textMorning.setText(morningTime);
+                    textEvening.setText(eveningTime);
+                    textParking.setText(parkingTime);
+                    if (fillParkingParams) {
+                        fillParkingParams = false;
+                        editMorning.setText(morningTime);
+                        editEvening.setText(eveningTime);
+                        editParking.setText(parkingTime);
+                    }
+                    textAbsEast.setText(eastLimitAbs);
+                    textAbsPos.setText(panPosAbs);
+                    textAbsWest.setText(westLimitAbs);
+                    textRttEast.setText(eastLimitRel);
+                    textRttPos.setText(panPosRel);
+                    textRttWest.setText(westLimitRel);
+                    if (active) {
+                        if (reverse) {
+                            textDriveState.setText("{" + posToTime(target) + "}<<P");
+                        } else {
+                            textDriveState.setText("P>>{" + posToTime(target) + "}");
+                        }
+                    } else {
+                        textDriveState.setText("-------------------");
+                    }
+                    textAbsEast.setTextColor(eastLimitColor);
+                    textRttEast.setTextColor(eastLimitColor);
+                    textAbsWest.setTextColor(westLimitColor);
+                    textRttWest.setTextColor(westLimitColor);
+                }
+            });
+
+        }
+
+        private final static int RESPONSE_LENGTH = 27;
 
         @Override
         public void run() { // Listen bluetooth input
-            byte header[] = {0x14, 0x15, 0x10, 0x51, (byte)0x80};
-            byte in[] = new byte[32];
+            int header[] = {0x14, 0x16, 0x10, 0x51, 0x80};
+            int in[] = new int[RESPONSE_LENGTH];
             int pnt = 0;
             byte[] inputByte = new byte[1];
             while (true) {
@@ -260,18 +340,20 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     break;
                 }
-                byte input = inputByte[0];
+                int input = inputByte[0] >= 0 ? inputByte[0] : 0x100 + inputByte[0];
                 in[pnt] = input;
                 if ((pnt < header.length) && (header[pnt] != input)) {
                     pnt = 0;
                 } else {
                     pnt++;
                 }
-                if (pnt < 26) continue;
+                if (pnt < RESPONSE_LENGTH) continue;
                 byte checkSum = 0;
-                for (int i = 0; i < 25; i++) checkSum += in[i];
+                for (int i = 0; i < RESPONSE_LENGTH - 1; i++) checkSum += in[i];
                 pnt = 0;
-                if (checkSum == in[25]) decode(in);
+                if (checkSum == (byte)in[RESPONSE_LENGTH - 1]) {
+                    decode(in);
+                }
             }
         }
 
@@ -297,6 +379,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             if (myThreadConnected !=null) request();
+            if (checkAutoTime.isChecked()) {
+                Calendar currentTime = Calendar.getInstance();
+                int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = currentTime.get(Calendar.MINUTE);
+                int second = currentTime.get(Calendar.SECOND);
+                final String time = String.format(Locale.getDefault(), "%02d:%02d:%02d", hour, minute, second);
+                editTrackerTime.setText(time);
+            }
             timerHandler.postDelayed(this, 500);
         }
     };
@@ -315,8 +405,10 @@ public class MainActivity extends AppCompatActivity {
 
     /////////////////// Buttons /////////////////////
 
-    public void onClickRequest(View v) {
-        request();
+    public void onClickGetParams(View v) {
+        editEvening.setText(textEvening.getText());
+        editMorning.setText(textMorning.getText());
+        editParking.setText(textParking.getText());
     }
 
 }

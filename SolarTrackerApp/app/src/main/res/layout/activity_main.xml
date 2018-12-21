@@ -113,7 +113,6 @@
     <RelativeLayout
         android:id="@+id/layoutParking"
         android:layout_width="match_parent"
-        android:focusableInTouchMode="true"
         android:layout_height="wrap_content"
         android:background="#ffccff"
         android:layout_below="@+id/layoutTime">
@@ -121,8 +120,7 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:focusableInTouchMode="true">
+            android:layout_centerHorizontal="true">
 
             <CheckBox
                 android:id="@+id/checkParking"
@@ -148,17 +146,17 @@
                 android:layout_below="@id/checkParking"
                 android:layout_alignEnd="@id/textMorning"
                 android:textSize="24sp"
-                android:text="00:00:00"/>
+                android:text="00:00"/>
 
             <EditText
                 android:id="@+id/editEvening"
-                android:layout_width="110dp"
+                android:layout_width="75dp"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/textEvening"
                 android:layout_alignEnd="@id/editMorning"
                 android:inputType="time"
                 android:textSize="24sp"
-                android:text="00:00:00"/>
+                android:text="00:00"/>
 
             <TextView
                 android:id="@+id/textMorningTitle"
@@ -174,21 +172,21 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/textEvening"
                 android:layout_toEndOf="@id/textMorningTitle"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="35dp"
                 android:layout_marginTop="5dp"
                 android:textSize="24sp"
-                android:text="00:00:00"/>
+                android:text="00:00"/>
 
             <EditText
                 android:id="@+id/editMorning"
-                android:layout_width="110dp"
+                android:layout_width="75dp"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/textMorning"
                 android:layout_alignBaseline="@id/textMorning"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="25dp"
                 android:inputType="time"
                 android:textSize="24sp"
-                android:text="00:00:00"/>
+                android:text="00:00"/>
 
 
             <TextView
@@ -207,23 +205,22 @@
                 android:layout_alignEnd="@id/textMorning"
                 android:layout_marginTop="5dp"
                 android:textSize="24sp"
-                android:text="00:00:00"/>
+                android:text="00:00"/>
 
             <EditText
                 android:id="@+id/editParking"
-                android:layout_width="110dp"
+                android:layout_width="75dp"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/textParking"
                 android:layout_alignEnd="@id/editMorning"
                 android:inputType="time"
                 android:textSize="24sp"
-                android:text="00:00:00"/>
+                android:text="00:00"/>
 
             <Button
                 android:id="@+id/buttonSetParking"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:focusableInTouchMode="true"
                 android:layout_below="@id/editParking"
                 android:layout_marginTop="-8dp"
                 android:textSize="18sp"
@@ -233,12 +230,12 @@
                 android:id="@+id/buttonGetParking"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:focusableInTouchMode="true"
                 android:layout_toEndOf="@id/buttonSetParking"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="15dp"
                 android:layout_alignBaseline="@id/buttonSetParking"
                 android:layout_marginBottom="5dp"
                 android:textSize="18sp"
+                android:onClick="onClickGetParams"
                 android:text=" GET PARAMS "/>
 
         </RelativeLayout>
@@ -267,6 +264,16 @@
                 android:checked="false"
                 android:textSize="18sp"
                 android:text="PANEL POSITION" />
+
+            <TextView
+                android:id="@+id/textDriveState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/checkPosition"
+                android:layout_toEndOf="@id/checkPosition"
+                android:layout_marginStart="15dp"
+                android:textSize="18sp"
+                android:text="-------------------" />
 
             <TextView
                 android:id="@+id/textAbsHeader"
@@ -352,7 +359,7 @@
                 android:layout_centerHorizontal="true"
                 android:focusableInTouchMode="true"
                 android:textSize="18sp"
-                android:text="HOLD" />
+                android:text="  HOLD  " />
 
             <Button
                 android:id="@+id/buttonMoveEast"
@@ -360,7 +367,7 @@
                 android:layout_height="85dp"
                 android:layout_below="@id/textRttHeader"
                 android:layout_toStartOf="@id/buttonHold"
-                android:layout_marginEnd="7dp"
+                android:layout_marginEnd="25dp"
                 android:focusableInTouchMode="true"
                 android:textSize="18sp"
                 android:text="GO\nEAST" />
@@ -371,7 +378,7 @@
                 android:layout_height="85dp"
                 android:layout_below="@id/textRttHeader"
                 android:layout_toEndOf="@id/buttonHold"
-                android:layout_marginStart="7dp"
+                android:layout_marginStart="25dp"
                 android:focusableInTouchMode="true"
                 android:textSize="18sp"
                 android:text="GO\nWEST" />
