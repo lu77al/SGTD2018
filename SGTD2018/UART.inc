@@ -207,7 +207,7 @@ cm0_41:	ld	r16,X+
 	std	Y+yNextDelay,ZeroReg
 	std	Y+yDelayCntH,ZeroReg
 	stdi	yDelayCntL,15
-	sbrc	r25,1
+	sbrc	r25,0
 	rcall	UpdateTimeOffset
 	rjmp	cm0_10
 cm0_4:

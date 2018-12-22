@@ -60,6 +60,8 @@ RESET:
 	
 ;	rcall	TestOffsetBothSides
 
+;	rjmp	cm_s2
+
 Main:
 	tskTact
 RetTact:

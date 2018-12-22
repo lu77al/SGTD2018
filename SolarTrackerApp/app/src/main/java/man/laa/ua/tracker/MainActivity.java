@@ -462,7 +462,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case CMD_SET_OFFSET:
                 request = formSetTime();
-                if (request != null) request[0] = 0x56;
+                if (request != null) {
+                    request[0] = 0x56;
+                }
                 break;
             case CMD_SET_PARKING:
                 request = formSetParking();
