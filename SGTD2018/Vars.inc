@@ -83,6 +83,7 @@
 .equ	yRTCWaitStatus	= $2F
 .equ	yLimSetupStage  = $30
 .equ	yRTCDebug	= $31
+.equ	ySimButMask	= $32
 
 
 

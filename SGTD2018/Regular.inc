@@ -57,6 +57,10 @@ ReadBLS: ; Read buttons and limit sensors
 	and	r16,r21
 	swap	r21
 	or	r16,r21
+	ldd	r21,Y+ySimButMask
+	and	r16,r21
+	ldi	r21,$ff
+	std	Y+ySimButMask,r21
 	and	r17,r16	; Released = Prev_State & State^
 	or	r20,r17
 	com	r16

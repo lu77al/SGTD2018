@@ -8,7 +8,7 @@
     android:id="@+id/mainLayout"
     android:background="#e7e8ea"
     android:focusableInTouchMode="true"
-    android:contextClickable="true">
+    android:keepScreenOn="true">
 
     <RelativeLayout
         android:id="@+id/layoutStatus"

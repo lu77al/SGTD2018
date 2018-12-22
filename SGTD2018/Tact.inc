@@ -186,9 +186,17 @@ sk_BR5_0:
 
 	rcall	ReadBLS
 
+	lds	r16,iInitCnt
+	cpi	r16,$FF-10
+	brlo	br5_1
+	std	Y+yButPress,ZeroReg
+	std	Y+yButRelease,ZeroReg
+	rjmp	br5_2
+br5_1:
 	rcall	TestLimitPressed
 
 	rcall	StopOnLimits
+br5_2:
 
 	rjmp	RetTact
 sk_BR5:

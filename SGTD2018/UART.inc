@@ -238,6 +238,17 @@ cm0_5:
 	stdi	yDelayCntL,75
 	rjmp	cm0_10
 cm0_6:
+	cpi	r16,$58	; Set parking
+	brne	cm0_8
+	sbrs	AFlags,afActive
+	rjmp	cm0_10
+	ldi	r16,$ff - (1<<btWestLimit)
+	sbrc	AFlags,afReverse
+	ldi	r16,$ff - (1<<btEastLimit)
+	std	Y+ySimButMask,r16
+	rjmp	cm0_10
+cm0_8:
+
 	rjmp	cm_S4
 cm0_10:
 	ldd	XL,Y+yTXPointer

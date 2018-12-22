@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     final static int CMD_GO_WEST = 5;
     final static int CMD_HOLD = 6;
     final static int CMD_STOP = 7;
+    final static int CMD_FAKE_LIMIT = 8;
 
     int userCommand = CMD_NONE;
 
@@ -67,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
     // Find visual components
-
-
         final String UUID_STRING_WELL_KNOWN_SPP = "00001101-0000-1000-8000-00805F9B34FB";
 
         checkTime = findViewById(R.id.checkTime);
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         buttonSetTime.setEnabled(false);
         buttonSetOffset.setEnabled(false);
 
-        checBoxChanges();
+        checkBoxChangeEvents();
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)){
             Toast.makeText(this, "BLUETOOTH NOT support", Toast.LENGTH_LONG).show();
@@ -317,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
             final String westLimitRel = "{" + posToTime(FULL_CIRCLE_T / 2 + halfSpan - offset) + "}W";
             final String eastButton = driveActive ? "STOP" : "GO\nEAST";
             final String westButton = driveActive ? "STOP" : "GO\nWEST";
-            final String holdButton = driveActive ? "  STOP  " : "  HOLD  ";
+            final String holdButton = driveActive ? "FAKE\nLIMIT" : "  HOLD  ";
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -354,6 +353,23 @@ public class MainActivity extends AppCompatActivity {
                     buttonMoveEast.setText(eastButton);
                     buttonMoveWest.setText(westButton);
                     buttonHold.setText(holdButton);
+                    if (active) {
+                        if (checkTime.isEnabled()) {
+                            checkTime.setChecked(false);
+                            checkTime.setEnabled(false);
+                        }
+                        if (checkParking.isEnabled()) {
+                            checkParking.setChecked(false);
+                            checkParking.setEnabled(false);;
+                        }
+                    } else {
+                        if (!checkTime.isEnabled()) {
+                            checkTime.setEnabled(true);
+                        }
+                        if (!checkParking.isEnabled()) {
+                            checkParking.setEnabled(true);
+                        }
+                    }
                 }
             });
 
@@ -456,6 +472,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case CMD_HOLD:
                 request = new int[]{0x54};
+                break;
+            case CMD_FAKE_LIMIT:
+                request = new int[]{0x58};
                 break;
             case CMD_SET_TIME:
                 request = formSetTime();
@@ -570,11 +589,11 @@ public class MainActivity extends AppCompatActivity {
         if (!driveActive) {
             userCommand = CMD_HOLD;
         } else {
-            userCommand = CMD_STOP;
+            userCommand = CMD_FAKE_LIMIT;
         }
     }
 
-    private void checBoxChanges() {
+    private void checkBoxChangeEvents() {
         checkPosition.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
