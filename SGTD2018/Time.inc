@@ -3,7 +3,7 @@ TimeGo:	; RTC H:M:S
 	ldd	r17,Y+ySecondCntH
 	subi_w	r17,r16,SECOND_FRACTION
 	brcc	tg_1
-	subi_w	r17,r16,SECOND_FRACTION
+	subi_w	r17,r16,-FULL_SECOND
 	ldd	r18,Y+ySecond
 	inc	r18
 	cpi	r18,60
