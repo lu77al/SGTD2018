@@ -6,7 +6,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +19,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.IOException;
@@ -41,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
     public TextView textStatus, textTrackerTime, textMorning, textEvening, textParking;
     public TextView textAbsEast, textAbsPos, textAbsWest, textRttEast, textRttPos, textRttWest;
     public TextView textDriveState;
-    public Button buttonMoveEast, buttonHold, buttonMoveWest, buttonSetParking, buttonSetTime, buttonSetOffset;
+    public Button buttonMoveEast, buttonMoveWest, buttonSetParking, buttonSetTime, buttonSetOffset;
     public EditText editTrackerTime, editMorning, editEvening, editParking;
+    public ImageView imagePanel;
 
     boolean fillParkingParams = true;
 
@@ -90,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         textRttWest = findViewById(R.id.textRttWest);
 
         buttonMoveEast = findViewById(R.id.buttonMoveEast);
-        buttonHold = findViewById(R.id.buttonHold);
+//        buttonHold = findViewById(R.id.buttonHold);
         buttonMoveWest = findViewById(R.id.buttonMoveWest);
         buttonSetParking = findViewById(R.id.buttonSetParking);
         buttonSetTime = findViewById(R.id.buttonSetTime);
@@ -104,9 +110,11 @@ public class MainActivity extends AppCompatActivity {
         textStatus = findViewById(R.id.textStatus);
         textTrackerTime = findViewById(R.id.textTrackerTime);
 
+        imagePanel = findViewById(R.id.imagePanel);
+
         buttonMoveEast.setEnabled(false);
         buttonMoveWest.setEnabled(false);
-        buttonHold.setEnabled(false);
+//        buttonHold.setEnabled(false);
         buttonSetParking.setEnabled(false);
         buttonSetTime.setEnabled(false);
         buttonSetOffset.setEnabled(false);
@@ -352,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
                     textRttWest.setTextColor(westLimitColor);
                     buttonMoveEast.setText(eastButton);
                     buttonMoveWest.setText(westButton);
-                    buttonHold.setText(holdButton);
+//                    buttonHold.setText(holdButton);
                     if (active) {
                         if (checkTime.isEnabled()) {
                             checkTime.setChecked(false);
@@ -516,6 +524,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             if (myThreadConnected !=null) request();
+            drawPanel();
             if (checkAutoTime.isChecked()) {
                 Calendar currentTime = Calendar.getInstance();
                 int hour = currentTime.get(Calendar.HOUR_OF_DAY);
@@ -538,6 +547,55 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         timerHandler.postDelayed(timerRunnable, 1000);
+    }
+
+    /////////////////// Draw /////////////////////
+
+    private Canvas canvas;
+    private Paint paint = new Paint();
+    private Bitmap bitmap;
+
+    private static final int SUN_SIZE = 16;
+
+    private float sunAng = 190;
+    private float panAng = 200;
+    private float midAng = 170;
+    private float hspAng = 85;
+
+    public void drawPanel() {
+        int size = imagePanel.getWidth();
+        bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        imagePanel.setImageBitmap(bitmap);
+        canvas = new Canvas(bitmap);
+        canvas.drawColor(0xffbbffbb);
+
+        float center = size / 2;
+        float radius = center - 1 - SUN_SIZE / 2;
+        RectF rect = new RectF(center - radius, center - radius,  center + radius, center + radius);
+        paint.setColor(0xffaae0e0);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawArc(rect, hspAng - 95, 370 - 2*hspAng, true, paint);
+        paint.setColor(0xffffffcc);
+        canvas.drawArc(rect, - hspAng - 90,  2*hspAng, true, paint);
+        float mdX = center - radius * (float)Math.sin(Math.toRadians(midAng));
+        float mdY = center + radius * (float)Math.cos(Math.toRadians(midAng));
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4);
+        paint.setColor(0xffdddddd);
+        canvas.drawLine(center, center, mdX, mdY, paint);
+
+
+
+
+//        canvas.drawColor(0xffffffbb);
+
+
+//        paint.setStrokeWidth(10);
+//        paint.setStyle(Paint.Style.STROKE);
+//        canvas.drawArc(rect, 20, 120, true, paint);
+//        canvas.drawArc(rect, 360, false, paint);
+//        canvas.drawCircle(width / 2, height / 2, width / 2 - 5, paint);
+        imagePanel.invalidate();
     }
 
     /////////////////// Buttons /////////////////////
@@ -599,7 +657,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 buttonMoveEast.setEnabled(isChecked);
                 buttonMoveWest.setEnabled(isChecked);
-                buttonHold.setEnabled(isChecked);
+//                buttonHold.setEnabled(isChecked);
             }
         });
         checkParking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

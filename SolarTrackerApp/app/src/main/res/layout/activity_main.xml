@@ -6,7 +6,6 @@
     android:layout_height="fill_parent"
     tools:context=".MainActivity"
     android:id="@+id/mainLayout"
-    android:background="#e7e8ea"
     android:focusableInTouchMode="true"
     android:keepScreenOn="true">
 
@@ -72,10 +71,10 @@
             <EditText
                 android:id="@+id/editTrackerTime"
                 android:layout_height="wrap_content"
+                android:layout_width="155dp"
                 android:layout_toEndOf="@id/textTrackerTime"
                 android:layout_alignBaseline="@id/textTrackerTime"
-                android:layout_marginStart="35dp"
-                android:layout_width="130dp"
+                android:layout_marginStart="25dp"
                 android:inputType="time"
                 android:textSize="30sp"
                 android:text="00:00:00" />
@@ -147,7 +146,7 @@
 
             <EditText
                 android:id="@+id/editEvening"
-                android:layout_width="75dp"
+                android:layout_width="95dp"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/textEvening"
                 android:layout_alignEnd="@id/editMorning"
@@ -176,7 +175,7 @@
 
             <EditText
                 android:id="@+id/editMorning"
-                android:layout_width="75dp"
+                android:layout_width="95dp"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/textMorning"
                 android:layout_alignBaseline="@id/textMorning"
@@ -206,7 +205,7 @@
 
             <EditText
                 android:id="@+id/editParking"
-                android:layout_width="75dp"
+                android:layout_width="95dp"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/textParking"
                 android:layout_alignEnd="@id/editMorning"
@@ -348,36 +347,31 @@
                 android:text="{00:00:00}W" />
 
             <Button
-                android:id="@+id/buttonHold"
-                android:layout_width="wrap_content"
-                android:layout_height="85dp"
-                android:layout_below="@id/textRttHeader"
-                android:layout_centerHorizontal="true"
-                android:onClick="onClickHold"
-                android:text="  HOLD  "
-                android:textSize="18sp" />
-
-            <Button
                 android:id="@+id/buttonMoveEast"
                 android:layout_width="wrap_content"
                 android:layout_height="85dp"
                 android:layout_below="@id/textRttHeader"
-                android:layout_marginEnd="25dp"
-                android:layout_toStartOf="@id/buttonHold"
                 android:onClick="onClickGoEast"
                 android:text="GO\nEAST"
                 android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/imagePanel"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_centerHorizontal="true"
+                android:layout_alignTop="@id/buttonMoveEast"/>
 
             <Button
                 android:id="@+id/buttonMoveWest"
                 android:layout_width="wrap_content"
                 android:layout_height="85dp"
                 android:layout_below="@id/textRttHeader"
-                android:layout_marginStart="25dp"
-                android:layout_toEndOf="@id/buttonHold"
+                android:layout_alignEnd="@id/textRttWest"
                 android:onClick="onClickGoWest"
                 android:text="GO\nWEST"
                 android:textSize="18sp" />
+
 
         </RelativeLayout>
 

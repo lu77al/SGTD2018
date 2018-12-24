@@ -18,7 +18,7 @@ TimeGo:	; RTC H:M:S
 	inc	r20
 	cpi	r20,24
 	brlo	tg_4
-	ldi	r24,0
+	ldi	r20,0
 tg_4:	std	Y+yHour,r20
 tg_3:	std	Y+yMinute,r19
 tg_2:	std	Y+ySecond,r18
