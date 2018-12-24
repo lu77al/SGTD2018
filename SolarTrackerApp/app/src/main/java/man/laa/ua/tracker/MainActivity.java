@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         buttonSetOffset.setEnabled(false);
 
         checkBoxChangeEvents();
+        setupImageOnClick();
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)){
             Toast.makeText(this, "BLUETOOTH NOT support", Toast.LENGTH_LONG).show();
@@ -141,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() { // Check for bluetooth enabled, request it, then setup
         super.onStart();
+//        drawPanel();
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
@@ -231,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
                     textStatus.setText("Connected " + name);
                     }
                 });
-                timerHandler.postDelayed(timerRunnable, 1000);
+//                timerHandler.postDelayed(timerRunnable, 500);
                 myThreadConnected = new ThreadConnected(bluetoothSocket);
                 myThreadConnected.start();
             }
@@ -325,6 +327,13 @@ public class MainActivity extends AppCompatActivity {
             final String eastButton = driveActive ? "STOP" : "GO\nEAST";
             final String westButton = driveActive ? "STOP" : "GO\nWEST";
             final String holdButton = driveActive ? "FAKE\nLIMIT" : "  HOLD  ";
+
+            double koef = 360.0 / 70693.0;
+            double offsAng = offset * koef;
+            sunAng = (float)((in[5] * 3600 + in[6] * 60 + in[7]) / 240.0 + offsAng);
+            panAng = (float)(panPos * koef);
+            midAng = (float)(180.0 + offsAng);
+            hspAng = (float)(halfSpan * koef);
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -523,7 +532,6 @@ public class MainActivity extends AppCompatActivity {
     Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            if (myThreadConnected !=null) request();
             drawPanel();
             if (checkAutoTime.isChecked()) {
                 Calendar currentTime = Calendar.getInstance();
@@ -532,6 +540,31 @@ public class MainActivity extends AppCompatActivity {
                 int second = currentTime.get(Calendar.SECOND);
                 final String time = String.format(Locale.getDefault(), "%02d:%02d:%02d", hour, minute, second);
                 editTrackerTime.setText(time);
+            }
+            if (myThreadConnected !=null) {
+                request();
+            } else {
+                String time = editTrackerTime.getText().toString();
+                int hour, minute, second;
+                try {
+                    if (time.length() != 8) throw new NumberFormatException();
+                    String timeChunks[] = time.split(":");
+                    if (timeChunks.length != 3) throw new NumberFormatException();
+                    hour = Integer.parseInt(timeChunks[0]);
+                    minute = Integer.parseInt(timeChunks[1]);
+                    second = Integer.parseInt(timeChunks[2]);
+                    if ((hour < 0) || (hour > 23) ||
+                            (minute < 0) || (minute > 59) ||
+                            (second < 0) || (second > 59)) throw new NumberFormatException();
+                } catch ( Exception e) {
+                    hour = 12;
+                    minute = 0;
+                    second = 0;
+                }
+                sunAng = (float)((hour * 3600 + minute * 60 + second) / 240.0);
+                panAng = sunAng;
+                midAng = 180;
+                hspAng = 85;
             }
             timerHandler.postDelayed(this, 500);
         }
@@ -546,59 +579,125 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        timerHandler.postDelayed(timerRunnable, 1000);
+        timerHandler.postDelayed(timerRunnable, 100);
+//        drawPanel();
     }
 
     /////////////////// Draw /////////////////////
 
     private Canvas canvas;
     private Paint paint = new Paint();
-    private Bitmap bitmap;
+    private Bitmap bitmap = null;
 
-    private static final int SUN_SIZE = 16;
+    private static final int SUN_SIZE = 32;
 
-    private float sunAng = 190;
-    private float panAng = 200;
-    private float midAng = 170;
+    private float sunAng = 180;
+    private float panAng = 180;
+    private float midAng = 180;
     private float hspAng = 85;
 
     public void drawPanel() {
         int size = imagePanel.getWidth();
-        bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
-        imagePanel.setImageBitmap(bitmap);
-        canvas = new Canvas(bitmap);
+        if (bitmap == null) { // Init bitmap and canvas
+            bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+            imagePanel.setImageBitmap(bitmap);
+            canvas = new Canvas(bitmap);
+        }
+
         canvas.drawColor(0xffbbffbb);
 
         float center = size / 2;
-        float radius = center - 1 - SUN_SIZE / 2;
+        float radius = center - SUN_SIZE - 5;
         RectF rect = new RectF(center - radius, center - radius,  center + radius, center + radius);
-        paint.setColor(0xffaae0e0);
+        // --- Shady halfcircle ---
+        paint.setColor(0xffa0e0e0);
         paint.setStyle(Paint.Style.FILL);
-        canvas.drawArc(rect, hspAng - 95, 370 - 2*hspAng, true, paint);
-        paint.setColor(0xffffffcc);
-        canvas.drawArc(rect, - hspAng - 90,  2*hspAng, true, paint);
-        float mdX = center - radius * (float)Math.sin(Math.toRadians(midAng));
-        float mdY = center + radius * (float)Math.cos(Math.toRadians(midAng));
+        canvas.drawArc(rect, panAng - 185, 190, true, paint);
+        // --- Sunny halfcircle ---
+        paint.setColor(0xffffffaa);
+        canvas.drawArc(rect, panAng,  180, true, paint);
+        float pdx = radius * (float)Math.cos(Math.toRadians(panAng));
+        float pdy = radius * (float)Math.sin(Math.toRadians(panAng));
+        // --- Panel line ---
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(12);
+        paint.setColor(0xff0000aa);
+        canvas.drawLine(center + pdx, center + pdy, center - pdx, center - pdy, paint);
+        // --- Perpendicular to panel ---
+        paint.setStrokeWidth(2);
+        canvas.drawLine(center, center, center - pdy, center + pdx, paint);
+        // --- Unreachable arc (outside hall limits) ---
+        paint.setColor(0xffaaaaaa);
+        paint.setStrokeWidth(7);
+        canvas.drawArc(rect, hspAng - 90, 360 - 2*hspAng, false, paint);
+        // --- Active arc (inside hall limits) ---
+        paint.setColor(0xff00ff00);
+        canvas.drawArc(rect, 270 - hspAng, 2*hspAng, false, paint);
+
+        radius = center - SUN_SIZE / 2;
+        // --- Sun orbit ---
+        paint.setColor(0xffffaa33);
+        paint.setStrokeWidth(4);
+        canvas.drawCircle(center, center, radius, paint);
+        float x = center - radius * (float)Math.sin(Math.toRadians(sunAng));
+        float y = center + radius * (float)Math.cos(Math.toRadians(sunAng));
+        // --- Sun icon ---
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(0xffff8800);
+        canvas.drawCircle(x, y, SUN_SIZE / 2, paint);
+
+        float x1 = - (center - SUN_SIZE) * (float)Math.sin(Math.toRadians(midAng));
+        float y1 = (center - SUN_SIZE) * (float)Math.cos(Math.toRadians(midAng));
+        float x2 = - center * (float)Math.sin(Math.toRadians(midAng));
+        float y2 = center * (float)Math.cos(Math.toRadians(midAng));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
-        paint.setColor(0xffdddddd);
-        canvas.drawLine(center, center, mdX, mdY, paint);
-
-
-
-
-//        canvas.drawColor(0xffffffbb);
-
-
-//        paint.setStrokeWidth(10);
-//        paint.setStyle(Paint.Style.STROKE);
-//        canvas.drawArc(rect, 20, 120, true, paint);
-//        canvas.drawArc(rect, 360, false, paint);
-//        canvas.drawCircle(width / 2, height / 2, width / 2 - 5, paint);
+        // --- Midday (12:00) mark ---
+        paint.setColor(0xffff0000);
+        canvas.drawLine(center + x1, center + y1, center + x2, center + y2, paint);
+        // --- Midnight (00:00) mark ---
+        paint.setColor(0xff000000);
+        canvas.drawLine(center - x1, center - y1, center - x2, center - y2, paint);
+        // --- Evening (18:00) mark ---
+        paint.setColor(0xffcccccc);
+        canvas.drawLine(center + y1, center - x1, center + y2, center - x2, paint);
+        // --- Morning (06:00) mark ---
+        canvas.drawLine(center - y1, center + x1, center - y2, center + x2, paint);
         imagePanel.invalidate();
     }
 
+
+
     /////////////////// Buttons /////////////////////
+
+    private boolean doubleClick = false;
+    Handler doubleHandler = new Handler();
+    Runnable doubleRunnable = new Runnable() {
+        @Override
+        public void run() {
+            doubleClick = false;
+        }
+    };
+
+    private void setupImageOnClick() {
+        imagePanel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (doubleClick) {
+                    doubleClick = false;
+                    if (!driveActive) {
+                        userCommand = CMD_HOLD;
+                    } else {
+                        userCommand = CMD_FAKE_LIMIT;
+                    }
+                } else {
+                    doubleClick = true;
+                    doubleHandler.postDelayed(doubleRunnable, 300);
+                }
+            }
+        });
+    }
+
 
     public void onClickSetTime(View v) {
         if (!checkTime.isChecked()) return;
@@ -616,12 +715,6 @@ public class MainActivity extends AppCompatActivity {
         if (!checkParking.isChecked()) return;
         if (driveActive) return;
         userCommand = CMD_SET_PARKING;
-    }
-
-    public void onClickGetParams(View v) {
-        editEvening.setText(textEvening.getText());
-        editMorning.setText(textMorning.getText());
-        editParking.setText(textParking.getText());
     }
 
     public void onClickGoEast(View v) {
@@ -642,22 +735,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onClickHold(View v) {
-        if (!checkPosition.isChecked()) return;
-        if (!driveActive) {
-            userCommand = CMD_HOLD;
-        } else {
-            userCommand = CMD_FAKE_LIMIT;
-        }
-    }
-
     private void checkBoxChangeEvents() {
         checkPosition.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 buttonMoveEast.setEnabled(isChecked);
                 buttonMoveWest.setEnabled(isChecked);
-//                buttonHold.setEnabled(isChecked);
             }
         });
         checkParking.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

@@ -57,7 +57,7 @@
                 android:text="COPY SYSTEM TIME"
                 android:layout_alignBaseline="@id/checkTime"
                 android:layout_toEndOf="@id/checkTime"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="30dp"
                 android:textSize="18sp" />
 
             <TextView
@@ -81,12 +81,12 @@
 
             <Button
                 android:id="@+id/buttonSetTime"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/editTrackerTime"
                 android:layout_marginTop="-8dp"
                 android:onClick="onClickSetTime"
-                android:text="   SET TIME   "
+                android:text="SET TIME"
                 android:textSize="18sp" />
 
             <Button
@@ -95,10 +95,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/buttonSetTime"
                 android:layout_marginBottom="5dp"
-                android:layout_marginLeft="20dp"
-                android:layout_toRightOf="@id/buttonSetTime"
+                android:layout_alignEnd="@id/checkAutoTime"
                 android:onClick="onClickSetOffset"
-                android:text="   SET OFFSET   "
+                android:text="OFFSET"
                 android:textSize="18sp" />
 
         </RelativeLayout>
@@ -215,25 +214,14 @@
 
             <Button
                 android:id="@+id/buttonSetParking"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/editParking"
+                android:layout_centerHorizontal="true"
                 android:layout_marginTop="-8dp"
                 android:onClick="onClickSetParking"
-                android:text=" SET PARAMS "
+                android:text="APPLY PARAMETERS"
                 android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/buttonGetParking"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/buttonSetParking"
-                android:layout_marginStart="15dp"
-                android:layout_alignBaseline="@id/buttonSetParking"
-                android:layout_marginBottom="5dp"
-                android:textSize="18sp"
-                android:onClick="onClickGetParams"
-                android:text=" GET PARAMS "/>
 
         </RelativeLayout>
 
