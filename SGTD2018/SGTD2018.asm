@@ -62,6 +62,8 @@ RESET:
 
 ;	rjmp	cm_s2
 
+;	rcall	ParkingTest
+
 Main:
 	tskTact
 RetTact:

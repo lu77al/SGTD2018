@@ -155,5 +155,21 @@ TestOffsetBothSides:
 	ldd	r21,Y+yTargetPosH
 	ret
 
+ParkingTest:
+	stdi	yHour,$16
+	stdi	yMinute,$39
+	stdi	ySecond,$20
+	stsi	iMorningL,$D0
+	stsi	iMorningH,$02
+	stsi	iEveningL,$D0
+	stsi	iEveningH,$02
+	stsi	iParkingL,$58
+	stsi	iParkingH,$02
+	stsi	iHalfSpanL,$16
+	stsi	iHalfSpanH,$35
+	stsi	iTimeOffsetL,$F8
+	stsi	iTimeOffsetM,$02
+	stsi	iTimeOffsetH,$00
+	rjmp	TimeToTargetPos
 
 
