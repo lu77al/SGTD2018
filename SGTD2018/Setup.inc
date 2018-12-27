@@ -81,7 +81,8 @@ SetParkingCMD:
 	bld	AFlags,afSaveParams
 	std	Y+yNextDelay,ZeroReg
 	std	Y+yDelayCntH,ZeroReg
-	stdi	yDelayCntL,75
+	stdi	yDelayCntL,15
+	ret
 
 SetupDelayCMD:
 	std	Y+yLimSetupStage,ZeroReg

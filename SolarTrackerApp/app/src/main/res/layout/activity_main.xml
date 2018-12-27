@@ -83,8 +83,7 @@
                 android:id="@+id/buttonSetTime"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/editTrackerTime"
-                android:layout_marginTop="-8dp"
+                android:layout_below="@id/textTrackerTime"
                 android:onClick="onClickSetTime"
                 android:text="SET TIME"
                 android:textSize="18sp" />
@@ -216,11 +215,20 @@
                 android:id="@+id/buttonSetParking"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/editParking"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="-8dp"
+                android:layout_below="@id/textParking"
                 android:onClick="onClickSetParking"
                 android:text="APPLY PARAMETERS"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/buttonHold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/buttonSetParking"
+                android:layout_marginBottom="5dp"
+                android:layout_toRightOf="@id/buttonSetParking"
+                android:onClick="onClickFixPanel"
+                android:text="HOLD"
                 android:textSize="18sp" />
 
         </RelativeLayout>
@@ -291,11 +299,11 @@
                 android:id="@+id/textAbsWest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/textAbsPos"
                 android:layout_alignBaseline="@id/textAbsHeader"
                 android:layout_marginStart="12dp"
-                android:textSize="18sp"
-                android:text="{00:00:00}W" />
+                android:layout_toEndOf="@id/textAbsPos"
+                android:text="{00:00:00}W"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/textRttHeader"

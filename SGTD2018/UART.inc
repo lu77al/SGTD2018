@@ -235,7 +235,7 @@ cm0_5:
 	bld	AFlags,afSaveParams
 	std	Y+yNextDelay,ZeroReg
 	std	Y+yDelayCntH,ZeroReg
-	stdi	yDelayCntL,75
+	stdi	yDelayCntL,15
 	rjmp	cm0_10
 cm0_6:
 	cpi	r16,$58	; Set parking

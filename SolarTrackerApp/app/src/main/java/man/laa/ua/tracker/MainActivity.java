@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -46,11 +45,10 @@ public class MainActivity extends AppCompatActivity {
     public TextView textStatus, textTrackerTime, textMorning, textEvening, textParking;
     public TextView textAbsEast, textAbsPos, textAbsWest, textRttEast, textRttPos, textRttWest;
     public TextView textDriveState;
-    public Button buttonMoveEast, buttonMoveWest, buttonSetParking, buttonSetTime, buttonSetOffset;
+    public Button buttonMoveEast, buttonMoveWest, buttonSetParking;
+    public Button buttonSetTime, buttonSetOffset, buttonHold;
     public EditText editTrackerTime, editMorning, editEvening, editParking;
     public ImageView imagePanel;
-
-    boolean fillParkingParams = true;
 
     final static int CMD_NONE = 0;
     final static int CMD_SET_TIME = 1;
@@ -64,9 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
     int userCommand = CMD_NONE;
 
+    boolean fillParkingParams = true;
+
     boolean connected = false;
 
-    boolean driveActive = false;
+    SolarTracker tracker = new SolarTracker();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
         textRttWest = findViewById(R.id.textRttWest);
 
         buttonMoveEast = findViewById(R.id.buttonMoveEast);
-//        buttonHold = findViewById(R.id.buttonHold);
         buttonMoveWest = findViewById(R.id.buttonMoveWest);
         buttonSetParking = findViewById(R.id.buttonSetParking);
+        buttonHold = findViewById(R.id.buttonHold);
         buttonSetTime = findViewById(R.id.buttonSetTime);
         buttonSetOffset = findViewById(R.id.buttonSetOffset);
 
@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
 
         buttonMoveEast.setEnabled(false);
         buttonMoveWest.setEnabled(false);
-//        buttonHold.setEnabled(false);
         buttonSetParking.setEnabled(false);
+        buttonHold.setEnabled(false);
         buttonSetTime.setEnabled(false);
         buttonSetOffset.setEnabled(false);
 
@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() { // Check for bluetooth enabled, request it, then setup
         super.onStart();
-//        drawPanel();
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
@@ -227,13 +226,11 @@ public class MainActivity extends AppCompatActivity {
             }
             if (connected) {  // Start work thread if connected
                 runOnUiThread(new Runnable() {
-
                     @Override
                     public void run() {
                     textStatus.setText("Connected " + name);
                     }
                 });
-//                timerHandler.postDelayed(timerRunnable, 500);
                 myThreadConnected = new ThreadConnected(bluetoothSocket);
                 myThreadConnected.start();
             }
@@ -269,129 +266,6 @@ public class MainActivity extends AppCompatActivity {
             connectedOutputStream = out;
         }
 
-        private void showText(final TextView view, String text) {
-            outputText = text;
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    view.setText(outputText);
-                }
-            });
-        }
-/*
->>>14-02-51-10-00-50-C7-
-   00-01-02-03-04-05-06-07-08-09-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26
-<<<14-16-10-51-80-12-3B-3B-8F-A6-00-00-8E-A6-00-C2-1C-E3-F4-FF-78-00-28-05-78-00-CD-
-   [---HEADER---][H--M--S][PanPos-][F][StopPos][HSPN][OFFSET-][MRNG][EVNG][PRKG][CS]
-*/
-        final static int FULL_CIRCLE_T = 70693;
-
-        private String posToTime(int pos) {
-            while (pos < 0) pos += FULL_CIRCLE_T;
-            while (pos >= FULL_CIRCLE_T) pos -= FULL_CIRCLE_T;
-            int second = (int)(pos * 1.222186072171219215481);
-            int hour = second / 3600;
-            second %= 3600;
-            int minute = second / 60;
-            second %= 60;
-            return String.format(Locale.getDefault(), "%02d:%02d:%02d", hour, minute, second);
-        }
-
-        private void decode(int in[]) {
-            final String time = String.format(Locale.getDefault(), "%02d:%02d:%02d", in[5], in[6], in[7]);
-            int morning = in[20] + 256 * in[21];
-            final String morningTime = String.format(Locale.getDefault(), "%02d:%02d", morning / 60, morning % 60);
-            int evening = in[22] + 256 * in[23];
-            final String eveningTime = String.format(Locale.getDefault(), "%02d:%02d", evening / 60, evening % 60);
-            int parking = in[24] + 256 * in[25];
-            final String parkingTime = String.format(Locale.getDefault(), "%02d:%02d", parking / 60, parking % 60);
-            int offset = in[17] + 256 * in[18] + 65536 * in[19];
-            if (offset >= 0x800000) offset -= 0x1000000;
-            int halfSpan = in[15] + 256 * in[16];
-            int flags = in[11];
-            final boolean active = (flags & 1) != 0;
-            driveActive = active;
-            final boolean reverse = (flags & 2) != 0;
-            boolean eastLimit =  (flags & 0x10) != 0;
-            boolean westLimit =  (flags & 0x20) != 0;
-            final int eastLimitColor = eastLimit ? Color.RED : Color.GRAY;
-            final int westLimitColor = westLimit ? Color.RED : Color.GRAY;
-            final int target = in[12] + 256 * in[13] + 65536 * in[14];
-            int panPos = in[8] + 256 * in[9] + 65536 * in[10];
-            final String panPosAbs = posToTime(panPos);
-            final String eastLimitAbs = "E{" + posToTime(FULL_CIRCLE_T / 2 - halfSpan) + "}";
-            final String westLimitAbs = "{" + posToTime(FULL_CIRCLE_T / 2 + halfSpan) + "}W";
-            final String panPosRel = posToTime(panPos - offset);
-            final String eastLimitRel = "E{" + posToTime(FULL_CIRCLE_T / 2 - halfSpan - offset) + "}";
-            final String westLimitRel = "{" + posToTime(FULL_CIRCLE_T / 2 + halfSpan - offset) + "}W";
-            final String eastButton = driveActive ? "STOP" : "GO\nEAST";
-            final String westButton = driveActive ? "STOP" : "GO\nWEST";
-            final String holdButton = driveActive ? "FAKE\nLIMIT" : "  HOLD  ";
-
-            double koef = 360.0 / 70693.0;
-            double offsAng = offset * koef;
-            sunAng = (float)((in[5] * 3600 + in[6] * 60 + in[7]) / 240.0 + offsAng);
-            panAng = (float)(panPos * koef);
-            midAng = (float)(180.0 + offsAng);
-            hspAng = (float)(halfSpan * koef);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    textTrackerTime.setText(time);
-                    textMorning.setText(morningTime);
-                    textEvening.setText(eveningTime);
-                    textParking.setText(parkingTime);
-                    if (fillParkingParams) {
-                        fillParkingParams = false;
-                        editMorning.setText(morningTime);
-                        editEvening.setText(eveningTime);
-                        editParking.setText(parkingTime);
-                    }
-                    textAbsEast.setText(eastLimitAbs);
-                    textAbsPos.setText(panPosAbs);
-                    textAbsWest.setText(westLimitAbs);
-                    textRttEast.setText(eastLimitRel);
-                    textRttPos.setText(panPosRel);
-                    textRttWest.setText(westLimitRel);
-                    if (active) {
-                        if (reverse) {
-                            textDriveState.setText("{" + posToTime(target) + "}<<P");
-                        } else {
-                            textDriveState.setText("P>>{" + posToTime(target) + "}");
-                        }
-                    } else {
-                        textDriveState.setText("-------------------");
-                    }
-                    textAbsEast.setTextColor(eastLimitColor);
-                    textRttEast.setTextColor(eastLimitColor);
-                    textAbsWest.setTextColor(westLimitColor);
-                    textRttWest.setTextColor(westLimitColor);
-                    buttonMoveEast.setText(eastButton);
-                    buttonMoveWest.setText(westButton);
-//                    buttonHold.setText(holdButton);
-                    if (active) {
-                        if (checkTime.isEnabled()) {
-                            checkTime.setChecked(false);
-                            checkTime.setEnabled(false);
-                        }
-                        if (checkParking.isEnabled()) {
-                            checkParking.setChecked(false);
-                            checkParking.setEnabled(false);;
-                        }
-                    } else {
-                        if (!checkTime.isEnabled()) {
-                            checkTime.setEnabled(true);
-                        }
-                        if (!checkParking.isEnabled()) {
-                            checkParking.setEnabled(true);
-                        }
-                    }
-                }
-            });
-
-        }
-
         private final static int RESPONSE_LENGTH = 27;
 
         @Override
@@ -418,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < RESPONSE_LENGTH - 1; i++) checkSum += in[i];
                 pnt = 0;
                 if (checkSum == (byte)in[RESPONSE_LENGTH - 1]) {
-                    decode(in);
+                    tracker.decode(in);
                 }
             }
         }
@@ -430,25 +304,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-    }
-
-    private int[] formSetTime() {
-        String time = editTrackerTime.getText().toString();
-        if (time.length() != 8) return null;
-        String timeChunks[] = time.split(":");
-        if (timeChunks.length != 3) return null;
-        int hour, minute, second;
-        try {
-            hour = Integer.parseInt(timeChunks[0]);
-            minute = Integer.parseInt(timeChunks[1]);
-            second = Integer.parseInt(timeChunks[2]);
-        } catch ( NumberFormatException e) {
-            return null;
-        }
-        if ((hour < 0) || (hour > 23) ||
-            (minute < 0) || (minute > 59) ||
-            (second < 0) || (second > 59)) return null;
-        return new int[]{0x55, hour, minute, second};
     }
 
     private int parseParkingPoint(String time) {
@@ -474,6 +329,25 @@ public class MainActivity extends AppCompatActivity {
         return new int[]{0x57, morming % 256, morming / 256, evening % 256, evening / 256, parking % 256, parking / 256};
     }
 
+    public int[] formSetTimeRequest(boolean offset) {
+        String time = editTrackerTime.getText().toString();
+        if (time.length() != 8) return null;
+        String timeChunks[] = time.split(":");
+        if (timeChunks.length != 3) return null;
+        int hour, minute, second;
+        try {
+            hour = Integer.parseInt(timeChunks[0]);
+            minute = Integer.parseInt(timeChunks[1]);
+            second = Integer.parseInt(timeChunks[2]);
+        } catch ( NumberFormatException e) {
+            return null;
+        }
+        if ((hour < 0) || (hour > 23) ||
+                (minute < 0) || (minute > 59) ||
+                (second < 0) || (second > 59)) return null;
+        return new int[]{offset ? 0x56 : 0x55, hour, minute, second};
+    }
+
     private void request() {
         if (myThreadConnected==null) return;
         int[] request = null;
@@ -494,13 +368,10 @@ public class MainActivity extends AppCompatActivity {
                 request = new int[]{0x58};
                 break;
             case CMD_SET_TIME:
-                request = formSetTime();
+                request = formSetTimeRequest(false);
                 break;
             case CMD_SET_OFFSET:
-                request = formSetTime();
-                if (request != null) {
-                    request[0] = 0x56;
-                }
+                request = formSetTimeRequest(true);
                 break;
             case CMD_SET_PARKING:
                 request = formSetParking();
@@ -532,40 +403,15 @@ public class MainActivity extends AppCompatActivity {
     Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            drawPanel();
-            if (checkAutoTime.isChecked()) {
-                Calendar currentTime = Calendar.getInstance();
-                int hour = currentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = currentTime.get(Calendar.MINUTE);
-                int second = currentTime.get(Calendar.SECOND);
-                final String time = String.format(Locale.getDefault(), "%02d:%02d:%02d", hour, minute, second);
-                editTrackerTime.setText(time);
+            showState();
+            if (checkAutoTime.isChecked()) showSystemTime();
+            if (tracker.isConnected() && fillParkingParams) {
+                fillParkingParams = false;
+                editEvening.setText(textEvening.getText());
+                editMorning.setText(textMorning.getText());
+                editParking.setText(textParking.getText());
             }
-            if (myThreadConnected !=null) {
-                request();
-            } else {
-                String time = editTrackerTime.getText().toString();
-                int hour, minute, second;
-                try {
-                    if (time.length() != 8) throw new NumberFormatException();
-                    String timeChunks[] = time.split(":");
-                    if (timeChunks.length != 3) throw new NumberFormatException();
-                    hour = Integer.parseInt(timeChunks[0]);
-                    minute = Integer.parseInt(timeChunks[1]);
-                    second = Integer.parseInt(timeChunks[2]);
-                    if ((hour < 0) || (hour > 23) ||
-                            (minute < 0) || (minute > 59) ||
-                            (second < 0) || (second > 59)) throw new NumberFormatException();
-                } catch ( Exception e) {
-                    hour = 12;
-                    minute = 0;
-                    second = 0;
-                }
-                sunAng = (float)((hour * 3600 + minute * 60 + second) / 240.0);
-                panAng = sunAng;
-                midAng = 180;
-                hspAng = 85;
-            }
+            if (myThreadConnected !=null) request();
             timerHandler.postDelayed(this, 500);
         }
     };
@@ -580,21 +426,87 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         timerHandler.postDelayed(timerRunnable, 100);
-//        drawPanel();
     }
 
-    /////////////////// Draw /////////////////////
+    /////////////////// Show state ///////////////
+
+    private void showSystemTime() {
+        Calendar currentTime = Calendar.getInstance();
+        int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = currentTime.get(Calendar.MINUTE);
+        int second = currentTime.get(Calendar.SECOND);
+        final String time = String.format(Locale.getDefault(), "%02d:%02d:%02d", hour, minute, second);
+        editTrackerTime.setText(time);
+    }
+
+    private void showState() {
+        showTime();
+        showParking();
+        showPosition();
+        drawPanel();
+        adjustHandlePermission();
+    }
+
+    private void showTime() {
+        textTrackerTime.setText(tracker.getTimeString());
+        if (checkAutoTime.isChecked()) {
+            Calendar currentTime = Calendar.getInstance();
+            int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+            int minute = currentTime.get(Calendar.MINUTE);
+            int second = currentTime.get(Calendar.SECOND);
+            final String time = String.format(Locale.getDefault(), "%02d:%02d:%02d", hour, minute, second);
+            editTrackerTime.setText(time);
+        }
+    }
+
+    private void showParking() {
+        textEvening.setText(tracker.getEveningString());
+        textMorning.setText(tracker.getMorningString());
+        textParking.setText(tracker.getParkingString());
+    }
+
+    private void showPosition() {
+        textAbsEast.setText(tracker.getEastLimitString(true));
+        textAbsPos.setText(tracker.getPositionString(true));
+        textAbsWest.setText(tracker.getWestLimitString(true));
+        textRttEast.setText(tracker.getEastLimitString(false));
+        textRttPos.setText(tracker.getPositionString(false));
+        textRttWest.setText(tracker.getWestLimitString(false));
+        textDriveState.setText(tracker.getStateString());
+        textAbsEast.setTextColor(tracker.getEastLimitColor());
+        textRttEast.setTextColor(tracker.getEastLimitColor());
+        textAbsWest.setTextColor(tracker.getWestLimitColor());
+        textRttWest.setTextColor(tracker.getWestLimitColor());
+        buttonMoveEast.setText(tracker.isActive() ? "STOP" : "GO\nEAST");
+        buttonMoveWest.setText(tracker.isActive() ? "STOP" : "GO\nWEST");
+    }
+
+    private void adjustHandlePermission() {
+        if (tracker.isActive()) {
+            if (checkTime.isEnabled()) {
+                checkTime.setChecked(false);
+                checkTime.setEnabled(false);
+            }
+            if (checkParking.isEnabled()) {
+                checkParking.setChecked(false);
+                checkParking.setEnabled(false);;
+            }
+        } else {
+            if (!checkTime.isEnabled()) {
+                checkTime.setEnabled(true);
+            }
+            if (!checkParking.isEnabled()) {
+                checkParking.setEnabled(true);
+            }
+        }
+    }
+
+    /////////////////// Draw animated icon/////////////////////
 
     private Canvas canvas;
     private Paint paint = new Paint();
     private Bitmap bitmap = null;
-
     private static final int SUN_SIZE = 32;
-
-    private float sunAng = 180;
-    private float panAng = 180;
-    private float midAng = 180;
-    private float hspAng = 85;
 
     public void drawPanel() {
         int size = imagePanel.getWidth();
@@ -603,6 +515,11 @@ public class MainActivity extends AppCompatActivity {
             imagePanel.setImageBitmap(bitmap);
             canvas = new Canvas(bitmap);
         }
+
+        float sunAng = tracker.getSunAngle();
+        float panAng = tracker.getPanAngle();
+        float midAng = tracker.getMidAngle();
+        float hspAng = tracker.getHspAngle();
 
         canvas.drawColor(0xffbbffbb);
 
@@ -666,8 +583,6 @@ public class MainActivity extends AppCompatActivity {
         imagePanel.invalidate();
     }
 
-
-
     /////////////////// Buttons /////////////////////
 
     private boolean doubleClick = false;
@@ -685,7 +600,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (doubleClick) {
                     doubleClick = false;
-                    if (!driveActive) {
+                    if (!tracker.isActive()) {
                         userCommand = CMD_HOLD;
                     } else {
                         userCommand = CMD_FAKE_LIMIT;
@@ -698,28 +613,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     public void onClickSetTime(View v) {
         if (!checkTime.isChecked()) return;
-        if (driveActive) return;
+        if (tracker.isActive()) return;
         userCommand = CMD_SET_TIME;
     }
 
     public void onClickSetOffset(View v) {
         if (!checkTime.isChecked()) return;
-        if (driveActive) return;
+        if (tracker.isActive()) return;
         userCommand = CMD_SET_OFFSET;
     }
 
     public void onClickSetParking(View v) {
         if (!checkParking.isChecked()) return;
-        if (driveActive) return;
+        if (tracker.isActive()) return;
         userCommand = CMD_SET_PARKING;
     }
 
     public void onClickGoEast(View v) {
         if (!checkPosition.isChecked()) return;
-        if (!driveActive) {
+        if (!tracker.isActive()) {
             userCommand = CMD_GO_EAST;
         } else {
             userCommand = CMD_STOP;
@@ -728,11 +642,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickGoWest(View v) {
         if (!checkPosition.isChecked()) return;
-        if (!driveActive) {
+        if (!tracker.isActive()) {
             userCommand = CMD_GO_WEST;
         } else {
             userCommand = CMD_STOP;
         }
+    }
+
+    public void onClickFixPanel(View v) {
+        if (!checkParking.isChecked()) return;
+        if (tracker.isActive()) return;
+        int morning = parseParkingPoint(editMorning.getText().toString());
+        int parking = parseParkingPoint(editParking.getText().toString());
+        if ((morning == -1) || (parking == -1)) return;
+        int evening = (morning + 1) % (24 * 60);
+        String eveningTime = String.format(Locale.getDefault(), "%02d:%02d", evening / 60, evening % 60);
+        editEvening.setText(eveningTime);
+        userCommand = CMD_SET_PARKING;
     }
 
     private void checkBoxChangeEvents() {
@@ -747,6 +673,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 buttonSetParking.setEnabled(isChecked);
+                buttonHold.setEnabled(isChecked);
             }
         });
         checkTime.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
