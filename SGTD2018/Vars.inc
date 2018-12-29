@@ -84,6 +84,10 @@
 .equ	yLimSetupStage  = $30
 .equ	yRTCDebug	= $31
 .equ	ySimButMask	= $32
+.equ	yBakTargetPosL	= $33
+.equ	yBakTargetPosM	= $34
+.equ	yBakTargetPosH	= $35
+
 
 
 

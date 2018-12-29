@@ -42,6 +42,9 @@ ini_1:	st	Z+,YH
 	ldd	r16,Y+yTargetPosL
 	ldd	r17,Y+yTargetPosM
 	ldd	r18,Y+yTargetPosH
+	std	Y+yBakTargetPosL,r16
+	std	Y+yBakTargetPosM,r17
+	std	Y+yBakTargetPosH,r18
 	std	Y+yPanPosL,r16
 	std	Y+yPanPosM,r17
 	std	Y+yPanPosH,r18

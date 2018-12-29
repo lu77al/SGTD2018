@@ -206,6 +206,7 @@ pb_4:
 	rjmp	pb_3
 pb_9:
 ;	rcall	SetName
+;	rcall	SetPassword
 	rcall	SetupDelayCMD
 	rjmp	pb_6
 pb_8:

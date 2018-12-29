@@ -386,7 +386,18 @@ ctp_2:	ret
 	subi	r16,1
 	brcs	ctp_3
 	rjmp	ContinueLimitSetup
-ctp_3:	ldd	r19,Y+yTargetPosL
+ctp_3:
+	lds	r16,iMorningL
+	lds	r17,iMorningH
+	cpi_w	r17,r16,60*12,r18
+	brne	ctp_5
+	lds	r18,iEveningL
+	lds	r19,iEveningH
+	cp	r16,r18
+	cpc	r17,r19
+	breq	ctp_2
+ctp_5:
+	ldd	r19,Y+yTargetPosL
 	ldd	r20,Y+yTargetPosM
 	ldd	r21,Y+yTargetPosH
 	ldd	r16,Y+yPanPosL
@@ -395,16 +406,27 @@ ctp_3:	ldd	r19,Y+yTargetPosL
 	sub	r16,r19
 	sbc	r17,r20
 	sbc	r18,r21
+	breq	ctp_2
 	brcc	ctp_1
 	com	r16
 	com	r17
 	com	r18
 	subi_w	r17,r16,-1
 	sbci	r18,-1
-ctp_1:	cpi_w	r17,r16,MAX_POS_DIFF,r25
+ctp_1:	ldd	r22,Y+yBakTargetPosL
+	ldd	r23,Y+yBakTargetPosM
+	ldd	r24,Y+yBakTargetPosH
+	std	Y+yBakTargetPosL,r19
+	std	Y+yBakTargetPosM,r20
+	std	Y+yBakTargetPosH,r21
+	cp	r22,r19
+	cpc	r23,r20
+	cpc	r24,r21
+	brne	ctp_4
+	cpi_w	r17,r16,MAX_POS_DIFF,r25
 	cpc	r18,ZeroReg
 	brlo	ctp_2
-	std	Y+yStopPosL,r19
+ctp_4:	std	Y+yStopPosL,r19
 	std	Y+yStopPosM,r20
 	std	Y+yStopPosH,r21
 	rjmp	DriveOn

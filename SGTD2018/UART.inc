@@ -397,6 +397,24 @@ ModuleName:
 
 ;.db	"AT5",13,10,0
 
+*/
+
+/*
+SetPassword:
+	ldi_w	ZH,ZL,ModulePassword*2
+	ldi	XL,TXBuf
+	std	Y+yTXPointer,XL
+stn_2:	lpm	r16,Z+
+	cpi	r16,0
+	breq	stn_1
+	st	X+,r16
+	rjmp	stn_2
+stn_1:	std	Y+yTXEnd,XL
+	set
+	bld	BFlags,bfNoCHS
+	ret	
 
 
+ModulePassword:
+.db	"AT+PSWD=1977",13,10,0
 */
