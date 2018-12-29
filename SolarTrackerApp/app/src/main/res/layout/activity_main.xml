@@ -213,22 +213,33 @@
 
             <Button
                 android:id="@+id/buttonSetParking"
-                android:layout_width="200dp"
+                android:layout_width="112dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/textParking"
                 android:onClick="onClickSetParking"
-                android:text="APPLY PARAMETERS"
+                android:text="APPLY"
                 android:textSize="18sp" />
 
             <Button
-                android:id="@+id/buttonHold"
+                android:id="@+id/buttonManual"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/buttonSetParking"
                 android:layout_marginBottom="5dp"
                 android:layout_toRightOf="@id/buttonSetParking"
-                android:onClick="onClickFixPanel"
-                android:text="HOLD"
+                android:onClick="onClickManual"
+                android:text="MANUAL"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/buttonAlways"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/buttonSetParking"
+                android:layout_marginBottom="5dp"
+                android:layout_toRightOf="@id/buttonManual"
+                android:onClick="onClickAlwaysParking"
+                android:text="24/24"
                 android:textSize="18sp" />
 
         </RelativeLayout>

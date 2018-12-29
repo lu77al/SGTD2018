@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public TextView textAbsEast, textAbsPos, textAbsWest, textRttEast, textRttPos, textRttWest;
     public TextView textDriveState;
     public Button buttonMoveEast, buttonMoveWest, buttonSetParking;
-    public Button buttonSetTime, buttonSetOffset, buttonHold;
+    public Button buttonSetTime, buttonSetOffset, buttonAlawaysParking, buttonManual;
     public EditText editTrackerTime, editMorning, editEvening, editParking;
     public ImageView imagePanel;
 
@@ -98,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
         buttonMoveEast = findViewById(R.id.buttonMoveEast);
         buttonMoveWest = findViewById(R.id.buttonMoveWest);
         buttonSetParking = findViewById(R.id.buttonSetParking);
-        buttonHold = findViewById(R.id.buttonHold);
+        buttonAlawaysParking = findViewById(R.id.buttonAlways);
+        buttonManual = findViewById(R.id.buttonManual);
         buttonSetTime = findViewById(R.id.buttonSetTime);
         buttonSetOffset = findViewById(R.id.buttonSetOffset);
 
@@ -115,7 +116,8 @@ public class MainActivity extends AppCompatActivity {
         buttonMoveEast.setEnabled(false);
         buttonMoveWest.setEnabled(false);
         buttonSetParking.setEnabled(false);
-        buttonHold.setEnabled(false);
+        buttonAlawaysParking.setEnabled(false);
+        buttonManual.setEnabled(false);
         buttonSetTime.setEnabled(false);
         buttonSetOffset.setEnabled(false);
 
@@ -649,7 +651,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onClickFixPanel(View v) {
+    public void onClickAlwaysParking(View v) {
         if (!checkParking.isChecked()) return;
         if (tracker.isActive()) return;
         int morning = parseParkingPoint(editMorning.getText().toString());
@@ -658,6 +660,16 @@ public class MainActivity extends AppCompatActivity {
         int evening = (morning + 1) % (24 * 60);
         String eveningTime = String.format(Locale.getDefault(), "%02d:%02d", evening / 60, evening % 60);
         editEvening.setText(eveningTime);
+        userCommand = CMD_SET_PARKING;
+    }
+
+    public void onClickManual(View v) {
+        if (!checkParking.isChecked()) return;
+        if (tracker.isActive()) return;
+        if (parseParkingPoint(editParking.getText().toString()) == -1) return;
+        String time = "12:00";
+        editEvening.setText(time);
+        editMorning.setText(time);
         userCommand = CMD_SET_PARKING;
     }
 
@@ -673,7 +685,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 buttonSetParking.setEnabled(isChecked);
-                buttonHold.setEnabled(isChecked);
+                buttonAlawaysParking.setEnabled(isChecked);
+                buttonManual.setEnabled(isChecked);
             }
         });
         checkTime.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
