@@ -41,6 +41,9 @@ pbf_40:
 	ret
 
 ReadBLS: ; Read buttons and limit sensors
+	in	r0,PORTD
+	sbi	LED_WEST
+	cbi	LED_WEST_DIR
 	LIMIT_HS_POWER_ON
 	lds	r21,iButtons_F
 	ldd	r17,Y+yButState ; Prev_State
@@ -50,6 +53,10 @@ ReadBLS: ; Read buttons and limit sensors
 	ldd	r20,Y+yButRelease  ; Release flags
 	in	r16,PIND
 	LIMIT_HS_POWER_OFF
+	out	PORTD,r0
+	sbi	LED_WEST_DIR
+	bst	r16,6
+	bld	r16,5
 	bst	r16,7
 	bld	r16,6
 	lsl	r16

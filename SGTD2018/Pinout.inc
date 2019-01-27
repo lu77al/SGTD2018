@@ -30,9 +30,11 @@
 11 AIN1		PORTD,7	- WEST_BUT^ / LED
 */
 
-#define	LED		PORTD,7
-#define	LED_ON		sbi LED
-#define	LED_OFF		cbi LED
+#define	LED_WEST	PORTD,7
+#define	LED_WEST_DIR	DDRD,7
+#define	LED_ON		sbi LED_WEST
+#define	LED_OFF		cbi LED_WEST
+
 
 #define	ROTOR_HS_POWER  PORTC,0
 #define	ROTOR_HS_POWER_ON  cbi ROTOR_HS_POWER
@@ -55,8 +57,8 @@
 	outi	DDRB, 0b111111
 	outi	PORTC,0b001111
 	outi	DDRC, 0b000001
-	outi	PORTD,0b00011100
-	outi	DDRD, 0b00100100
+	outi	PORTD,0b01011100
+	outi	DDRD, 0b10100100
 .endm
 
 

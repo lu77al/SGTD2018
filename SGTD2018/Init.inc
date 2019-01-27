@@ -28,8 +28,7 @@ ini_1:	st	Z+,YH
 	rcall	PrepareButtonsF
 
 	stsi	iInitCnt,$FF
-	stsi	ySimButMask,$FF
-
+	stdi	ySimButMask,$FF
 
 	stdi	yDelayCntH,3
 	set

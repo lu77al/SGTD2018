@@ -53,6 +53,7 @@ DriveKeyTable:	; !!! Must be within first 256 bytes of PROM
 ;.include "Tests.inc"
 
 RESET:
+	cli
 
 .include "Init.inc"
 
