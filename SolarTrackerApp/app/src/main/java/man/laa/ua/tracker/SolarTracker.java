@@ -51,6 +51,7 @@ public class SolarTracker {
         target = in[12] + 256 * in[13] + 65536 * in[14];
         halfSpan = in[15] + 256 * in[16];
         offset = in[17] + 256 * in[18] + 65536 * in[19];
+        if ((in[19] & 0x80) != 0) offset = offset - 0x1000000;
         morning = in[20] + 256 * in[21];
         evening = in[22] + 256 * in[23];
         parking = in[24] + 256 * in[25];
