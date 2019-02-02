@@ -21,7 +21,7 @@ SEGMENTBASE $60
 .equ	yRXTXCHS	= $07
 .equ	yMyAddr		= $08
 .equ	yAFlags		= $09
-.equ	yRegDisabled	= $0A
+.equ	yIrregular	= $0A
 .equ	yMainReg	= $0B
 .equ	yButState	= $0C
 .equ	yButPress	= $0D
@@ -62,6 +62,10 @@ SEGMENTBASE $60
 .equ	yRTCWaitStatus	= $2F
 .equ	yLimSetupStage  = $30
 .equ	yRTCDebug	= $31
+.equ	ySimButMask	= $32
+.equ	yBakTargetPosL	= $33
+.equ	yBakTargetPosM	= $34
+.equ	yBakTargetPosH	= $35
 
 
 
@@ -69,8 +73,8 @@ SEGMENTBASE $000
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1
-.equ	iTimeOffsetL	= $A2	; /2
-.equ	iTimeOffsetH	= $A3
+.equ	iTimeOffsetL	= $A2
+.equ	iTimeOffsetM	= $A3
 .equ	iMorningL	= $A4
 .equ	iMorningH	= $A5
 .equ	iEveningL	= $A6
@@ -93,3 +97,8 @@ SEGMENTBASE $000
 .equ	iUH		= $B7
 .equ	iUL		= $B8
 .equ	iSleepCnt	= $B9
+.equ	iTimeOffsetH	= $BA
+.equ	iLedLightCnt	= $BB
+.equ	iNoRequestsCnt	= $BC
+.equ	iNoRequestsCnt	= $BC
+.equ	iHCResetCnt	= $BD

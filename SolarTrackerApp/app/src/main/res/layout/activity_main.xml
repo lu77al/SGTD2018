@@ -264,16 +264,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:text="PANEL POSITION"
+                android:text="POS"
                 android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textPower"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/checkPosition"
+                android:layout_toEndOf="@id/checkPosition"
+                android:layout_marginStart="10dp"
+                android:textSize="18sp"
+                android:text="110W/14.5V " />
 
             <TextView
                 android:id="@+id/textDriveState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/checkPosition"
-                android:layout_toEndOf="@id/checkPosition"
-                android:layout_marginStart="15dp"
+                android:layout_toEndOf="@id/textPower"
+                android:layout_marginStart="10dp"
                 android:textSize="18sp"
                 android:text="-------------------" />
 

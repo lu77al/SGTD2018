@@ -59,6 +59,28 @@ skBr0:
 	brne	br1_1
 	rcall	DelayCountdown
 br1_1:
+	ldd	r24,Y+yMainCntM
+	cpi	r24,$FF
+	brne	br1_2
+	ldd	r25,Y+yMainCntH
+	andi	r25,0b11
+	brne	br1_2
+	lds	r16,iNoRequestsCnt
+	subi	r16,1
+	brcc	br1_3
+	stsi	iHCResetCnt,60
+	ldi	r16,128
+br1_3:	sts	iNoRequestsCnt,r16	
+br1_2:
+	lds	r16,iHCResetCnt
+	subi	r16,1
+	brcs	br1_4
+	sts	iHCResetCnt,r16
+	HC_POWER_OFF
+	rjmp	br1_5
+br1_4:	HC_POWER_ON
+br1_5:
+
 	rjmp	RetTact
 sk_BR1:
 

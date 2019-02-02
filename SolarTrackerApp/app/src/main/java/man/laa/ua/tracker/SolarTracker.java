@@ -4,6 +4,8 @@ import android.graphics.Color;
 
 import java.util.Locale;
 
+import static java.lang.Math.round;
+
 public class SolarTracker {
     private final static int FULL_CIRCLE = 70693;
 
@@ -26,6 +28,9 @@ public class SolarTracker {
     private float panAngle = 180;
     private float midAngle = 180;
     private float hspAngle = 85;
+    private float voltage = 0;
+    private float current = 0;
+    private int power = 0;
 
 /*
 >>>14-02-51-10-00-50-C7-
@@ -49,12 +54,19 @@ public class SolarTracker {
         morning = in[20] + 256 * in[21];
         evening = in[22] + 256 * in[23];
         parking = in[24] + 256 * in[25];
+        if (in[04] == 0x81) {
+            voltage = (float)((in[26] + 256 * in[27]) / 10.0);
+            current = (float)(in[28] / 10.0);
+        } else {
+            voltage = current = 0;
+        }
         double koef = 360.0 / 70693.0;
         double offsAngle = offset * koef;
         sunAngle = (float)((hour * 3600 + minute * 60 + second) / 240.0 + offsAngle);
         panAngle = (float)(position * koef);
         midAngle = (float)(180.0 + offsAngle);
         hspAngle = (float)(halfSpan * koef);
+        power = round(voltage * current);
         connected = true;
     }
 
@@ -72,6 +84,10 @@ public class SolarTracker {
 
     public String getTimeString() {
         return timeToString(hour, minute, second);
+    }
+
+    public String getPowerString() {
+        return String.format(Locale.getDefault(), "%dW/%.1fV", power, voltage);
     }
 
     public String getEastLimitString(boolean absolute) {

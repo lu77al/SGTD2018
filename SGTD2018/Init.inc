@@ -50,6 +50,8 @@ ini_1:	st	Z+,YH
 
 	rcall	ReadParams
 
+	stsi	iNoRequestsCnt,$ff
+
 	sei
 
 

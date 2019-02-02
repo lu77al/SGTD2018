@@ -165,7 +165,11 @@ cm_S2:
 	cpi	r16,$00
 	breq	cm0_st
 	rjmp	cm0_0
-cm0_st:	ld	r16,X+
+cm0_st:
+	push	r16
+	stsi	iNoRequestsCnt,$ff
+
+	ld	r16,X+
 	std	Y+yRXPointer,XL
 	cpi	r16,$50	; Request
 	breq	cm0_10_
@@ -252,8 +256,9 @@ cm0_8:
 	rjmp	cm_S4
 cm0_10:
 	ldd	XL,Y+yTXPointer
-	ldi	r16,$80+$00
-	st	X+,r16
+	pop	r25
+	ori	r25,$80
+	st	X+,r25
 	ldd	r16,Y+yHour
 	st	X+,r16
 	ldd	r16,Y+yMinute
@@ -301,9 +306,23 @@ cm0_10:
 	st	X+,r16
 	lds	r16,iParkingH
 	st	X+,r16
+	cpi	r25,$80
+	breq	cm0_11
+	lds	r16,iUL
+	st	X+,r16
+	lds	r16,iUH
+	st	X+,r16
+	lds	r16,iCurrent
+	st	X+,r16
+cm0_11:
 	std	Y+yTXPointer,XL
 	rjmp	cm_S4
 cm0_0:
+
+	cpi	r16,$01
+	brne	cm1_0
+	rjmp	cm0_st
+cm1_0:
 
 	cpi	r16,$70 ; *** Запрос участка памяти ***
 	brne	cm70_0
@@ -375,7 +394,6 @@ cm_S4:
 cm_S3:	lds	r16,XSEG+RXBuf+2
 	ldd	r17,Y+yMyAddr
 	rjmp	RetCMDProc
-
 /*
 SetName:
 	ldi_w	ZH,ZL,ModuleName*2
@@ -393,10 +411,9 @@ stn_1:	std	Y+yTXEnd,XL
 
 
 ModuleName:
-.db	"AT+NAME=Svit_Vitru_TSV_025",13,10,0
+.db	"AT+NAME=Svit_Vitru_TSV_024",13,10,0
 
 ;.db	"AT5",13,10,0
-
 */
 
 /*

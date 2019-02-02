@@ -35,15 +35,17 @@
 #define	LED_ON		sbi LED_WEST
 #define	LED_OFF		cbi LED_WEST
 
+#define	HC_POWER	PORTD,5
+#define	HC_POWER_ON	cbi HC_POWER
+#define	HC_POWER_OFF	sbi HC_POWER
 
 #define	ROTOR_HS_POWER  PORTC,0
-#define	ROTOR_HS_POWER_ON  cbi ROTOR_HS_POWER
-#define	ROTOR_HS_POWER_OFF sbi ROTOR_HS_POWER
+#define	ROTOR_HS_POWER_ON  sbi ROTOR_HS_POWER
+#define	ROTOR_HS_POWER_OFF cbi ROTOR_HS_POWER
 
 #define	LIMIT_HS_POWER  PORTD,2
-#define	LIMIT_HS_POWER_ON  cbi LIMIT_HS_POWER
-#define	LIMIT_HS_POWER_OFF sbi LIMIT_HS_POWER
-
+#define	LIMIT_HS_POWER_ON  sbi LIMIT_HS_POWER
+#define	LIMIT_HS_POWER_OFF cbi LIMIT_HS_POWER
 
 .equ	btEastLimit  = 0
 .equ	btWestLimit  = 1

@@ -119,3 +119,5 @@
 .equ	iSleepCnt	= $B9
 .equ	iTimeOffsetH	= $BA
 .equ	iLedLightCnt	= $BB
+.equ	iNoRequestsCnt	= $BC
+.equ	iHCResetCnt	= $BD

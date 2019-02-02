@@ -199,7 +199,7 @@ adc_5:	rcall	PrepareIreg
 adc_1:				; Voltage
 	sts	iUadcL,r16
 	sts	iUadcH,r17
-	K16x16m	813
+	K16x16m	815
 	sts	iUL,r16
 	sts	iUH,r17
 	rcall	PrepareUreg

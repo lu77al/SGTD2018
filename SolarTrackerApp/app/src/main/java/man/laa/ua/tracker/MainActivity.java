@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public CheckBox checkTime, checkParking, checkPosition, checkAutoTime;
     public TextView textStatus, textTrackerTime, textMorning, textEvening, textParking;
     public TextView textAbsEast, textAbsPos, textAbsWest, textRttEast, textRttPos, textRttWest;
-    public TextView textDriveState;
+    public TextView textDriveState, textPower;
     public Button buttonMoveEast, buttonMoveWest, buttonSetParking;
     public Button buttonSetTime, buttonSetOffset, buttonAlawaysParking, buttonManual;
     public EditText editTrackerTime, editMorning, editEvening, editParking;
@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
         textStatus = findViewById(R.id.textStatus);
         textTrackerTime = findViewById(R.id.textTrackerTime);
+        textPower = findViewById(R.id.textPower);
 
         imagePanel = findViewById(R.id.imagePanel);
 
@@ -233,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                     textStatus.setText("Connected " + name);
                     }
                 });
+                requestCommandCode = "Svit_Vitru_TSV_025".equals(name) ? 0x00 : 0x01;
                 myThreadConnected = new ThreadConnected(bluetoothSocket);
                 myThreadConnected.start();
             }
@@ -248,12 +250,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    int requestCommandCode = 0x00;
+
     private class ThreadConnected extends Thread {    // Main work thread
 
         private final InputStream connectedInputStream;
         private final OutputStream connectedOutputStream;
 
-        private String outputText;
+        Boolean oldProtocol;
 
         ThreadConnected(BluetoothSocket socket) {
             InputStream in = null;
@@ -268,13 +272,15 @@ public class MainActivity extends AppCompatActivity {
             connectedOutputStream = out;
         }
 
-        private final static int RESPONSE_LENGTH = 27;
+        private final static int RESPONSE_LENGTH_OLD = 27;
+        private final static int RESPONSE_LENGTH_NEW = 30;
 
         @Override
         public void run() { // Listen bluetooth input
-            int header[] = {0x14, 0x16, 0x10, 0x51, 0x80};
-            int in[] = new int[RESPONSE_LENGTH];
+            int header[] = {0x14, 0x16, 0x10, 0x51};
+            int in[] = new int[RESPONSE_LENGTH_NEW];
             int pnt = 0;
+            int responseLength = RESPONSE_LENGTH_NEW;
             byte[] inputByte = new byte[1];
             while (true) {
                 try {
@@ -284,16 +290,24 @@ public class MainActivity extends AppCompatActivity {
                 }
                 int input = inputByte[0] >= 0 ? inputByte[0] : 0x100 + inputByte[0];
                 in[pnt] = input;
-                if ((pnt < header.length) && (header[pnt] != input)) {
+                if ((pnt < header.length) && (pnt != 1) && (header[pnt] != input)) {
                     pnt = 0;
                 } else {
                     pnt++;
+                    if (pnt == header.length + 1) {
+                        if (input == 0x80) {
+                            responseLength = RESPONSE_LENGTH_OLD;
+                        } else {
+                            if (input != 0x81) pnt = 0;
+                        }
+                        if (in[1] != responseLength - 5) pnt = 0;
+                    }
                 }
-                if (pnt < RESPONSE_LENGTH) continue;
+                if (pnt < responseLength) continue;
                 byte checkSum = 0;
-                for (int i = 0; i < RESPONSE_LENGTH - 1; i++) checkSum += in[i];
+                for (int i = 0; i < responseLength - 1; i++) checkSum += in[i];
                 pnt = 0;
-                if (checkSum == (byte)in[RESPONSE_LENGTH - 1]) {
+                if (checkSum == (byte)in[responseLength - 1]) {
                     tracker.decode(in);
                 }
             }
@@ -388,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
         bytesToSend[1] = (byte)(request.length + 1);
         bytesToSend[2] = 0x51;
         bytesToSend[3] = 0x10;
-        bytesToSend[4] = 0x00;
+        bytesToSend[4] = (byte)requestCommandCode;
         for (int i = 0; i < request.length; i++) {
             bytesToSend[5 + i] = (byte)request[i];
         }
@@ -468,6 +482,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showPosition() {
+        textPower.setText(tracker.getPowerString());
         textAbsEast.setText(tracker.getEastLimitString(true));
         textAbsPos.setText(tracker.getPositionString(true));
         textAbsWest.setText(tracker.getWestLimitString(true));
