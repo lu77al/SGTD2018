@@ -6,8 +6,8 @@
 	outi	DDRB, 0b111111
 	outi	PORTC,0b001111
 	outi	DDRC, 0b000001
-	outi	PORTD,0b11111111
-	outi	DDRD, 0b00100100
+	outi	PORTD,0b01011111
+	outi	DDRD, 0b10100100
 .endm
 //#define	UART_DIR_PORT	PORTD,2	; <- UartDir
 //#define	UART_DIR_DDR	 DDRD,2

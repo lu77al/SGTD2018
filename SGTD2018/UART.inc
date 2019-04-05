@@ -394,6 +394,7 @@ cm_S4:
 cm_S3:	lds	r16,XSEG+RXBuf+2
 	ldd	r17,Y+yMyAddr
 	rjmp	RetCMDProc
+
 /*
 SetName:
 	ldi_w	ZH,ZL,ModuleName*2
@@ -411,22 +412,20 @@ stn_1:	std	Y+yTXEnd,XL
 
 
 ModuleName:
-.db	"AT+NAME=Svit_Vitru_TSV_024",13,10,0
+.db	"AT+NAME=Svit_Vitru_TSV_027",13,10,0
 
 ;.db	"AT5",13,10,0
-*/
 
-/*
 SetPassword:
 	ldi_w	ZH,ZL,ModulePassword*2
 	ldi	XL,TXBuf
 	std	Y+yTXPointer,XL
-stn_2:	lpm	r16,Z+
+stp_2:	lpm	r16,Z+
 	cpi	r16,0
-	breq	stn_1
+	breq	stp_1
 	st	X+,r16
-	rjmp	stn_2
-stn_1:	std	Y+yTXEnd,XL
+	rjmp	stp_2
+stp_1:	std	Y+yTXEnd,XL
 	set
 	bld	BFlags,bfNoCHS
 	ret	
@@ -434,4 +433,5 @@ stn_1:	std	Y+yTXEnd,XL
 
 ModulePassword:
 .db	"AT+PSWD=1977",13,10,0
+
 */
