@@ -10,9 +10,11 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.ArraySet;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -24,7 +26,12 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
@@ -39,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     ThreadConnectBTdevice myThreadConnectBTdevice;
     ThreadConnected myThreadConnected;
+    private int nextDevIndex = 0;
 
 // Visual Components
     public CheckBox checkTime, checkParking, checkPosition, checkAutoTime;
@@ -64,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
 
     boolean fillParkingParams = true;
 
-    boolean connected = false;
+    private volatile boolean connected = false;
+    private boolean reconnect = false;
 
     SolarTracker tracker = new SolarTracker();
 
@@ -148,27 +157,48 @@ public class MainActivity extends AppCompatActivity {
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        } else {
+            setup();
         }
-        setup();
     }
 
     private void setup() { // Search for paired tracker
+        reconnect = false;
         if (connected) return;
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        BluetoothDevice tracker = null;
+        List<BluetoothDevice> trackers = new ArrayList<>();
         for (BluetoothDevice device : pairedDevices) {
             String name = device.getName();
-            if (name.length() > 15) {
+            if (name != null && name.length() > 15) {
                 if (name.substring(0,15).equals("Svit_Vitru_TSV_")) {
-                    tracker = device;
-                    break;
+                    trackers.add(device);
                 }
             }
         }
-        if (tracker != null) {
+        if (trackers.size() != 0) {
+            nextDevIndex %= trackers.size();
+            Collections.sort(trackers, new Comparator<BluetoothDevice>() {
+                @Override
+                public int compare(BluetoothDevice o1, BluetoothDevice o2) {
+                    return o1.getName().compareTo(o2.getName());
+                }
+            });
+            BluetoothDevice tracker = trackers.get(nextDevIndex);
+            nextDevIndex++;
             textStatus.setText("Connecting " + tracker.getName());
             myThreadConnectBTdevice = new ThreadConnectBTdevice(tracker);
             myThreadConnectBTdevice.start(); // Start connection
+        } else {
+            Toast.makeText(getApplicationContext(), "No trackers found", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "No trackers found", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "No trackers found", Toast.LENGTH_LONG).show();
+            finish();
+/*
+            if(Build.VERSION.SDK_INT>=16 && Build.VERSION.SDK_INT<21){
+                finishAffinity();
+            } else if(Build.VERSION.SDK_INT>=21){
+                finishAndRemoveTask();
+            }*/
         }
     }
 
@@ -185,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 setup();
             }
             else { // Finish app otherwise
-                Toast.makeText(this, "Can't continue without bluetooth", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Can't continue without bluetooth", Toast.LENGTH_LONG).show();
                 finish();
             }
         }
@@ -196,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
 
         private BluetoothSocket bluetoothSocket = null;
         private String name;
+        private int deb;
 
         private ThreadConnectBTdevice(BluetoothDevice device) {
             try {
@@ -215,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
                 runOnUiThread(new Runnable() {
-
                     @Override
                     public void run() {
                     textStatus.setText("Can't connect " + name);
@@ -226,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
+                reconnect = true;
             }
             if (connected) {  // Start work thread if connected
                 runOnUiThread(new Runnable() {
@@ -257,11 +288,13 @@ public class MainActivity extends AppCompatActivity {
         private final InputStream connectedInputStream;
         private final OutputStream connectedOutputStream;
 
-        Boolean oldProtocol;
+//        Boolean oldProtocol;
+        BluetoothSocket socketToClose;
 
         ThreadConnected(BluetoothSocket socket) {
             InputStream in = null;
             OutputStream out = null;
+            socketToClose = socket;
             try {
                 in = socket.getInputStream();
                 out = socket.getOutputStream();
@@ -282,11 +315,18 @@ public class MainActivity extends AppCompatActivity {
             int pnt = 0;
             int responseLength = RESPONSE_LENGTH_NEW;
             byte[] inputByte = new byte[1];
+            mainLoop:
             while (true) {
                 try {
+                    while (connectedInputStream.available() == 0) {
+                        Thread.sleep(50);
+                        if (!connected) break mainLoop;
+                    };
                     int inputLen = connectedInputStream.read(inputByte);
                 } catch (IOException e) {
                     break;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
                 int input = inputByte[0] >= 0 ? inputByte[0] : 0x100 + inputByte[0];
                 in[pnt] = input;
@@ -310,6 +350,11 @@ public class MainActivity extends AppCompatActivity {
                 if (checkSum == (byte)in[responseLength - 1]) {
                     tracker.decode(in);
                 }
+            }
+            try {
+                socketToClose.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
@@ -419,15 +464,22 @@ public class MainActivity extends AppCompatActivity {
     Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            showState();
-            if (checkAutoTime.isChecked()) showSystemTime();
-            if (tracker.isConnected() && fillParkingParams) {
-                fillParkingParams = false;
-                editEvening.setText(textEvening.getText());
-                editMorning.setText(textMorning.getText());
-                editParking.setText(textParking.getText());
+            if (reconnect && !connected) {
+                if ((myThreadConnectBTdevice == null || !myThreadConnectBTdevice.isAlive())
+                       && (myThreadConnected == null || !myThreadConnected.isAlive())) {
+                    setup();
+                }
+            } else {
+                showState();
+                if (checkAutoTime.isChecked()) showSystemTime();
+                if (tracker.isConnected() && fillParkingParams) {
+                    fillParkingParams = false;
+                    editEvening.setText(textEvening.getText());
+                    editMorning.setText(textMorning.getText());
+                    editParking.setText(textParking.getText());
+                }
+                if (myThreadConnected != null) request();
             }
-            if (myThreadConnected !=null) request();
             timerHandler.postDelayed(this, 500);
         }
     };
@@ -686,6 +738,11 @@ public class MainActivity extends AppCompatActivity {
         editEvening.setText(time);
         editMorning.setText(time);
         userCommand = CMD_SET_PARKING;
+    }
+
+    public void onClickTracker(View v) {
+       reconnect = true;
+       connected = false;
     }
 
     private void checkBoxChangeEvents() {

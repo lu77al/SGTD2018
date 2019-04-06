@@ -15,7 +15,8 @@
         android:layout_height="wrap_content"
         android:background="#aaaaff">
 
-        <TextView
+        <Button
+            android:onClick="onClickTracker"
             android:id="@+id/textStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
