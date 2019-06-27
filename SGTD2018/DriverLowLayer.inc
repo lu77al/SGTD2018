@@ -104,6 +104,10 @@ don_2:	bld	AFlags,afReverse
 	ldi_w	r17,r16,PWM_MIN_PULSE ; Minimum pulse
 	out	OCR1BH,r17
 	out	OCR1BL,r16
+	ldi_w	r17,r16,PWM_MIN_PULSE + 1 ; Delay to stabilize halls
+	out	TCNT1H,r17
+	out	TCNT1L,r16
+	stdi	yDriveHallActCnt,120
 	clr	KS_High		; Zero state registers
 	clr	KS_Dead
 	out	PORTB,ZeroReg
@@ -139,27 +143,8 @@ doff_1:	clt
 
 ; Read hall state when drive isn't active
 GetHallState:
-	ROTOR_HS_POWER_ON
-
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-; addition
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
-	rjmp	PC+1
 	in	r16,PINC
-	ROTOR_HS_POWER_OFF	; Power off hall sensors
+	andi	r16,0b1110
 	cp	r16,HallsBak
 	brne	ghs_1
 	cp	HallsStCnt,ZeroReg
@@ -200,6 +185,7 @@ tr_4:	ldd	r16,Y+yRotorHallsPort
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,-1 ; increase position
 	sbci	r20,$FF
+	stdi	yDriveHallActCnt,120
 	cpi	r21,$80+JAM_PATH
 	brsh	tr_3
 	inc	r21
@@ -214,6 +200,7 @@ tr_8:	sbrc	AFlags,afReverse
 	ldd	r25,Y+yCurPeriod
 	subi_w	r19,r18,1  ; decrease position
 	sbci	r20,0
+	stdi	yDriveHallActCnt,120
 	cpi	r21,$80-JAM_PATH
 	brlo	tr_3
 	dec	r21
@@ -227,9 +214,8 @@ tr_1:	ldd	r16,Y+yDummyPeriod
 	inc	r16
 	std	Y+yDummyPeriod,r16
 	breq	tr_6
-	sbrs	AFlags,afActive	; If PWM isn't active -> get halls port state
-	rjmp	GetHallState
 	ret
+
 tr_6:	ldi	r25,$FF
 	rjmp	tr_7
 tr_5:	std	Y+yCurPeriod,ZeroReg
@@ -237,8 +223,7 @@ tr_5:	std	Y+yCurPeriod,ZeroReg
 tr_7:	std	Y+yLastPeriod,r25
 
 	sbrs	AFlags,afActive
-	rjmp	GetHallState	; If PWM isn't active -> get halls port state
-
+	ret
 
 ; *** Set speed ***
 	sbrs	AFlags,afReverse	; Calculate rest of target path

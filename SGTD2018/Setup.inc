@@ -176,7 +176,7 @@ ProcessButtons:
 	ldd	r25,Y+yButStateCnt ; Stable state counter
 	inc	r25
 	brne	pb_1
-	ldi	r25,0
+	ldi	r25,255
 pb_1:	std	Y+yButStateCnt,r25
 	sbrs	AFlags,afWaitButRel ; Wait for buttons released
 	rjmp	pb_2
@@ -211,15 +211,24 @@ pb_9:
 	rjmp	pb_6
 pb_8:
 	cpi	r25,40		; Long ...
-	brlo	pb_5
+	brne	pb_5
 	sbrs	r24,btWestButton  ; Press west
 	rjmp	pb_7
+
+#ifdef AT_SETUP
+	rcall	SetName
+#else
 	rcall	MoveWestCMD		; -> Move west
+#endif
 	rjmp	pb_6
 pb_7:
 	sbrs	r24,btEastButton  ; Press east
 	rjmp	pb_5
+#ifdef AT_SETUP
+	rcall	SetPassword
+#else
 	rcall	MoveEastCMD		; -> Move east
+#endif
 	rjmp	pb_6
 pb_5:
 	rjmp	pb_3

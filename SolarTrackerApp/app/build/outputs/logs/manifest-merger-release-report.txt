@@ -1,0 +1,113 @@
+-- Merging decision tree log ---
+manifest
+ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+MERGED from [com.android.support:appcompat-v7:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\appcompat-v7-27.1.1.aar\05082405858084b6b081a84e06a0d490\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\396683489f4106e4012f5de16ae470e2\AndroidManifest.xml:2:1-11:12
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-fragment-27.1.1.aar\b287ea767b46db1679320e3d472e1e18\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:animated-vector-drawable:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-27.1.1.aar\4a77efee7e10ee7f356dfca187c9ed11\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.1.1.aar\f466f768a7d58218a71b8e8e23e441f8\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.1.1.aar\ff4d26ae8daadf48d820790a18e8c3af\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-vector-drawable:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-27.1.1.aar\4bf71eac3bc6aed4e6f533ddb0e987a8\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-compat-27.1.1.aar\4dc85a3734f362c04c7d0b439704f8e3\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:livedata-core:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\livedata-core-1.1.0.aar\b475ca0cd9f7ffcc4528a2f2fa7310b0\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:viewmodel:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\viewmodel-1.1.0.aar\4108ba27e30ea30bc93442230a5b2913\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:runtime:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\df58a63d399e659c2aba6d7d91e8429b\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.core:runtime:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\39009933585baabfc32ae417cb85b71a\AndroidManifest.xml:17:1-22:12
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+	package
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:3:5-33
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:1-24:12
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.BLUETOOTH
+ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:4:5-67
+	android:name
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:4:22-65
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:5:5-73
+	android:name
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:5:22-71
+application
+ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:7:5-22:19
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\396683489f4106e4012f5de16ae470e2\AndroidManifest.xml:9:5-20
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\396683489f4106e4012f5de16ae470e2\AndroidManifest.xml:9:5-20
+	android:supportsRtl
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:12:9-35
+	android:label
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:10:9-41
+	android:roundIcon
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:11:9-54
+	android:icon
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:9:9-43
+	android:allowBackup
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:8:9-35
+	android:theme
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:13:9-40
+activity#man.laa.ua.tracker.MainActivity
+ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:15:9-21:20
+	android:screenOrientation
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:15:51-87
+	android:name
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:15:19-47
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:16:13-20:29
+action#android.intent.action.MAIN
+ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:17:17-69
+	android:name
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:17:25-66
+category#android.intent.category.LAUNCHER
+ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:19:17-77
+	android:name
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml:19:27-74
+uses-sdk
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+MERGED from [com.android.support:appcompat-v7:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\appcompat-v7-27.1.1.aar\05082405858084b6b081a84e06a0d490\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\appcompat-v7-27.1.1.aar\05082405858084b6b081a84e06a0d490\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\396683489f4106e4012f5de16ae470e2\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.1.3.aar\396683489f4106e4012f5de16ae470e2\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-fragment-27.1.1.aar\b287ea767b46db1679320e3d472e1e18\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-fragment-27.1.1.aar\b287ea767b46db1679320e3d472e1e18\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-27.1.1.aar\4a77efee7e10ee7f356dfca187c9ed11\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\animated-vector-drawable-27.1.1.aar\4a77efee7e10ee7f356dfca187c9ed11\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.1.1.aar\f466f768a7d58218a71b8e8e23e441f8\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.1.1.aar\f466f768a7d58218a71b8e8e23e441f8\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.1.1.aar\ff4d26ae8daadf48d820790a18e8c3af\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.1.1.aar\ff4d26ae8daadf48d820790a18e8c3af\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-27.1.1.aar\4bf71eac3bc6aed4e6f533ddb0e987a8\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-vector-drawable-27.1.1.aar\4bf71eac3bc6aed4e6f533ddb0e987a8\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-compat-27.1.1.aar\4dc85a3734f362c04c7d0b439704f8e3\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\support-compat-27.1.1.aar\4dc85a3734f362c04c7d0b439704f8e3\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\livedata-core-1.1.0.aar\b475ca0cd9f7ffcc4528a2f2fa7310b0\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\livedata-core-1.1.0.aar\b475ca0cd9f7ffcc4528a2f2fa7310b0\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\viewmodel-1.1.0.aar\4108ba27e30ea30bc93442230a5b2913\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\viewmodel-1.1.0.aar\4108ba27e30ea30bc93442230a5b2913\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\df58a63d399e659c2aba6d7d91e8429b\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\df58a63d399e659c2aba6d7d91e8429b\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\39009933585baabfc32ae417cb85b71a\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.0] C:\Users\AlexL\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\39009933585baabfc32ae417cb85b71a\AndroidManifest.xml:20:5-44
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+		ADDED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Proj2019\SvitVitru\Solar\GT2018\Soft\SolarTrackerApp\app\src\main\AndroidManifest.xml

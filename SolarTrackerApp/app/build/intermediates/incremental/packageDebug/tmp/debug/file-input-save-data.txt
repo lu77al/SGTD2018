@@ -1,0 +1,7 @@
+#Internal package file, do not edit.
+#Sat Apr 06 20:50:01 EEST 2019
+0.baseType=DIRECTORY
+0.base=D\:\\Proj2019\\SvitVitru\\Solar\\GT2018\\Soft\\SolarTrackerApp\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0
+0.path=classes.dex
+0.set=DEX
+count=1

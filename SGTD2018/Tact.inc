@@ -9,7 +9,7 @@ InitTact:
 	rjmp	Tact
 .endm
 
-Tact:	ROTOR_HS_POWER_ON
+Tact: ;	ROTOR_HS_POWER_ON
 	outi	TIFR,1<<TOV2
 
 ;**** RXTimer ****
@@ -23,6 +23,13 @@ Tact:	ROTOR_HS_POWER_ON
 rxtm_1:
 ;**** RXTimer ****
 
+	sbic	ROTOR_HS_POWER
+	sbrc	AFLags,afActive
+	rjmp	tct_2
+	rcall	GetHallState
+tct_2:
+	rcall	TrackRotor
+
 ;-- MainCnt 24bit
 	ldd	r23,Y+yMainCntL
 	ldd	r24,Y+yMainCntM
@@ -33,14 +40,8 @@ rxtm_1:
 	std	Y+yMainCntM,r24
 	std	Y+yMainCntH,r25
 
-	ldd	r23,Y+yMainCntL
-	ldd	r24,Y+yMainCntM
-	ldd	r25,Y+yMainCntH
-
-	rcall	TrackRotor
-
 ;--- Br0 ---
-	cpi	r23,0b00001111	; 15.2587890625 關
+	cpi	r23,0b00011111	; 15.2587890625 關
 	brne	skBr0
 
 	ldi_w	r20,r19,END_POS_GAP
@@ -52,7 +53,7 @@ rxtm_1:
 skBr0:
 
 ;--- Br ---
-	cpi	r23,0b00011111	; 15.2587890625 關
+	cpi	r23,0b00111111	; 15.2587890625 關
 	brne	sk_BR1
 
 	andi	r24,0b11
@@ -86,7 +87,7 @@ sk_BR1:
 
 
 ;--- Br ---
-	cpi	r23,0b00101111	; 15.2587890625 關
+	cpi	r23,0b01011111	; 15.2587890625 關
 	brne	sk_BR2
 
 	rcall	CheckJam
@@ -100,7 +101,7 @@ sk_BR2:
 
 
 ;--- Br ---
-	cpi	r23,0b00111111	; 15.2587890625 關
+	cpi	r23,0b01111111	; 15.2587890625 關
 	brne	sk_BR3
 
 	lds	r16,iInitCnt
@@ -128,7 +129,7 @@ br3_3:
 sk_BR3:
 
 ;--- Br ---
-	cpi	r23,0b01001111	; 15.2587890625 關
+	cpi	r23,0b10011111	; 15.2587890625 關
 	brne	sk_BR4
 
 	rcall	TimeToTargetPos
@@ -193,7 +194,7 @@ sk_BR4:
 
 ;--- Br ---
 	andi	r23,0b01111111	; 30.517578125 關
-	cpi	r23,0b00000110
+	cpi	r23,0b00000001
 	brne	sk_BR5_0
 
 	LIMIT_HS_POWER_ON
@@ -202,8 +203,7 @@ sk_BR4:
 sk_BR5_0:
 
 ;--- Br ---
-	andi	r23,0b01111111	; 30.517578125 關
-	cpi	r23,0b00000111
+	cpi	r23,0b00000010	; 30.517578125 關
 	brne	sk_BR5
 
 	rcall	ReadBLS
@@ -219,13 +219,31 @@ br5_1:
 
 	rcall	StopOnLimits
 br5_2:
+	ROTOR_HS_POWER_ON
 
 	rjmp	RetTact
 sk_BR5:
 
 ;--- Br ---
+	cpi	r23,0b00000011	; 30.517578125 關
+	brne	sk_BR7
+
+	ldd	r16,Y+yDriveHallActCnt
+	sbrc	AFlags,afActive
+	ldi	r16,120
+	subi	r16,1
+	brcs	br7_1
+	std	Y+yDriveHallActCnt,r16
+	rjmp	br7_2
+br7_1:	ROTOR_HS_POWER_OFF
+br7_2:
+
+	rjmp	RetTact
+sk_BR7:
+
+;--- Br ---
 	andi	r23,0b00011111	; 122.0703125 關
-	cpi	r23,0b00001111
+	cpi	r23,0b00000100
 	brne	sk_BR6
 
 	rcall	ReadADC

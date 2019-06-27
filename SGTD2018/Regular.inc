@@ -44,7 +44,8 @@ ReadBLS: ; Read buttons and limit sensors
 	in	r0,PORTD
 	sbi	LED_WEST
 	cbi	LED_WEST_DIR
-	LIMIT_HS_POWER_ON
+;	LIMIT_HS_POWER_ON
+	rjmp	PC+1
 	lds	r21,iButtons_F
 	ldd	r17,Y+yButState ; Prev_State
 	ldd	r18,Y+yButState
@@ -52,8 +53,8 @@ ReadBLS: ; Read buttons and limit sensors
 	ldd	r19,Y+yButPress	   ; Press flags
 	ldd	r20,Y+yButRelease  ; Release flags
 	in	r16,PIND
-	LIMIT_HS_POWER_OFF
 	out	PORTD,r0
+	LIMIT_HS_POWER_OFF
 	sbi	LED_WEST_DIR
 	bst	r16,6
 	bld	r16,5

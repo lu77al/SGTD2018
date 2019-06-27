@@ -395,7 +395,8 @@ cm_S3:	lds	r16,XSEG+RXBuf+2
 	ldd	r17,Y+yMyAddr
 	rjmp	RetCMDProc
 
-/*
+#ifdef AT_SETUP
+
 SetName:
 	ldi_w	ZH,ZL,ModuleName*2
 	ldi	XL,TXBuf
@@ -412,9 +413,9 @@ stn_1:	std	Y+yTXEnd,XL
 
 
 ModuleName:
-.db	"AT+NAME=Svit_Vitru_TSV_027",13,10,0
+.db	DEV_NAME, 13,10,0
 
-;.db	"AT5",13,10,0
+
 
 SetPassword:
 	ldi_w	ZH,ZL,ModulePassword*2
@@ -432,6 +433,7 @@ stp_1:	std	Y+yTXEnd,XL
 
 
 ModulePassword:
-.db	"AT+PSWD=1977",13,10,0
+.db	DEV_PIN,13,10,0
 
-*/
+#endif
+

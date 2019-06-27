@@ -5,7 +5,7 @@
 	.equ	afReverse    = 1
 	.equ	afFastStop   = 2
 	.equ	afFailStop   = 3
-;	.equ	afStopping   = 4
+;	.equ	afHallsReady = 4
 	.equ	afSetupMove  = 5
 	.equ	afWaitButRel = 6
 	.equ	afSaveParams = 7
@@ -87,6 +87,8 @@
 .equ	yBakTargetPosL	= $33
 .equ	yBakTargetPosM	= $34
 .equ	yBakTargetPosH	= $35
+
+.equ	yDriveHallActCnt = $36
 
 
 

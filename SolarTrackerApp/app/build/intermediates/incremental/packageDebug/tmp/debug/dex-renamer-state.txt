@@ -1,0 +1,4 @@
+#Sat Apr 06 20:50:01 EEST 2019
+base.0=D\:\\Proj2019\\SvitVitru\\Solar\\GT2018\\Soft\\SolarTrackerApp\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0
+path.0=classes.dex
+renamed.0=classes.dex
