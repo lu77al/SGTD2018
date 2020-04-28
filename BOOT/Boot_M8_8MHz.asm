@@ -69,6 +69,14 @@ Main:
 .ORG	SECONDBOOTSTART
 Boot:
 	cli
+
+	wdr
+	in	r16,WDTCR
+	ori	r16,(1<<WDCE) | (1<<WDE)
+	out	WDTCR,r16
+	ldi	r16,(1<<WDE) | 0b111
+	out	WDTCR,r16
+
 ;-- Порты --
 	InitPorts
 #ifdef	UART_DIR_PORT
@@ -100,6 +108,11 @@ bini_1:	st	Z+,YH
 	outi	UBRRH,High(UBRRB_V)
 	outi	UBRRL,Low(UBRRB_V)
 
+	ldi	r17,$ff
+BTL_N1:	subi_w	r17,r16,1
+	wdr
+	brne	BTL_N1
+
 ;--- Обмен "приветстивием" $A5-$5A ---
 	in	r16,UDR
 	TR_Start
@@ -109,11 +122,21 @@ bini_1:	st	Z+,YH
 BTL_1:	subi_w	r18,r17,1
 	brne	BTL_2
 BTL_3:	rjmp	BTL_EX
-BTL_2:	sbis	UCSRA,RXC
+BTL_2:	wdr
+	sbis	UCSRA,RXC
 	rjmp	BTL_1
 	in	r16,UDR
 	cpi	r16,$5A
 	brne	BTL_3
+
+;BTL_1:	sbis	UCSRA,RXC
+;	rjmp	BTL_1
+;	in	r16,UDR
+;	cpi	r16,$5A
+;	breq	BTL_2
+;BTL_3:	rjmp	BTL_EX
+;BTL_2:	wdr
+
 ;--- Инициализация загрузчика
 	outi	TCCR1B,0b011	; CK/64 -> 8e6/64/65536 = 1.907Hz Overflow
 	ldi	r25,58		; Счетчик выхода из загрузчика через 30 сек
@@ -127,7 +150,8 @@ BTL_4:	in	r16,TIFR
 	outi	TIFR,1<<TOV1
 	dec	r25
 	breq	BTL_3
-BTL_5:	sbis	UCSRA,RXC
+BTL_5:	wdr
+	sbis	UCSRA,RXC
 	rjmp	BTL_4
 	in	r16,UDR
 	cpi	XL,0
@@ -262,14 +286,16 @@ BSU_4:	subi_w	r17,r16,1
 	TR_Start
 	ldi	r24,0
 	ldi	XL,0
-BSU_1:	sbis	UCSRA,UDRE
+BSU_1:	wdr
+	sbis	UCSRA,UDRE
 	rjmp	BSU_1
 	ld	r16,X+
 	out	UDR,r16
 	add	r24,r16
 	cp	XL,r23
 	brlo	BSU_1
-BSU_2:	sbis	UCSRA,UDRE
+BSU_2:	wdr
+	sbis	UCSRA,UDRE
 	rjmp	BSU_2
 	out	UDR,r24
 	TR_Wait
@@ -288,10 +314,11 @@ ERASE_PAGE:
 DO_SPM:	in	r17,SPMCR
 	sbrc	r17,SPMEN
 	rjmp	DO_SPM
-DSPM_1:	sbic	EECR,EEWE
+DSPM_1:	wdr
+	sbic	EECR,EEWE
 	rjmp	DSPM_1
 	out	SPMCR,r16
 	spm
 	ret
 	
-.db	"The end of boot+"
+//.db	"The end of boot+"

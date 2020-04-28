@@ -5,6 +5,7 @@ TimeGo:	; RTC H:M:S
 	brcc	tg_1
 	subi_w	r17,r16,-FULL_SECOND
 	ldd	r18,Y+ySecond
+	wdr
 	inc	r18
 	cpi	r18,60
 	brlo	tg_2

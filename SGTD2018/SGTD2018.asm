@@ -1,5 +1,5 @@
 ;#define AT_SETUP
-#define DEV_NAME "AT+NAME=Svit_Vitru_TSV_033"
+#define DEV_NAME "AT+NAME=Svit_Vitru_TSV_047"
 #define DEV_PIN  "AT+PSWD=1977"
 
 .include "m8def.inc"
