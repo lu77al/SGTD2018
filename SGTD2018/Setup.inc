@@ -1,20 +1,3 @@
-/* Buttons interface V1
- *   Enter setup - long press both
- *   Exit setup  - press both
- *   Start move (with offset correction) - release
- *   Stop move  - press
- *   Start limits search - long press
- */
-
-/* Buttons interface V2
- *   Release - Start move + enter setup
- *   Long press - Start limit search + enter setup
- *   Press when moving - Stop and enter setup
- *   Press both - exit setup 
- *     - wait for long release after each command 
- *     - automatic countdown for exit setup
- */
-
 /* Buttons interface V3
  *   Long press - Start move
  *   Press when moving - Stop + delay
@@ -205,8 +188,7 @@ pb_4:
 	rcall	StopCmd
 	rjmp	pb_3
 pb_9:
-;	rcall	SetName
-;	rcall	SetPassword
+	rcall	ATSetupStart
 	rcall	SetupDelayCMD
 	rjmp	pb_6
 pb_8:
@@ -214,21 +196,12 @@ pb_8:
 	brne	pb_5
 	sbrs	r24,btWestButton  ; Press west
 	rjmp	pb_7
-
-#ifdef AT_SETUP
-	rcall	SetName
-#else
 	rcall	MoveWestCMD		; -> Move west
-#endif
 	rjmp	pb_6
 pb_7:
 	sbrs	r24,btEastButton  ; Press east
 	rjmp	pb_5
-#ifdef AT_SETUP
-	rcall	SetPassword
-#else
 	rcall	MoveEastCMD		; -> Move east
-#endif
 	rjmp	pb_6
 pb_5:
 	rjmp	pb_3

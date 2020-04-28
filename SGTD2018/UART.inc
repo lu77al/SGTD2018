@@ -36,6 +36,8 @@ rxtm_1:
 
 ; Обработчик USART в основном потоке
 .macro	tskUart
+	sbrc	BFlags,bfATSetup
+	rjmp	ATSetup
 	ldd	XL,Y+yTXPointer
 	ldd	r17,Y+yTXEnd
 	cp	XL,r17
@@ -48,7 +50,6 @@ rxtm_1:
 	ld	r16,X+
 	cp	XL,r17
 	brne	uart_2
-	sbrs	BFlags,bfNoCHS
 	ldd	r16,Y+yRXTXCHS
 uart_2:	out	UDR,r16   ; отправить очереждной байт в буфер
 	std	Y+yTXPointer,XL
@@ -59,8 +60,6 @@ uart_2:	out	UDR,r16   ; отправить очереждной байт в буфер
 	rjmp	RetUart
 uart_1:
 #ifdef	UART_DIR
-	clt
-	bld	BFlags,bfNoCHS
 	sbic	UCSRA,TXC ; ++ Обработка в режиме приема
 	cbi	UART_DIR  ;  переключить микросхему на прием после передачи крайнего байта
 #endif
@@ -395,45 +394,60 @@ cm_S3:	lds	r16,XSEG+RXBuf+2
 	ldd	r17,Y+yMyAddr
 	rjmp	RetCMDProc
 
-#ifdef AT_SETUP
+#define AT_CMD_DELAY 24
 
-SetName:
-	ldi_w	ZH,ZL,ModuleName*2
-	ldi	XL,TXBuf
-	std	Y+yTXPointer,XL
-stn_2:	lpm	r16,Z+
-	cpi	r16,0
-	breq	stn_1
-	st	X+,r16
-	rjmp	stn_2
-stn_1:	std	Y+yTXEnd,XL
+;--- Init pushing setup data into UART ---
+ATSetupStart:
+	stdi	yATSetupDelay,AT_CMD_DELAY
+	std	Y+yATSetupPos,ZeroReg
 	set
-	bld	BFlags,bfNoCHS
-	ret	
+	bld	BFlags,bfATSetup
+	ret
 
+;--- Tact driven delay 15.2587890625 Hz ---
+ATSetupDelayCountDown:
+	ldd	r16,Y+yATSetupDelay
+	subi	r16,1
+	brcs	atsd_1
+	std	Y+yATSetupDelay,r16
+atsd_1:	ret
 
-ModuleName:
-.db	DEV_NAME, 13,10,0
-
-
-
-SetPassword:
-	ldi_w	ZH,ZL,ModulePassword*2
-	ldi	XL,TXBuf
-	std	Y+yTXPointer,XL
-stp_2:	lpm	r16,Z+
-	cpi	r16,0
-	breq	stp_1
-	st	X+,r16
-	rjmp	stp_2
-stp_1:	std	Y+yTXEnd,XL
-	set
-	bld	BFlags,bfNoCHS
-	ret	
-
-
-ModulePassword:
-.db	DEV_PIN,13,10,0
-
+;--- Push setup data into UART ---
+ATSetup:
+	sbis	UCSRA,UDRE ; Wait for buffer ready
+	rjmp	RetUart
+#ifdef	UART_DIR
+	sbi	UART_DIR  ; Ensure data dir
 #endif
+	ldd	r16,Y+yATSetupDelay ; Delay between commands (Tact driven)
+	cpi	r16,0
+	brne	ats_1
+
+	ldd	ZL,Y+yATSetupPos ; Next char position
+	inc	ZL
+	brne	ats_2	; Boundary overflow check 
+ats_3:	
+	clt		; Exit ATSetup mode
+	bld	BFlags,bfATSetup
+	in	r16,UDR
+	rjmp	RetUart
+
+ats_2:	std	Y+yATSetupPos,ZL ; Read next char and shift pointer
+	ldi	ZH,0
+	subi_w	ZH,ZL,-(ATSetupData*2-1)
+	lpm	r16,Z
+
+	cpi	r16,0		; EndOfSetup marker
+	breq	ats_3
+
+	out	UDR,r16		; Push next char
+	sbi	UCSRA,TXC ; For changing data direction
+
+	cpi	r16,10		; Init delay at the end of command
+	brne	ats_1
+	stdi	yATSetupDelay,AT_CMD_DELAY
+ats_1:	rjmp	RetUart
+
+ATSetupData:
+.db	BLE_NAME,13,10, BLE_PIN,13,10, BLE_SCAN,13,10, 0
 

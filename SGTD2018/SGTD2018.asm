@@ -1,6 +1,6 @@
-;#define AT_SETUP
-#define DEV_NAME "AT+NAME=Svit_Vitru_TSV_047"
-#define DEV_PIN  "AT+PSWD=1977"
+#define BLE_NAME "AT+NAME=Svit_Vitru_TSV_036"
+#define BLE_PIN  "AT+PSWD=1977"
+#define BLE_SCAN "AT+IPSCAN=1024,8,1024,8"
 
 .include "m8def.inc"
 .include "Constants.inc"

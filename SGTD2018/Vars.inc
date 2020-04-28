@@ -5,13 +5,13 @@
 	.equ	afReverse    = 1
 	.equ	afFastStop   = 2
 	.equ	afFailStop   = 3
-;	.equ	afHallsReady = 4
+;	.equ	af = 4
 	.equ	afSetupMove  = 5
 	.equ	afWaitButRel = 6
 	.equ	afSaveParams = 7
 
 .def	BFlags	= r4
-	.equ	bfNoCHS  = 0
+	.equ	bfATSetup    = 0
 
 .def	KS_Dead    = r5
 .def	KS_High    = r6
@@ -90,7 +90,8 @@
 
 .equ	yDriveHallActCnt = $36
 
-
+.equ	yATSetupDelay	= $37
+.equ	yATSetupPos	= $38
 
 
 .equ	iHalfSpanL	= $A0

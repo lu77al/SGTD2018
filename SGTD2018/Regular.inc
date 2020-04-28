@@ -106,8 +106,6 @@ ph_1:	sbrs	r25,btWestLimit	; West limit trigger
 	clt
 ph_2:	rcall	SetPosOnLimit
 	ret
-;	rjmp	UpdateTimeOffset
-
 
 SetPosOnLimit:
 	ldi_w	r17,r16,HALF_CIRCLE

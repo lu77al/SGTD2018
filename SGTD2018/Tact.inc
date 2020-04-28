@@ -90,6 +90,8 @@ sk_BR1:
 	cpi	r23,0b01011111	; 15.2587890625 Ãö
 	brne	sk_BR2
 
+	rcall	ATSetupDelayCountDown
+
 	rcall	CheckJam
 
 	rcall	CheckSaveParam
@@ -144,6 +146,9 @@ sk_BR3:
 	sts	iLedLightCnt,r16
 	rjmp	i_2
 i_6:
+	sbrc	BFLags,bfATSetup
+	rjmp	i_2
+
 	ldd	r16,Y+yButState
 	andi	r16,(1<<btEastLimit) + (1<<btWestLimit)
 	breq	i_7
