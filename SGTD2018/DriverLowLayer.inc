@@ -100,6 +100,7 @@ don_2:	bld	AFlags,afReverse
 	sbrc	AFlags,afReverse
 	ldi	r16,$80-JAM_INIT_PATH
 	std	Y+yJamPath,r16
+	std	Y+yRightDirCnt,ZeroReg
 
 	ldi_w	r17,r16,PWM_MIN_PULSE ; Minimum pulse
 	out	OCR1BH,r17
@@ -161,6 +162,7 @@ ghs_2:	dec	HallsStCnt
 
 /*** Track rotor position and speed (step period) ***/
 TrackRotor:
+	ldd	r25,Y+yRightDirCnt
 	ldd	r16,Y+yCurPeriod
 	inc	r16
 	breq	tr_4
@@ -170,8 +172,9 @@ tr_4:	ldd	r16,Y+yRotorHallsPort
 	ldd	ZL,Y+yRotorState ; Recorded state
 	cp	r16,ZL
 	breq	tr_1	; Hall state wasn't changed
-	ldi	r25,0	; Step Flag
 	std	Y+yRotorState,r16
+	sbrs	r25,1
+	inc	r25	; RightDirCnt <= 2
 	ldi	ZH,0
 	subi_w	ZH,ZL,-2*RotorMovement	; Pointer to raw
 	ldd	r18,Y+yPanPosL	; load current panel position
@@ -181,8 +184,8 @@ tr_4:	ldd	r16,Y+yRotorHallsPort
 	lpm	r17,Z+
 	cp	r16,r17	; is it step to west?
 	brne	tr_2
-	sbrs	AFlags,afReverse
-	ldd	r25,Y+yCurPeriod
+	sbrc	AFlags,afReverse
+	ldi	r25,0
 	subi_w	r19,r18,-1 ; increase position
 	sbci	r20,$FF
 	stdi	yDriveHallActCnt,120
@@ -195,9 +198,10 @@ tr_2:	lpm	r17,Z+
 	breq	tr_8
 	ldi	r24,$77
 	std	Y+yIrregular,r24
+	ldi	r25,0
 	rjmp	tr_1
-tr_8:	sbrc	AFlags,afReverse
-	ldd	r25,Y+yCurPeriod
+tr_8:	sbrs	AFlags,afReverse
+	ldi	r25,0
 	subi_w	r19,r18,1  ; decrease position
 	sbci	r20,0
 	stdi	yDriveHallActCnt,120
@@ -208,22 +212,24 @@ tr_3:	std	Y+yPanPosL,r18	; save current panel position
 	std	Y+yPanPosM,r19
 	std	Y+yPanPosH,r20
 	std	Y+yJamPath,r21
-	cpi	r25,0
-	brne	tr_5
-tr_1:	ldd	r16,Y+yDummyPeriod
+	std	Y+yRightDirCnt,r25
+	cpi	r25,2
+	brsh	tr_5
+tr_1:	std	Y+yRightDirCnt,r25
+	ldd	r16,Y+yDummyPeriod
 	inc	r16
 	std	Y+yDummyPeriod,r16
-	breq	tr_6
-	ret
-
-tr_6:	ldi	r25,$FF
+	brne	tr_6
+	ldi	r16,$FF
 	rjmp	tr_7
-tr_5:	std	Y+yCurPeriod,ZeroReg
+
+tr_5:	ldd	r16,Y+yCurPeriod
+tr_7:	std	Y+yLastPeriod,r16
+	std	Y+yCurPeriod,ZeroReg
 	std	Y+yDummyPeriod,ZeroReg
-tr_7:	std	Y+yLastPeriod,r25
 
 	sbrs	AFlags,afActive
-	ret
+tr_6:	ret
 
 ; *** Set speed ***
 	sbrs	AFlags,afReverse	; Calculate rest of target path

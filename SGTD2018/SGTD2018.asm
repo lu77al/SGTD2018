@@ -1,4 +1,4 @@
-#define BLE_NAME "AT+NAME=Svit_Vitru_TSV_036"
+#define BLE_NAME "AT+NAME=Svit_Vitru_TSV_052"
 #define BLE_PIN  "AT+PSWD=1977"
 #define BLE_SCAN "AT+IPSCAN=1024,8,1024,8"
 

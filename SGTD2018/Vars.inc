@@ -93,6 +93,8 @@
 .equ	yATSetupDelay	= $37
 .equ	yATSetupPos	= $38
 
+.equ	yRightDirCnt	= $39
+
 
 .equ	iHalfSpanL	= $A0
 .equ	iHalfSpanH	= $A1
